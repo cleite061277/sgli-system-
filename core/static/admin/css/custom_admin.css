@@ -1,0 +1,30 @@
+/* CSS Customizado para Admin - SGLI */
+
+/* Labels dos campos em NEGRITO */
+.form-row label,
+.field-box label,
+div.form-row > div > label,
+th.column-header,
+.module caption,
+label {
+    font-weight: bold !important;
+}
+
+/* Títulos das seções em negrito e maior */
+.module h2,
+fieldset.module h2,
+.inline-group h2 {
+    font-weight: bold !important;
+    font-size: 14px !important;
+}
+
+/* Melhorar contraste dos emojis nas seções */
+fieldset h2 {
+    color: #417690 !important;
+}
+
+/* Botões de ação mais destacados */
+.submit-row input[type="submit"],
+.button {
+    font-weight: 600 !important;
+}

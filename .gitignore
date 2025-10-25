@@ -1,0 +1,71 @@
+# Python
+*.py[cod]
+*$py.class
+*.so
+.Python
+__pycache__/
+*.pyc
+venv/
+env/
+ENV/
+*.egg-info/
+dist/
+build/
+
+# Django
+*.log
+db.sqlite3
+db.sqlite3-journal
+/media
+/staticfiles
+/static
+
+# Backups
+*.backup
+*.backup_*
+backups/
+backups_sgli/
+backup_*/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+*.env.backup*
+
+# OS
+.DS_Store
+Thumbs.db
+*.bak
+
+# Railway
+.railway/
+
+# Documentação local
+*.txt.backup
+IMPLEMENTACAO_*.txt
+
+# Documentação com secrets
+ATIVAR_NOTIFICACOES.txt
+RESUMO_TECNICO.txt
+IMPLEMENTACAO_*.txt
+
+# Backups grandes
+*.tar.gz
+*.zip
+backups/
+backups_sgli/
+backup_*/
+
+# Secrets
+*.env
+.env.*
+*.pem
+*.key

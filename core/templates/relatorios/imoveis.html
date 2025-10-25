@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Relatório por Imóvel - SGLI</title>
+    <meta charset="utf-8">
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #f5f5f5; }
+        .container { max-width: 1200px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background: #f8f9fa; }
+        .btn { display: inline-block; padding: 10px 20px; background: #007bff; color: white; text-decoration: none; border-radius: 4px; }
+        .status { padding: 4px 8px; border-radius: 4px; font-size: 12px; }
+        .status-ocupado { background: #d4edda; color: #155724; }
+        .status-disponivel { background: #cce5ff; color: #004085; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Relatório por Imóvel</h1>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Código</th>
+                    <th>Endereço</th>
+                    <th>Status</th>
+                    <th>Locatário</th>
+                    <th>Receita 12m</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in dados_imoveis %}
+                <tr>
+                    <td>{{ item.imovel.codigo_imovel }}</td>
+                    <td>{{ item.imovel.endereco }}, {{ item.imovel.numero }}</td>
+                    <td>
+                        <span class="status status-{{ item.status|lower }}">
+                            {{ item.imovel.get_status_display }}
+                        </span>
+                    </td>
+                    <td>
+                        {% if item.locacao %}
+                            {{ item.locacao.locatario.nome_razao_social }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td>R$ {{ item.receita_12m }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+        <a href="{% url 'dashboard_relatorios' %}" class="btn">Voltar ao Dashboard</a>
+    </div>
+</body>
+</html>

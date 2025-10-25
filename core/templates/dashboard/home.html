@@ -1,0 +1,160 @@
+{% extends 'dashboard/base.html' %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3">Dashboard Executivo</h1>
+    <div class="btn-group" role="group">
+        <button type="button" class="btn btn-outline-primary" id="periodo-mes">Mês</button>
+        <button type="button" class="btn btn-outline-primary" id="periodo-trimestre">Trimestre</button>
+        <button type="button" class="btn btn-primary" id="periodo-ano">Ano</button>
+    </div>
+</div>
+
+<!-- Alertas -->
+<div id="alertas-container" class="mb-4">
+    <!-- Alertas serão carregados via JS -->
+</div>
+
+<!-- Cards de Métricas -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-title">Locações Ativas</h6>
+                        <h3 id="locacoes-ativas">-</h3>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-handshake fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-title">Arrecadação Mensal</h6>
+                        <h3 id="arrecadacao-mes">-</h3>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-dollar-sign fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-warning text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-title">Taxa Ocupação</h6>
+                        <h3 id="taxa-ocupacao">-%</h3>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-chart-pie fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-danger text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-title">Inadimplência</h6>
+                        <h3 id="taxa-inadimplencia">-%</h3>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-exclamation-triangle fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Gráficos -->
+<div class="row mb-4">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Evolução Financeira</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="grafico-evolucao" height="100"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Status das Comandas</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="grafico-status" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tabelas de Dados -->
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Top 5 Imóveis por Receita</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Código</th>
+                                <th>Endereço</th>
+                                <th>Receita</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ranking-imoveis">
+                            <!-- Dados carregados via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Comandas Vencendo</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Número</th>
+                                <th>Locatário</th>
+                                <th>Vencimento</th>
+                                <th>Valor</th>
+                            </tr>
+                        </thead>
+                        <tbody id="comandas-vencendo">
+                            <!-- Dados carregados via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{% load static %}{% static 'js/dashboard/home.js' %}"></script>
+{% endblock %}

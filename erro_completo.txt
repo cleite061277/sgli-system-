@@ -1,0 +1,2992 @@
+Watching for file changes with StatReloader
+INFO 2025-10-21 13:57:55,343 autoreload Watching for file changes with StatReloader
+Exception in thread django-main-thread:
+Traceback (most recent call last):
+  File "/usr/lib/python3.11/threading.py", line 1038, in _bootstrap_inner
+    self.run()
+  File "/usr/lib/python3.11/threading.py", line 975, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/utils/autoreload.py", line 64, in wrapper
+    fn(*args, **kwargs)
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/management/commands/runserver.py", line 133, in inner_run
+    self.check(display_num_errors=True)
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/management/base.py", line 485, in check
+    all_issues = checks.run_checks(
+                 ^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/registry.py", line 88, in run_checks
+    new_errors = check(app_configs=app_configs, databases=databases)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 14, in check_url_config
+    return check_resolver(resolver)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 495, in check
+    messages.extend(check_resolver(pattern))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 496, in check
+    messages.extend(self._check_custom_error_handlers())
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/usuario/sgli_system/venv/lib/python3.11/site-packages/django/urls/resolvers.py", line 514, in _check_custom_error_handlers
+    signature = inspect.signature(handler)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/inspect.py", line 3279, in signature
+    return Signature.from_callable(obj, follow_wrapped=follow_wrapped,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/inspect.py", line 3027, in from_callable
+    return _signature_from_callable(obj, sigcls=cls,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/inspect.py", line 2514, in _signature_from_callable
+    return _signature_from_function(sigcls, obj,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/inspect.py", line 2376, in _signature_from_function
+    parameters.append(Parameter(name, annotation=annotation,
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/inspect.py", line 2685, in __init__
+    self._kind = _ParameterKind(kind)
+                 ^^^^^^^^^^^^^^^^^^^^
+RecursionError: maximum recursion depth exceeded

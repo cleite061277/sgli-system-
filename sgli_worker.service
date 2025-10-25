@@ -1,0 +1,15 @@
+[Unit]
+Description=SGLI Django-Q Worker
+After=network.target postgresql.service
+
+[Service]
+Type=simple
+User=usuario
+WorkingDirectory=/home/usuario/sgli_system
+Environment="PATH=/home/usuario/sgli_system/venv/bin"
+ExecStart=/home/usuario/sgli_system/venv/bin/python manage.py qcluster
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

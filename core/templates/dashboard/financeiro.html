@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>SGLI - Dashboard Financeiro</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .card { background: white; padding: 20px; margin: 10px 0; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+        .metric { text-align: center; padding: 15px; }
+        .metric h3 { margin: 0; color: #333; }
+        .metric .value { font-size: 2em; font-weight: bold; color: #007bff; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background: #f8f9fa; font-weight: bold; }
+        .devedor { color: #dc3545; }
+        .credor { color: #28a745; }
+        .status-paga { background: #d4edda; }
+        .status-pendente { background: #f8d7da; }
+        .status-parcial { background: #fff3cd; }
+        .comanda-link { 
+            color: #007bff; 
+            text-decoration: none; 
+            cursor: pointer; 
+        }
+        .comanda-link:hover { 
+            text-decoration: underline; 
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Dashboard Financeiro SGLI</h1>
+        
+        <div id="loading">Carregando dados financeiros...</div>
+        
+        <div id="dashboard" style="display:none;">
+            <div class="grid">
+                <div class="card metric">
+                    <h3>Total Comandas</h3>
+                    <div class="value" id="total-comandas">-</div>
+                </div>
+                <div class="card metric">
+                    <h3>Valor Total</h3>
+                    <div class="value" id="valor-total">-</div>
+                </div>
+                <div class="card metric">
+                    <h3>Comandas Pagas</h3>
+                    <div class="value" id="comandas-pagas">-</div>
+                </div>
+                <div class="card metric">
+                    <h3>Pendentes</h3>
+                    <div class="value" id="comandas-pendentes">-</div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3>Comandas Detalhadas</h3>
+                <table id="comandas-table">
+                    <thead>
+                        <tr>
+                            <th>Número</th>
+                            <th>Locatário</th>
+                            <th>Valor Total</th>
+                            <th>Valor Pago</th>
+                            <th>Saldo</th>
+                            <th>Status</th>
+                            <th>Referência</th>
+                        </tr>
+                    </thead>
+                    <tbody id="comandas-body">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        fetch('/financeiro/')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('dashboard').style.display = 'block';
+                
+                document.getElementById('total-comandas').textContent = data.resumo.total_comandas;
+                document.getElementById('valor-total').textContent = data.resumo.valor_total_cobrado;
+                document.getElementById('comandas-pagas').textContent = data.resumo.comandas_pagas;
+                document.getElementById('comandas-pendentes').textContent = data.resumo.comandas_pendentes;
+                
+                const tbody = document.getElementById('comandas-body');
+                data.comandas.forEach(c => {
+                    const row = tbody.insertRow();
+                    row.innerHTML = `
+                        <td><a href="/admin/core/comanda/?q=${c.numero}" class="comanda-link" target="_blank">${c.numero}</a></td>
+                        <td>${c.locatario}</td>
+                        <td>${c.valor_total}</td>
+                        <td>${c.valor_pago}</td>
+                        <td class="${c.tipo_saldo}">${c.saldo}</td>
+                        <td class="status-${c.status.toLowerCase().replace(' ', '-')}">${c.status}</td>
+                        <td>${c.referencia}</td>
+                    `;
+                });
+            })
+            .catch(error => {
+                document.getElementById('loading').innerHTML = 
+                    'Erro ao carregar dados. Certifique-se de estar logado no admin.';
+            });
+    </script>
+</body>
+</html>

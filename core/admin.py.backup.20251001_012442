@@ -1,0 +1,238 @@
+from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin
+from django.utils import timezone
+from .forms import PagamentoAdminForm
+from .models import Usuario, Locador, Imovel, Locatario, Locacao, Comanda, Pagamento, TemplateContrato
+
+@admin.register(Usuario)
+class UsuarioAdmin(UserAdmin):
+    list_display = ('username', 'email', 'first_name', 'last_name', 'tipo_usuario', 'is_active')
+    list_filter = ('tipo_usuario', 'is_active', 'is_staff', 'date_joined')
+    search_fields = ('username', 'email', 'first_name', 'last_name')
+    
+    fieldsets = UserAdmin.fieldsets + (
+        ('SGLI Specific', {
+            'fields': ('tipo_usuario', 'telefone', 'cpf', 'avatar')
+        }),
+    )
+
+@admin.register(Locador)
+class LocadorAdmin(admin.ModelAdmin):
+    list_display = ('nome_razao_social', 'tipo_locador', 'cpf_cnpj', 'telefone', 'email', 'is_active')
+    list_filter = ('tipo_locador', 'is_active', 'created_at')
+    search_fields = ('nome_razao_social', 'cpf_cnpj', 'email')
+
+@admin.register(Imovel)
+class ImovelAdmin(admin.ModelAdmin):
+    list_display = ('codigo_imovel', 'tipo_imovel', 'status', 'endereco', 'cidade', 'valor_aluguel')
+    list_filter = ('tipo_imovel', 'status', 'estado', 'is_active')
+    search_fields = ('codigo_imovel', 'endereco', 'bairro', 'cidade')
+
+@admin.register(Locatario)
+class LocatarioAdmin(admin.ModelAdmin):
+    list_display = ('nome_razao_social', 'cpf_cnpj', 'telefone', 'email', 'is_active')
+    search_fields = ('nome_razao_social', 'cpf_cnpj', 'email')
+
+@admin.register(Locacao)
+class LocacaoAdmin(admin.ModelAdmin):
+    
+    actions = ['gerar_contrato']
+    
+    def gerar_contrato(self, request, queryset):
+        """Gerar contratos em Word."""
+        from .document_generator import DocumentGenerator
+        generator = DocumentGenerator()
+        
+        contratos_gerados = []
+        for locacao in queryset:
+            try:
+                filename = generator.gerar_contrato_locacao(locacao.id)
+                contratos_gerados.append(filename)
+            except Exception as e:
+                self.message_user(request, f'Erro ao gerar contrato {locacao.numero_contrato}: {e}', level='ERROR')
+        
+        if contratos_gerados:
+            self.message_user(request, f'{len(contratos_gerados)} contrato(s) gerado(s) com sucesso!')
+    
+    gerar_contrato.short_description = "Gerar contratos Word"
+    list_display = ('numero_contrato', 'imovel', 'locatario', 'status', 'data_inicio', 'data_fim')
+    list_filter = ('status', 'is_active', 'created_at')
+    search_fields = ('numero_contrato', 'imovel__codigo_imovel', 'locatario__nome_razao_social')
+
+@admin.register(Comanda)
+class ComandaAdmin(admin.ModelAdmin):
+    list_display = ('numero_comanda', 'locacao', 'mes_referencia', 'ano_referencia', 'status', 'data_vencimento')
+    list_filter = ('status', 'ano_referencia', 'mes_referencia', 'is_active')
+    search_fields = ('numero_comanda', 'locacao__numero_contrato', 'locacao__locatario__nome_razao_social')
+    readonly_fields = ('numero_comanda',)
+
+@admin.register(Pagamento)
+class PagamentoAdmin(admin.ModelAdmin):
+    form = PagamentoAdminForm
+    
+    actions = ['gerar_recibo']
+    
+    def gerar_recibo(self, request, queryset):
+        """Gerar recibos em Word."""
+        from .document_generator import DocumentGenerator
+        generator = DocumentGenerator()
+        
+        recibos_gerados = []
+        for pagamento in queryset:
+            try:
+                filename = generator.gerar_recibo_pagamento(pagamento.id)
+                recibos_gerados.append(filename)
+            except Exception as e:
+                self.message_user(request, f'Erro ao gerar recibo {pagamento.numero_pagamento}: {e}', level='ERROR')
+        
+        if recibos_gerados:
+            self.message_user(request, f'{len(recibos_gerados)} recibo(s) gerado(s) com sucesso!')
+    
+    gerar_recibo.short_description = "Gerar recibos Word"
+    list_display = ('numero_pagamento', 'comanda', 'locatario_nome', 'valor_pago', 'data_pagamento', 'forma_pagamento', 'status')
+    list_filter = ('status', 'forma_pagamento', 'data_pagamento')
+    search_fields = ('numero_pagamento', 'comanda__numero_comanda', 'comanda__locacao__locatario__nome_razao_social')
+    readonly_fields = ('numero_pagamento', 'data_confirmacao', 'created_at', 'updated_at')
+    
+    def get_readonly_fields(self, request, obj=None):
+        """Mostrar info_contrato apenas na edição."""
+        if obj:  # Editando
+            return self.readonly_fields + ('info_contrato',)
+        return self.readonly_fields  # Adicionando
+    
+    fieldsets = (
+        ('Informações do Pagamento', {
+            'fields': ('comanda', 'numero_pagamento', 'valor_pago', 'data_pagamento')
+        }),
+        ('Forma e Status', {
+            'fields': ('forma_pagamento', 'status', 'data_confirmacao')
+        }),
+        ('Documentação', {
+            'fields': ('comprovante', 'observacoes')
+        }),
+        ('Auditoria', {
+            'fields': ('usuario_registro', 'created_at', 'updated_at'),
+            'classes': ('collapse',)
+        })
+    )
+    
+    def locatario_nome(self, obj):
+        """Display tenant name in list."""
+        return obj.comanda.locacao.locatario.nome_razao_social
+    locatario_nome.short_description = 'Locatário'
+    
+    def info_contrato(self, obj):
+        """Display clickable contract information."""
+        from django.utils.html import format_html
+        from django.urls import reverse
+        
+        locacao = obj.comanda.locacao
+        locatario = locacao.locatario
+        imovel = locacao.imovel
+        
+        # URL para locação
+        url_locacao = reverse('admin:core_locacao_change', args=[locacao.id])
+        # URL para locatário
+        url_locatario = reverse('admin:core_locatario_change', args=[locatario.id])
+        
+        return format_html(
+            '<div style="padding: 10px; background: #f8f9fa; border-radius: 5px;">'
+            '<strong>Contrato:</strong> <a href="{}" target="_blank" style="color: #007bff;">{}</a><br>'
+            '<strong>Locatário:</strong> <a href="{}" target="_blank" style="color: #007bff;">{}</a><br>'
+            '<strong>Imóvel:</strong> {}<br>'
+            '<strong>Valor Aluguel:</strong> R$ {:.2f}'
+            '</div>',
+            url_locacao,
+            locacao.numero_contrato,
+            url_locatario,
+            locatario.nome_razao_social,
+            imovel.endereco_completo,
+            locacao.valor_aluguel
+        )
+    info_contrato.short_description = 'Informações do Contrato'
+    
+    def save_model(self, request, obj, form, change):
+        if not change:
+            obj.usuario_registro = request.user
+        super().save_model(request, obj, form, change)
+
+
+@admin.register(TemplateContrato)
+class TemplateContratoAdmin(admin.ModelAdmin):
+    list_display = ('nome', 'locador', 'tipo_imovel', 'is_default', 'created_at')
+    list_filter = ('is_default', 'tipo_imovel', 'locador')
+    search_fields = ('nome', 'descricao')
+    
+    fieldsets = (
+        ('Informações Básicas', {
+            'fields': ('nome', 'descricao', 'arquivo_template')
+        }),
+        ('Associações', {
+            'fields': ('locador', 'tipo_imovel', 'is_default'),
+            'description': 'Defina quando este template deve ser usado'
+        })
+    )
+
+
+# ========== ADMIN: CONFIGURAÇÃO DO SISTEMA ==========
+@admin.register(ConfiguracaoSistema)
+class ConfiguracaoSistemaAdmin(admin.ModelAdmin):
+    fieldsets = (
+        ('Configurações de Comandas', {
+            'fields': ('dia_vencimento_padrao', 'gerar_comandas_automaticamente')
+        }),
+        ('Metadados', {
+            'fields': ('atualizado_em', 'atualizado_por'),
+            'classes': ('collapse',)
+        }),
+    )
+    
+    readonly_fields = ('atualizado_em',)
+    
+    def has_add_permission(self, request):
+        # Permitir apenas uma instância (Singleton)
+        return not ConfiguracaoSistema.objects.exists()
+    
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+
+@admin.register(LogGeracaoComandas)
+class LogGeracaoComandasAdmin(admin.ModelAdmin):
+    list_display = (
+        'data_execucao', 
+        'mes_referencia_display', 
+        'comandas_geradas', 
+        'comandas_duplicadas',
+        'sucesso_display',
+        'executado_por'
+    )
+    list_filter = ('sucesso', 'executado_por', 'data_execucao')
+    search_fields = ('mensagem', 'erro')
+    readonly_fields = (
+        'data_execucao', 
+        'mes_referencia', 
+        'comandas_geradas',
+        'comandas_duplicadas', 
+        'locacoes_processadas',
+        'sucesso', 
+        'mensagem', 
+        'erro', 
+        'executado_por'
+    )
+    
+    def mes_referencia_display(self, obj):
+        return obj.mes_referencia.strftime('%B/%Y')
+    mes_referencia_display.short_description = 'Mês'
+    
+    def sucesso_display(self, obj):
+        if obj.sucesso:
+            return '✅ Sucesso'
+        return '❌ Erro'
+    sucesso_display.short_description = 'Status'
+    
+    def has_add_permission(self, request):
+        return False
+    
+    def has_delete_permission(self, request, obj=None):
+        return request.user.is_superuser

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: #007bff; color: white; padding: 20px; text-align: center; }
+        .content { padding: 20px; background: #f8f9fa; }
+        .footer { text-align: center; padding: 20px; font-size: 12px; color: #666; }
+        .valor { font-size: 24px; font-weight: bold; color: #007bff; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        td { padding: 10px; border-bottom: 1px solid #ddd; }
+        td:first-child { font-weight: bold; width: 40%; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Lembrete de Vencimento</h1>
+        </div>
+        <div class="content">
+            <p>Olá, <strong>{{ locatario }}</strong></p>
+            <p>Este é um lembrete de que sua comanda vencerá em <strong>{{ dias_restantes }} dia(s)</strong>.</p>
+            
+            <table>
+                <tr>
+                    <td>Número da Comanda:</td>
+                    <td>{{ numero_comanda }}</td>
+                </tr>
+                <tr>
+                    <td>Imóvel:</td>
+                    <td>{{ imovel }}</td>
+                </tr>
+                <tr>
+                    <td>Data de Vencimento:</td>
+                    <td>{{ data_vencimento }}</td>
+                </tr>
+                <tr>
+                    <td>Valor Total:</td>
+                    <td class="valor">R$ {{ valor_total }}</td>
+                </tr>
+            </table>
+            
+            <p>Por favor, providencie o pagamento até a data de vencimento para evitar multas e juros.</p>
+        </div>
+        <div class="footer">
+            <p>Este é um email automático. Por favor, não responda.</p>
+            <p>SGLI - Sistema de Gestão de Locação de Imóveis</p>
+        </div>
+    </div>
+</body>
+</html>

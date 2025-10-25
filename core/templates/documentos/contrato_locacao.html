@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Contrato de Locação</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .section { margin: 20px 0; }
+        .signature { margin-top: 60px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>CONTRATO DE LOCAÇÃO RESIDENCIAL</h1>
+        <p>Número: {{ locacao.numero_contrato }}</p>
+    </div>
+    
+    <div class="section">
+        <h3>LOCADOR:</h3>
+        <p><strong>Nome:</strong> {{ locacao.imovel.locador.nome_razao_social }}</p>
+        <p><strong>CPF/CNPJ:</strong> {{ locacao.imovel.locador.cpf_cnpj }}</p>
+    </div>
+    
+    <div class="section">
+        <h3>LOCATÁRIO:</h3>
+        <p><strong>Nome:</strong> {{ locacao.locatario.nome_razao_social }}</p>
+        <p><strong>CPF/CNPJ:</strong> {{ locacao.locatario.cpf_cnpj }}</p>
+    </div>
+    
+    <div class="section">
+        <h3>IMÓVEL:</h3>
+        <p><strong>Endereço:</strong> {{ locacao.imovel.endereco_completo }}</p>
+        <p><strong>Valor do Aluguel:</strong> R$ {{ locacao.valor_aluguel }}</p>
+    </div>
+    
+    <div class="signature">
+        <p>_________________________</p>
+        <p>Locador</p>
+        <br><br>
+        <p>_________________________</p>
+        <p>Locatário</p>
+    </div>
+</body>
+</html>

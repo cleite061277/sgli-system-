@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>SGLI - Documentos Gerados</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .card { background: white; padding: 20px; margin: 10px 0; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        h1 { color: #333; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background: #f8f9fa; font-weight: bold; }
+        .btn-download { 
+            background: #007bff; 
+            color: white; 
+            padding: 6px 12px; 
+            border-radius: 4px; 
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-download:hover { background: #0056b3; }
+        .tipo-contrato { color: #28a745; font-weight: bold; }
+        .tipo-recibo { color: #17a2b8; font-weight: bold; }
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .stat-box { background: #e9ecef; padding: 15px; border-radius: 8px; text-align: center; }
+        .stat-box .number { font-size: 2em; font-weight: bold; color: #007bff; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Documentos Gerados</h1>
+        
+        <div class="stats" id="stats"></div>
+        
+        <div class="card">
+            <h3>Lista de Documentos</h3>
+            <div id="loading">Carregando documentos...</div>
+            <table id="docs-table" style="display:none;">
+                <thead>
+                    <tr>
+                        <th>Tipo</th>
+                        <th>Nome do Arquivo</th>
+                        <th>Tamanho</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="docs-body"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        fetch('/documentos/')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('docs-table').style.display = 'table';
+                
+                const contratos = data.documentos.filter(d => d.tipo === 'Contrato').length;
+                const recibos = data.documentos.filter(d => d.tipo === 'Recibo').length;
+                
+                document.getElementById('stats').innerHTML = `
+                    <div class="stat-box">
+                        <div class="number">${data.total}</div>
+                        <div>Total de Documentos</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="number">${contratos}</div>
+                        <div>Contratos</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="number">${recibos}</div>
+                        <div>Recibos</div>
+                    </div>
+                `;
+                
+                const tbody = document.getElementById('docs-body');
+                data.documentos.forEach(doc => {
+                    const row = tbody.insertRow();
+                    const tipoClass = doc.tipo === 'Contrato' ? 'tipo-contrato' : 'tipo-recibo';
+                    row.innerHTML = `
+                        <td class="${tipoClass}">${doc.tipo}</td>
+                        <td>${doc.nome}</td>
+                        <td>${doc.tamanho}</td>
+                        <td>
+                            <a href="${doc.url_download}" class="btn-download" download>
+                                Baixar
+                            </a>
+                        </td>
+                    `;
+                });
+            })
+            .catch(error => {
+                document.getElementById('loading').innerHTML = 
+                    '<div style="color: red;">Erro ao carregar documentos</div>';
+            });
+    </script>
+</body>
+</html>

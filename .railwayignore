@@ -1,0 +1,12 @@
+venv/
+*.pyc
+__pycache__/
+*.log
+.env
+db.sqlite3
+*.backup
+backups/
+backups_sgli/
+.git/
+.vscode/
+*.md
