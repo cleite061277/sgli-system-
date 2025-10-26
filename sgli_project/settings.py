@@ -2,6 +2,13 @@ import os
 from pathlib import Path
 from decouple import config
 
+# --------------------------------------------------------------------------
+# 🎯 CORREÇÃO DO DEPLOYMENT: DEFINIÇÃO DE IS_PRODUCTION
+# --------------------------------------------------------------------------
+# Definimos IS_PRODUCTION com base em uma variável de ambiente, 
+# assumindo que qualquer valor diferente de 'True' para DEBUG significa PRODUÇÃO.
+# (Em ambientes como Railway/Cloud, DEBUG deve ser False ou não existir)
+IS_PRODUCTION = os.environ.get('DEBUG', 'False') == 'False'
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = config('SECRET_KEY')
