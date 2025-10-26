@@ -100,9 +100,7 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-STATICFILES_DIRS = [BASE_DIR / 'static']
 ADMIN_MEDIA_PREFIX = '/static/admin/'
 
 MEDIA_URL = '/media/'
@@ -156,161 +154,14 @@ CACHES = {
     }
 }
 
-# ════════════════════════════════════════════
-# DJANGO-Q CONFIGURATION (Agendador de Tarefas)
-# ════════════════════════════════════════════
-Q_CLUSTER = {
-    'name': 'SGLI',
-    'workers': 2,
-    'recycle': 500,
-    'timeout': 300,
-    'compress': True,
-    'save_limit': 250,
-    'queue_limit': 500,
-    'cpu_affinity': 1,
-    'label': 'Django Q',
-    'orm': 'default',  # Usa o banco PostgreSQL configurado
-    'retry': 360,
-    'max_attempts': 1,
-    'ack_failures': True,
-}
-
-# ════════════════════════════════════════════
-# EMAIL CONFIGURATION
-# ════════════════════════════════════════════
-EMAIL_BACKEND = config('EMAIL_BACKEND', default='django.core.mail.backends.smtp.EmailBackend')
-EMAIL_HOST = config('EMAIL_HOST', default='smtp.gmail.com')
-EMAIL_PORT = config('EMAIL_PORT', default=587, cast=int)
-EMAIL_USE_TLS = config('EMAIL_USE_TLS', default=True, cast=bool)
-EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='')
-EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
-DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='SGLI System <noreply@sgli.com>')
-
-# ════════════════════════════════════════════
-# TWILIO CONFIGURATION (WhatsApp)
-# ════════════════════════════════════════════
-TWILIO_ACCOUNT_SID = config('TWILIO_ACCOUNT_SID', default='')
-TWILIO_AUTH_TOKEN = config('TWILIO_AUTH_TOKEN', default='')
-TWILIO_WHATSAPP_FROM = config('TWILIO_WHATSAPP_FROM', default='')
-
-# ════════════════════════════════════════════
-# NOTIFICAÇÕES CONFIGURATION
-# ════════════════════════════════════════════
-NOTIFICACOES_ATIVAS = config('NOTIFICACOES_ATIVAS', default=False, cast=bool)
-DIAS_ANTECEDENCIA_LEMBRETE = config('DIAS_ANTECEDENCIA_LEMBRETE', default=10, cast=int)
-HORARIO_ENVIO = config('HORARIO_ENVIO', default='09:00')
-ENVIAR_EMAIL = config('ENVIAR_EMAIL', default=True, cast=bool)
-ENVIAR_WHATSAPP = config('ENVIAR_WHATSAPP', default=True, cast=bool)
-
-
-# ════════════════════════════════════════════
-# RAILWAY PRODUCTION SETTINGS
-# ════════════════════════════════════════════
-import dj_database_url
-import os
-
-# Detectar ambiente
-RAILWAY_ENVIRONMENT = os.environ.get('RAILWAY_ENVIRONMENT_NAME')
-IS_PRODUCTION = RAILWAY_ENVIRONMENT is not None
-
-if IS_PRODUCTION:
-    # Debug OFF em produção
-    DEBUG = False
-    
-    # Allowed hosts
-    ALLOWED_HOSTS = [
-        '.railway.app',
-        '.up.railway.app',
-        'localhost',
-        '127.0.0.1',
-    ]
-    
-    # Railway fornece a variável DATABASE_URL
-    if 'DATABASE_URL' in os.environ:
-        DATABASES['default'] = dj_database_url.config(
-            default=os.environ.get('DATABASE_URL'),
-            conn_max_age=600,
-            conn_health_checks=True,
-        )
-    
-    # WhiteNoise para arquivos estáticos
-    MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
-    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-    
-    # Security
-    SECURE_SSL_REDIRECT = True
-    SESSION_COOKIE_SECURE = True
-    CSRF_COOKIE_SECURE = True
-    SECURE_BROWSER_XSS_FILTER = True
-    SECURE_CONTENT_TYPE_NOSNIFF = True
-    X_FRAME_OPTIONS = 'DENY'
-    
-    # Logging
-    LOGGING = {
-        'version': 1,
-        'disable_existing_loggers': False,
-        'handlers': {
-            'console': {
-                'class': 'logging.StreamHandler',
-            },
-        },
-        'root': {
-            'handlers': ['console'],
-            'level': 'INFO',
-        },
-        'loggers': {
-            'django': {
-                'handlers': ['console'],
-                'level': 'INFO',
-                'propagate': False,
-            },
-        },
-    }
-
-# Static files
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),
-] if os.path.exists(os.path.join(BASE_DIR, 'static')) else []
-
-
-# ════════════════════════════════════════════
-# CORREÇÃO RAILWAY - CSRF E HOSTS
-# ════════════════════════════════════════════
-if IS_PRODUCTION:
-    # CSRF Trusted Origins
-    CSRF_TRUSTED_ORIGINS = config(
-        'CSRF_TRUSTED_ORIGINS',
-        default='https://*.railway.app,https://*.up.railway.app'
-    ).split(',')
-    
-    # Allowed Hosts (sobrescrever)
-    ALLOWED_HOSTS = config(
-        'ALLOWED_HOSTS',
-        default='.railway.app,.up.railway.app'
-    ).split(',')
-    
-    # Proxy Headers (Railway usa proxy)
-    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-    USE_X_FORWARDED_HOST = True
-    USE_X_FORWARDED_PORT = True
-
-# ════════════════════════════════════════════
-# STATIC FILES CONFIGURATION (FIXED)
-# ════════════════════════════════════════════
-import os
 
 # Base directory
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # Garantir que existe um lugar para arquivos estáticos
-STATICFILES_DIRS = []
-if os.path.exists(os.path.join(BASE_DIR, 'static')):
-    STATICFILES_DIRS.append(os.path.join(BASE_DIR, 'static'))
 
 # WhiteNoise configuration
 if IS_PRODUCTION:
@@ -323,3 +174,18 @@ if IS_PRODUCTION:
         security_index = middleware_list.index('django.middleware.security.SecurityMiddleware')
         middleware_list.insert(security_index + 1, 'whitenoise.middleware.WhiteNoiseMiddleware')
         MIDDLEWARE = middleware_list
+
+# ════════════════════════════════════════════
+# STATIC FILES - CONFIGURAÇÃO LIMPA
+# ════════════════════════════════════════════
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+# Se estiver em produção, usar WhiteNoise
+if IS_PRODUCTION:
+    # WhiteNoise
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+    
+    # Garantir que WhiteNoise está no middleware
+    if 'whitenoise.middleware.WhiteNoiseMiddleware' not in MIDDLEWARE:
+        MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
