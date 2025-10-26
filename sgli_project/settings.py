@@ -294,3 +294,32 @@ if IS_PRODUCTION:
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
     USE_X_FORWARDED_HOST = True
     USE_X_FORWARDED_PORT = True
+
+# ════════════════════════════════════════════
+# STATIC FILES CONFIGURATION (FIXED)
+# ════════════════════════════════════════════
+import os
+
+# Base directory
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Static files (CSS, JavaScript, Images)
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+# Garantir que existe um lugar para arquivos estáticos
+STATICFILES_DIRS = []
+if os.path.exists(os.path.join(BASE_DIR, 'static')):
+    STATICFILES_DIRS.append(os.path.join(BASE_DIR, 'static'))
+
+# WhiteNoise configuration
+if IS_PRODUCTION:
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
+    
+    # WhiteNoise middleware (já deve estar, mas garantir)
+    if 'whitenoise.middleware.WhiteNoiseMiddleware' not in MIDDLEWARE:
+        # Adicionar após SecurityMiddleware
+        middleware_list = list(MIDDLEWARE)
+        security_index = middleware_list.index('django.middleware.security.SecurityMiddleware')
+        middleware_list.insert(security_index + 1, 'whitenoise.middleware.WhiteNoiseMiddleware')
+        MIDDLEWARE = middleware_list
