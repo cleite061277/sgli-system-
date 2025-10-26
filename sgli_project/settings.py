@@ -272,3 +272,25 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ] if os.path.exists(os.path.join(BASE_DIR, 'static')) else []
+
+
+# ════════════════════════════════════════════
+# CORREÇÃO RAILWAY - CSRF E HOSTS
+# ════════════════════════════════════════════
+if IS_PRODUCTION:
+    # CSRF Trusted Origins
+    CSRF_TRUSTED_ORIGINS = config(
+        'CSRF_TRUSTED_ORIGINS',
+        default='https://*.railway.app,https://*.up.railway.app'
+    ).split(',')
+    
+    # Allowed Hosts (sobrescrever)
+    ALLOWED_HOSTS = config(
+        'ALLOWED_HOSTS',
+        default='.railway.app,.up.railway.app'
+    ).split(',')
+    
+    # Proxy Headers (Railway usa proxy)
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    USE_X_FORWARDED_HOST = True
+    USE_X_FORWARDED_PORT = True
