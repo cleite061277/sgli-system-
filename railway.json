@@ -4,8 +4,9 @@
     "builder": "NIXPACKS"
   },
   "deploy": {
-    "startCommand": "gunicorn sgli_project.wsgi --log-file -",
-    "restartPolicyType": "ON_FAILURE",
+    // ESTA LINHA FOI ALTERADA PARA INCLUIR createsuperuser E migrate
+    "startCommand": "python manage.py createsuperuser --noinput --username $DJANGO_SUPERUSER_USERNAME --email $DJANGO_SUPERUSER_EMAIL || true && python manage.py migrate --noinput && gunicorn sgli_project.wsgi:application --bind 0.0.0.0:8080 --log-file - --timeout 120",
+    "restartPolicy": {"type": "ON_FAILURE"},
     "restartPolicyMaxRetries": 10
   }
 }
