@@ -125,33 +125,95 @@ CORS_ALLOW_CREDENTIALS = True
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'verbose': {
-            'format': '{levelname} {asctime} {module} {message}',
-            'style': '{',
+# -----------------------------------------------------------
+# LOGGING
+# -----------------------------------------------------------
+
+if IS_PRODUCTION:
+    # Configuração de LOGGING para Produção (Railway)
+    # Redireciona tudo para o console (stdout), que o Railway captura.
+    LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': False,
+        'formatters': {
+            'verbose': {
+                'format': '{levelname} {asctime} {module} {message}',
+                'style': '{',
+            },
         },
-    },
-    'handlers': {
-        'file': {
+        'handlers': {
+            'console': {
+                'class': 'logging.StreamHandler',
+                'formatter': 'verbose',
+                'level': 'INFO',  # Pode ser WARNING ou ERROR em produção
+            },
+        },
+        'root': {
+            'handlers': ['console'],
             'level': 'INFO',
-            'class': 'logging.FileHandler',
-            'filename': BASE_DIR / 'logs' / 'sgli.log',
-            'formatter': 'verbose',
         },
-        'console': {
-            'level': 'DEBUG',
-            'class': 'logging.StreamHandler',
-            'formatter': 'verbose',
+    }
+else:
+    # Configuração de LOGGING para Desenvolvimento (Local)
+    # Aqui você pode manter o log em arquivo e no console.
+    LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': False,
+        'formatters': {
+            'verbose': {
+                'format': '{levelname} {asctime} {module} {message}',
+                'style': '{',
+            },
         },
-    },
-    'root': {
-        'handlers': ['console', 'file'],
-        'level': 'INFO',
-    },
-}
+        'handlers': {
+            'console': {
+                'class': 'logging.StreamHandler',
+                'formatter': 'verbose',
+                'level': 'DEBUG',
+            },
+            'file': {
+                'class': 'logging.handlers.RotatingFileHandler', # Use RotatingFileHandler para segurança
+                # Use BASE_DIR para o caminho, garantindo que 'logs' seja criado
+                'filename': BASE_DIR / 'logs/sgli.log', 
+                'formatter': 'verbose',
+                'level': 'INFO',
+                'maxBytes': 1024 * 1024 * 5,  # 5 MB
+                'backupCount': 5,
+            },
+        },
+        'root': {
+            'handlers': ['console', 'file'],
+            'level': 'INFO',
+        },
+    }
+
+#LOGGING = {
+#    'version': 1,
+#    'disable_existing_loggers': False,
+#    'formatters': {
+#        'verbose': {
+#            'format': '{levelname} {asctime} {module} {message}',
+#            'style': '{',
+#        },
+#    },
+#    'handlers': {
+#        'file': {
+#            'level': 'INFO',
+#            'class': 'logging.FileHandler',
+#            'filename': BASE_DIR / 'logs' / 'sgli.log',
+#            'formatter': 'verbose',
+#        },
+#        'console': {
+#            'level': 'DEBUG',
+#            'class': 'logging.StreamHandler',
+#            'formatter': 'verbose',
+#        },
+#    },
+#    'root': {
+#        'handlers': ['console', 'file'],
+#        'level': 'INFO',
+#    },
+#}
 
 CACHES = {
     'default': {
