@@ -1,0 +1,19 @@
+════════════════════════════════════════════════════════════
+CONFIGURAR NO RAILWAY - Variables
+════════════════════════════════════════════════════════════
+
+Adicione estas 3 variáveis no Railway:
+
+1. DJANGO_SUPERUSER_USERNAME
+   Valor: admin
+
+2. DJANGO_SUPERUSER_EMAIL
+   Valor: seu_email@gmail.com
+
+3. DJANGO_SUPERUSER_PASSWORD
+   Valor: SenhaForte123!
+
+Após adicionar, o Railway fará redeploy e criará o superusuário
+automaticamente!
+
+════════════════════════════════════════════════════════════
