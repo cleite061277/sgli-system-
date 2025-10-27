@@ -1,7 +1,7 @@
 import os
 from pathlib import Path
 from decouple import config
-
+import dj_database_url  # Certifique-se de que dj-database-url está instalado (pip install dj-database-url)
 # --------------------------------------------------------------------------
 # 🎯 CORREÇÃO DO DEPLOYMENT: DEFINIÇÃO DE IS_PRODUCTION
 # --------------------------------------------------------------------------
@@ -63,16 +63,10 @@ TEMPLATES = [
 WSGI_APPLICATION = 'sgli_project.wsgi.application'
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': config('DB_NAME'),
-        'USER': config('DB_USER'),
-        'PASSWORD': config('DB_PASSWORD'),
-        'HOST': config('DB_HOST', default='localhost'),
-        'PORT': config('DB_PORT', default='5432'),
-        'OPTIONS': {
-        },
-    }
+    'default': dj_database_url.config(
+        default=os.environ.get('DATABASE_URL') or config('DATABASE_URL', default=None),
+        conn_max_age=600
+    )
 }
 
 AUTH_USER_MODEL = 'core.Usuario'
