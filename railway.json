@@ -4,8 +4,8 @@
     "builder": "NIXPACKS"
   },
   "deploy": {
-    "startCommand": "python manage.py migrate --noinput && gunicorn sgli_project.wsgi:application --log-file -",
-    "restartPolicy": {"type": "ON_FAILURE"},
+    "numReplicas": 1,
+    "restartPolicyType": "ON_FAILURE",
     "restartPolicyMaxRetries": 10
   }
 }
