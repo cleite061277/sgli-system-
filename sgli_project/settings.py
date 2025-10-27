@@ -101,7 +101,7 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = '/static/'
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 ADMIN_MEDIA_PREFIX = '/static/admin/'
 
 MEDIA_URL = '/media/'
@@ -247,7 +247,7 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 # Se estiver em produção, usar WhiteNoise
 if IS_PRODUCTION:
     # WhiteNoise
-    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
     
     # Garantir que WhiteNoise está no middleware
     if 'whitenoise.middleware.WhiteNoiseMiddleware' not in MIDDLEWARE:
