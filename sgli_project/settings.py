@@ -252,3 +252,34 @@ if IS_PRODUCTION:
     # Garantir que WhiteNoise está no middleware
     if 'whitenoise.middleware.WhiteNoiseMiddleware' not in MIDDLEWARE:
         MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
+
+
+# ════════════════════════════════════════════
+# CSRF TRUSTED ORIGINS - CORREÇÃO COMPLETA
+# ════════════════════════════════════════════
+if IS_PRODUCTION:
+    # Pegar domínio da variável ALLOWED_HOSTS
+    allowed_hosts = config('ALLOWED_HOSTS', default='.railway.app,.up.railway.app').split(',')
+    
+    # Criar lista de CSRF_TRUSTED_ORIGINS com https://
+    csrf_origins = []
+    for host in allowed_hosts:
+        host = host.strip()
+        if host.startswith('.'):
+            # Para wildcard domains como .railway.app
+            csrf_origins.append(f'https://*{host}')
+        elif host:
+            # Para domínios específicos
+            csrf_origins.append(f'https://{host}')
+    
+    # Adicionar origens manualmente também
+    csrf_origins.extend([
+        'https://romantic-liberation-production.up.railway.app',
+        'https://*.railway.app',
+        'https://*.up.railway.app',
+    ])
+    
+    # Remover duplicatas e aplicar
+    CSRF_TRUSTED_ORIGINS = list(set(csrf_origins))
+    
+    print(f"🔐 CSRF_TRUSTED_ORIGINS configurado: {CSRF_TRUSTED_ORIGINS}")
