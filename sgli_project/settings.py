@@ -283,3 +283,10 @@ if IS_PRODUCTION:
     CSRF_TRUSTED_ORIGINS = list(set(csrf_origins))
     
     print(f"🔐 CSRF_TRUSTED_ORIGINS configurado: {CSRF_TRUSTED_ORIGINS}")
+
+
+# ════════════════════════════════════════════
+# MIDDLEWARE DE TRATAMENTO DE ERROS
+# ════════════════════════════════════════════
+if IS_PRODUCTION:
+    MIDDLEWARE.append('core.middleware.error_handler.ProductionErrorMiddleware')

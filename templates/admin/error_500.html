@@ -1,0 +1,22 @@
+{% extends "admin/base_site.html" %}
+{% block title %}Erro no Sistema{% endblock %}
+
+{% block content %}
+<div style="padding: 40px; text-align: center;">
+    <h1 style="color: #dc3545;">⚠️ Erro Interno</h1>
+    <p style="font-size: 18px; margin: 20px 0;">
+        Desculpe, ocorreu um erro ao processar sua solicitação.
+    </p>
+    
+    {% if user.is_superuser %}
+    <div style="background: #f8d7da; border: 1px solid #f5c6cb; padding: 20px; margin: 20px auto; max-width: 600px; text-align: left; border-radius: 5px;">
+        <strong>Detalhes (apenas para administradores):</strong>
+        <pre style="white-space: pre-wrap; word-wrap: break-word;">{{ error }}</pre>
+    </div>
+    {% endif %}
+    
+    <a href="{% url 'admin:index' %}" class="button" style="display: inline-block; margin-top: 20px; padding: 10px 20px; background: #007bff; color: white; text-decoration: none; border-radius: 5px;">
+        ← Voltar ao Dashboard
+    </a>
+</div>
+{% endblock %}
