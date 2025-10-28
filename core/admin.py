@@ -2,6 +2,7 @@
 from django.contrib import admin
 from core.models import ConfiguracaoSistema, LogGeracaoComandas
 from django.contrib.auth.admin import UserAdmin
+from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django.utils import timezone
 from .forms import PagamentoAdminForm
 from .models import Fiador, Usuario, Locador, Imovel, Locatario, Locacao, Comanda, Pagamento, TemplateContrato
@@ -17,14 +18,32 @@ from docx.enum.text import WD_ALIGN_PARAGRAPH
 from datetime import datetime
 from io import BytesIO
 from .contrato_generator import gerar_contrato_pdf, gerar_contrato_docx
-from django.utils.html import format_html
-from django.urls import reverse
+
+
+# ════════════════════════════════════════════════════════════
+# USUARIO ADMIN - AUTENTICAÇÃO CORRIGIDA
+# ════════════════════════════════════════════════════════════
+
+class UsuarioCreationForm(UserCreationForm):
+    """Form para criar novos usuários"""
+    class Meta:
+        model = Usuario
+        fields = ('username', 'email', 'tipo_usuario')
+
+class UsuarioChangeForm(UserChangeForm):
+    """Form para editar usuários"""
+    class Meta:
+        model = Usuario
+        fields = '__all__'
 
 @admin.register(Usuario)
-class UsuarioAdmin(admin.ModelAdmin):
-    """Admin organizado para Usuario"""
+class UsuarioAdmin(UserAdmin):
+    """Admin customizado para Usuario com autenticação correta"""
     
-    list_display = ['username', 'get_full_name', 'email', 'tipo_usuario', 'is_staff', 'is_active', 'date_joined']
+    form = UsuarioChangeForm
+    add_form = UsuarioCreationForm
+    
+    list_display = ['username', 'email', 'tipo_usuario', 'is_staff', 'is_active', 'date_joined']
     list_filter = ['tipo_usuario', 'is_active', 'is_staff', 'date_joined']
     search_fields = ['username', 'email', 'first_name', 'last_name', 'cpf']
     
@@ -48,11 +67,34 @@ class UsuarioAdmin(admin.ModelAdmin):
         }),
     )
     
+    add_fieldsets = (
+        (None, {
+            'classes': ('wide',),
+            'fields': ('username', 'email', 'password1', 'password2'),
+        }),
+        ('👤 Informações', {
+            'fields': ('first_name', 'last_name', 'tipo_usuario'),
+        }),
+        ('🔑 Permissões', {
+            'fields': ('is_staff', 'is_active'),
+        }),
+    )
+    
     readonly_fields = ['date_joined', 'last_login']
+    
+    def save_model(self, request, obj, form, change):
+        """Garante que usuários tenham acesso ao admin"""
+        if not change:
+            if not obj.is_staff:
+                obj.is_staff = True
+        super().save_model(request, obj, form, change)
 
 
+# ════════════════════════════════════════════════════════════
 
-@admin.register(Locador)
+from django.utils.html import format_html
+from django.urls import reverse
+
 class LocadorAdmin(admin.ModelAdmin):
     """Admin organizado para Locador"""
     
