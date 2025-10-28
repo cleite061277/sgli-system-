@@ -249,3 +249,11 @@ if IS_PRODUCTION:
     }
     # Prevenir erro de cursor
     DATABASES['default']['DISABLE_SERVER_SIDE_CURSORS'] = True
+
+
+# ════════════════════════════════════════════
+# LOGIN PERSONALIZADO
+# ════════════════════════════════════════════
+LOGIN_URL = '/admin/login/'
+LOGIN_REDIRECT_URL = '/admin/'
+LOGOUT_REDIRECT_URL = '/admin/login/'
