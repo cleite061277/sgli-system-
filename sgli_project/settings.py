@@ -123,7 +123,6 @@ SECURE_CONTENT_TYPE_NOSNIFF = True
 # LOGGING
 # -----------------------------------------------------------
 
-if IS_PRODUCTION:
     # Configuração de LOGGING para Produção (Railway)
     # Redireciona tudo para o console (stdout), que o Railway captura.
     
