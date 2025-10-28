@@ -126,96 +126,7 @@ SECURE_CONTENT_TYPE_NOSNIFF = True
 if IS_PRODUCTION:
     # Configuração de LOGGING para Produção (Railway)
     # Redireciona tudo para o console (stdout), que o Railway captura.
-    LOGGING = {
-        'version': 1,
-        'disable_existing_loggers': False,
-        'formatters': {
-            'verbose': {
-                'format': '{levelname} {asctime} {module} {message}',
-                'style': '{',
-            },
-        },
-        'handlers': {
-            'console': {
-                'class': 'logging.StreamHandler',
-                'formatter': 'verbose',
-                'level': 'INFO',  # Pode ser WARNING ou ERROR em produção
-            },
-        },
-        'root': {
-            'handlers': ['console'],
-            'level': 'INFO',
-        },
-    }
-else:
-    # Configuração de LOGGING para Desenvolvimento (Local)
-    # Aqui você pode manter o log em arquivo e no console.
-    LOGGING = {
-        'version': 1,
-        'disable_existing_loggers': False,
-        'formatters': {
-            'verbose': {
-                'format': '{levelname} {asctime} {module} {message}',
-                'style': '{',
-            },
-        },
-        'handlers': {
-            'console': {
-                'class': 'logging.StreamHandler',
-                'formatter': 'verbose',
-                'level': 'DEBUG',
-            },
-            'file': {
-                'class': 'logging.handlers.RotatingFileHandler', # Use RotatingFileHandler para segurança
-                # Use BASE_DIR para o caminho, garantindo que 'logs' seja criado
-                'filename': BASE_DIR / 'logs/sgli.log', 
-                'formatter': 'verbose',
-                'level': 'INFO',
-                'maxBytes': 1024 * 1024 * 5,  # 5 MB
-                'backupCount': 5,
-            },
-        },
-        'root': {
-            'handlers': ['console', 'file'],
-            'level': 'INFO',
-        },
-    }
-
-#LOGGING = {
-#    'version': 1,
-#    'disable_existing_loggers': False,
-#    'formatters': {
-#        'verbose': {
-#            'format': '{levelname} {asctime} {module} {message}',
-#            'style': '{',
-#        },
-#    },
-#    'handlers': {
-#        'file': {
-#            'level': 'INFO',
-#            'class': 'logging.FileHandler',
-#            'filename': BASE_DIR / 'logs' / 'sgli.log',
-#            'formatter': 'verbose',
-#        },
-#        'console': {
-#            'level': 'DEBUG',
-#            'class': 'logging.StreamHandler',
-#            'formatter': 'verbose',
-#        },
-#    },
-#    'root': {
-#        'handlers': ['console', 'file'],
-#        'level': 'INFO',
-#    },
-#}
-
-CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
-        'LOCATION': 'redis://127.0.0.1:6379/1',
-        'KEY_PREFIX': 'sgli',
-    }
-}
+    
 
 
 # Base directory
@@ -290,3 +201,52 @@ if IS_PRODUCTION:
 # ════════════════════════════════════════════
 if IS_PRODUCTION:
     MIDDLEWARE.append('core.middleware.error_handler.ProductionErrorMiddleware')
+
+# ════════════════════════════════════════════
+# LOGGING CONFIGURATION (Railway-compatible)
+# ════════════════════════════════════════════
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'INFO',
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'django.db.backends': {
+            'handlers': ['console'],
+            'level': 'WARNING',  # Reduz log de SQL
+            'propagate': False,
+        },
+    },
+}
+
+
+# ════════════════════════════════════════════
+# DATABASE CONNECTION POOL (Railway)
+# ════════════════════════════════════════════
+if IS_PRODUCTION:
+    DATABASES['default']['CONN_MAX_AGE'] = 600  # 10 minutos
+    DATABASES['default']['OPTIONS'] = {
+        'connect_timeout': 10,
+        'options': '-c statement_timeout=30000',  # 30 segundos
+    }
+    # Prevenir erro de cursor
+    DATABASES['default']['DISABLE_SERVER_SIDE_CURSORS'] = True
