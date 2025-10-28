@@ -101,6 +101,11 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = '/static/'
+
+# Diretórios adicionais para collectstatic
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',
+]
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 ADMIN_MEDIA_PREFIX = '/static/admin/'
 
@@ -134,6 +139,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = '/static/'
 
+# Diretórios adicionais para collectstatic
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',
+]
+
 # Garantir que existe um lugar para arquivos estáticos
 
 # WhiteNoise configuration
@@ -152,6 +162,11 @@ if IS_PRODUCTION:
 # STATIC FILES - CONFIGURAÇÃO LIMPA
 # ════════════════════════════════════════════
 STATIC_URL = '/static/'
+
+# Diretórios adicionais para collectstatic
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',
+]
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # Se estiver em produção, usar WhiteNoise
