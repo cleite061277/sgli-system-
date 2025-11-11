@@ -9,7 +9,7 @@ from django.http import HttpResponse
 from django.contrib.auth import views as auth_views
 
 # Views
-from core.views_whatsapp import painel_whatsapp, gerar_mensagem_whatsapp
+#from core.views_whatsapp import painel_whatsapp, gerar_mensagem_whatsapp
 from core.views_comanda_web import comanda_web_view
 from core.views_gerar_contrato import gerar_contrato_docx, gerar_contrato_pdf
 from core.views import download_recibo_pagamento, pagina_recibo_pagamento
@@ -66,8 +66,8 @@ urlpatterns = [
     path('', home_view, name='home'),
     
     # === WHATSAPP ===
-    path('admin/whatsapp/', painel_whatsapp, name='painel_whatsapp'),
-    path('admin/whatsapp/api/mensagem/<uuid:comanda_id>/', 
+#    path('admin/whatsapp/', painel_whatsapp, name='painel_whatsapp'),
+#    path('admin/whatsapp/api/mensagem/<uuid:comanda_id>/', 
          gerar_mensagem_whatsapp, 
          name='api_mensagem_comanda'),
     
