@@ -68,8 +68,8 @@ urlpatterns = [
     # === WHATSAPP ===
 #    path('admin/whatsapp/', painel_whatsapp, name='painel_whatsapp'),
 #    path('admin/whatsapp/api/mensagem/<uuid:comanda_id>/', 
-         gerar_mensagem_whatsapp, 
-         name='api_mensagem_comanda'),
+         #         gerar_mensagem_whatsapp, 
+#         name='api_mensagem_comanda'),
     
     # === COMANDA WEB ===
     path('comanda/<uuid:comanda_id>/<str:token>/', 
