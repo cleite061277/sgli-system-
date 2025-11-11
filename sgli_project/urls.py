@@ -10,7 +10,7 @@ from django.contrib.auth import views as auth_views
 
 # Views
 #from core.views_whatsapp import painel_whatsapp, gerar_mensagem_whatsapp
-from core.views_comanda_web import comanda_web_view
+#from core.views_comanda_web import comanda_web_view
 from core.views_gerar_contrato import gerar_contrato_docx, gerar_contrato_pdf
 from core.views import download_recibo_pagamento, pagina_recibo_pagamento
 from core.dashboard_views import admin_index
