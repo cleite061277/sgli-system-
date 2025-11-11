@@ -81,3 +81,230 @@ class PagamentoViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(usuario_registro=self.request.user)
 
+
+from django.http import FileResponse, HttpResponse, Http404
+from django.contrib.auth.decorators import login_required
+from django.contrib.admin.views.decorators import staff_member_required
+from django.shortcuts import get_object_or_404
+from .models import Pagamento
+from .document_generator import DocumentGenerator
+import os
+import mimetypes
+
+@staff_member_required
+def download_recibo_pagamento(request, pagamento_id):
+    """
+    Download seguro de recibo de pagamento.
+    Requer autenticação de staff e gera/serve o arquivo sem expor filesystem.
+    """
+    # Buscar pagamento
+    pagamento = get_object_or_404(Pagamento, id=pagamento_id)
+    
+    # Verificar permissão
+    if not request.user.has_perm('core.view_pagamento'):
+        raise Http404("Permissão negada")
+    
+    try:
+        # Gerar recibo (ou pegar existente)
+        generator = DocumentGenerator()
+        filename = generator.gerar_recibo_pagamento(pagamento.id)
+        
+        # Caminho completo do arquivo
+        file_path = os.path.join(generator.output_dir, filename)
+        
+        # Verificar se existe
+        if not os.path.exists(file_path):
+            raise Http404("Recibo não encontrado")
+        
+        # Detectar tipo MIME
+        content_type, _ = mimetypes.guess_type(file_path)
+        if content_type is None:
+            content_type = 'application/octet-stream'
+        
+        # Abrir arquivo
+        with open(file_path, 'rb') as f:
+            response = HttpResponse(f.read(), content_type=content_type)
+            response['Content-Disposition'] = f'attachment; filename="{filename}"'
+            
+            # Log de auditoria (opcional)
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.info(
+                f"Recibo baixado: {filename} por {request.user.username} "
+                f"(Pagamento: {pagamento.numero_pagamento})"
+            )
+            
+            return response
+            
+    except Exception as e:
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.error(f"Erro ao gerar recibo para pagamento {pagamento_id}: {e}")
+        raise Http404(f"Erro ao gerar recibo: {str(e)}")
+
+
+
+@staff_member_required
+def pagina_recibo_pagamento(request, pagamento_id):
+    """
+    Página dedicada para visualizar e enviar recibo de pagamento.
+    """
+    from django.shortcuts import render
+    from django.contrib import messages
+    
+    # Buscar pagamento
+    pagamento = get_object_or_404(Pagamento, id=pagamento_id)
+    
+    # Verificar permissão
+    if not request.user.has_perm('core.view_pagamento'):
+        raise Http404("Permissão negada")
+    
+    # Buscar dados relacionados (ANTES do POST)
+    comanda = pagamento.comanda
+    locacao = comanda.locacao if comanda else None
+    locatario = locacao.locatario if locacao else None
+    imovel = locacao.imovel if locacao else None
+    
+    # Dados para o template
+    context = {
+        'pagamento': pagamento,
+        'comanda': comanda,
+        'locacao': locacao,
+        'locatario': locatario,
+        'imovel': imovel,
+        'title': f'Recibo {pagamento.numero_pagamento}',
+    }
+    
+    # Se for requisição POST (envio de email/whatsapp)
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        
+        # Limpar redirect do WhatsApp se existir
+        if action == 'clear_whatsapp_session':
+            request.session.pop('whatsapp_redirect', None)
+            return HttpResponse('OK')
+        
+        if action == 'email':
+            try:
+                from django.core.mail import EmailMessage
+                from django.conf import settings
+                from .document_generator import DocumentGenerator
+                
+                # Gerar recibo
+                generator = DocumentGenerator()
+                filename = generator.gerar_recibo_pagamento(pagamento.id)
+                file_path = os.path.join(generator.output_dir, filename)
+                
+                # Preparar email
+                locatario_email = locatario.email if locatario else None
+                
+                if not locatario_email:
+                    messages.error(request, '❌ Locatário não possui email cadastrado!')
+                else:
+                    assunto = f'Recibo de Pagamento - {pagamento.numero_pagamento}'
+                    corpo = f'''
+Prezado(a) {locatario.nome_razao_social},
+
+Segue em anexo o recibo de pagamento referente ao imóvel {imovel.endereco}, {imovel.numero}.
+
+Valor pago: R$ {pagamento.valor_pago}
+Data: {pagamento.data_pagamento.strftime('%d/%m/%Y')}
+Forma: {pagamento.get_forma_pagamento_display()}
+
+Atenciosamente,
+HABITAT PRO
+Sistema de Gestão Imobiliária
+'''
+                    
+                    email = EmailMessage(
+                        subject=assunto,
+                        body=corpo,
+                        from_email=settings.EMAIL_HOST_USER,
+                        to=[locatario_email],
+                    )
+                    
+                    # Anexar recibo
+                    with open(file_path, 'rb') as f:
+                        email.attach(filename, f.read(), 'application/vnd.openxmlformats-officedocument.wordprocessingml.document')
+                    
+                    email.send()
+                    
+                    messages.success(request, f'📧 Email enviado com sucesso para {locatario_email}!')
+                    
+            except Exception as e:
+                import logging
+                logger = logging.getLogger(__name__)
+                logger.error(f'Erro ao enviar email: {e}')
+                messages.error(request, f'❌ Erro ao enviar email: {str(e)}')
+        
+        elif action == 'whatsapp':
+            try:
+                from core.notifications.message_formatter import MessageFormatter
+                import urllib.parse
+                
+                # Telefone do locatário
+                telefone = locatario.telefone if locatario else None
+                
+                if not telefone:
+                    messages.error(request, '❌ Locatário não possui telefone cadastrado!')
+                else:
+                    # Limpar telefone (apenas números)
+                    telefone_limpo = ''.join(filter(str.isdigit, telefone))
+                    
+                    # Adicionar código do país se não tiver (Brasil = 55)
+                    if not telefone_limpo.startswith('55'):
+                        telefone_limpo = '55' + telefone_limpo
+                    
+                    # Gerar URL da página do recibo
+                    recibo_url = request.build_absolute_uri(
+                        f'/pagamento/{pagamento.id}/recibo/'
+                    )
+                    
+                    # Formatar mensagem usando MessageFormatter (com link)
+                    mensagem = MessageFormatter.formatar_mensagem_whatsapp_recibo(
+                        pagamento, 
+                        recibo_url=recibo_url
+                    )
+                    
+                    # URL WhatsApp (igual comandas)
+                    mensagem_encoded = urllib.parse.quote(mensagem)
+                    whatsapp_url = f'https://wa.me/{telefone_limpo}?text={mensagem_encoded}'
+                    
+                    # Salvar URL na sessão (mais seguro que cookie)
+                    request.session['whatsapp_redirect'] = whatsapp_url
+                    messages.success(request, '💬 Abrindo WhatsApp...')
+                    
+            except Exception as e:
+                import logging
+                logger = logging.getLogger(__name__)
+                logger.error(f'Erro ao preparar WhatsApp: {e}')
+                messages.error(request, f'❌ Erro ao enviar WhatsApp: {str(e)}')
+    
+    # Limpar redirect WhatsApp após renderizar (para não redirecionar novamente)
+    whatsapp_redirect_temp = request.session.get('whatsapp_redirect')
+    if whatsapp_redirect_temp and request.method == 'GET':
+        # Manter na primeira renderização, limpar depois
+        pass
+    
+    return render(request, 'admin/pagamento_recibo.html', context)
+    
+    
+from django.contrib.admin.views.decorators import staff_member_required
+from django.shortcuts import render, get_object_or_404
+from .models import Pagamento
+
+@staff_member_required
+def visualizar_recibo_pagamento(request, pagamento_id):
+    """Exibe recibo em modal HTML bonito"""
+    pagamento = get_object_or_404(Pagamento, pk=pagamento_id)
+    
+    context = {
+        'pagamento': pagamento,
+        'comanda': pagamento.comanda,
+        'locacao': pagamento.comanda.locacao,
+        'locatario': pagamento.comanda.locacao.locatario,
+        'imovel': pagamento.comanda.locacao.imovel,
+    }
+    
+    return render(request, 'admin/recibo_modal.html', context)
+

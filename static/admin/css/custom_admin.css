@@ -1,495 +1,330 @@
-/* ================================================== */
-/*    HABITAT PRO - CSS CUSTOMIZADO                  */
-/*    Versão Otimizada - Header Azul Claro           */
-/* ================================================== */
+/* ============================================================
+   HABITAT PRO - DASHBOARD PREMIUM v2.0
+   Cores do Logo: Azul #4169E1 + Laranja #FF8C00
+   ============================================================ */
 
-/* ============================================ */
-/* SEÇÃO 1: LABELS EM NEGRITO */
-/* ============================================ */
-label,
-.form-row label,
-.field-box label,
-div.form-row > div > label,
-.form-group label,
-.aligned label,
-label[for],
-.field label,
-.fieldBox label,
-.form-row > label,
-div label {
-    font-weight: 700 !important;
+:root {
+    --habitat-blue: #4169E1;
+    --habitat-orange: #FF8C00;
+    --habitat-blue-light: #5B7FEA;
+    --habitat-orange-light: #FFA500;
+    
+    --gradient-primary: linear-gradient(135deg, #4169E1 0%, #5B7FEA 100%);
+    --gradient-secondary: linear-gradient(135deg, #FF8C00 0%, #FFA500 100%);
+    --gradient-success: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    --gradient-warning: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+    
+    --shadow-sm: 0 2px 8px rgba(0,0,0,0.08);
+    --shadow-md: 0 8px 24px rgba(0,0,0,0.12);
+    --shadow-lg: 0 16px 48px rgba(0,0,0,0.16);
 }
 
-.vTextField label,
-.vDateField label,
-.vTimeField label,
-.vURLField label,
-.vIntegerField label,
-.vBigIntegerField label,
-.vForeignKeyRawIdAdminField label,
-.vManyToManyRawIdAdminField label {
-    font-weight: 700 !important;
+/* === ANIMAÇÕES === */
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
-.module caption,
-.module h2,
-fieldset.module h2,
-.inline-group h2,
-fieldset h2,
-h2.subhead,
-fieldset > h2,
-.collapse h2,
-.module > h2 {
-    font-weight: 700 !important;
-    font-size: 14px !important;
-    color: #417690 !important;
+@keyframes pulse { 
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
 }
 
-th,
-th.column-header,
-th.sortable,
-th.sortable a,
-thead th,
-.results th,
-table thead th {
-    font-weight: 700 !important;
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
 }
 
-.inline-group .form-row label,
-.inline-related .form-row label,
-.tabular tr th,
-.tabular thead th,
-.inline-related fieldset label,
-.tabular .form-row label {
-    font-weight: 700 !important;
+@keyframes shimmer {
+    0% { background-position: -100% 0; }
+    100% { background-position: 200% 0; }
 }
 
-.readonly label,
-div.readonly label,
-.form-row.readonly label {
-    font-weight: 700 !important;
+/* === BACKGROUND === */
+body {
+    background: linear-gradient(135deg, #4169E1 0%, #5B7FEA 50%, #FF8C00 100%);
+    background-size: 400% 400%;
+    animation: shimmer 15s ease infinite;
+    min-height: 100vh;
 }
 
-.submit-row input[type="submit"],
-.button,
-input[type="submit"],
-input[type="button"],
-button,
-.addlink,
-.changelink,
-.deletelink {
-    font-weight: 600 !important;
-}
-
-.help,
-p.help,
-.helptext,
-span.helptext,
-div.help {
-    font-weight: normal !important;
-}
-
-/* ================================================== */
-/*           HABITAT PRO - BRANDING                   */
-/* ================================================== */
-
-/* HEADER - Fundo Azul Claro */
-#header {
-    background: linear-gradient(135deg, #e8f4f8 0%, #dbeafe 100%) !important;
-    border-bottom: 3px solid #1e3a8a !important;
-    padding: 15px 20px !important;
-    box-shadow: 0 2px 4px rgba(30, 58, 138, 0.1) !important;
-}
-
-/* Logo com mais espaço e destaque */
-#site-name {
-    background: url('/static/images/habitat_pro_logo.png') no-repeat left center;
-    background-size: 200px auto;
-    padding-left: 220px !important;
-    min-height: 60px;
+/* === HEADER === */
+.dashboard-header {
+    background: var(--gradient-primary);
+    padding: 40px;
+    border-radius: 16px;
+    margin-bottom: 32px;
+    box-shadow: var(--shadow-lg);
     display: flex;
     align-items: center;
-    margin: 0 !important;
+    gap: 24px;
+    position: relative;
+    overflow: hidden;
 }
 
-/* Texto HABITAT PRO com cores vibrantes */
-#site-name a {
-    text-decoration: none !important;
-    font-weight: 800 !important;
-    font-size: 28px !important;
-    letter-spacing: 1px !important;
+.dashboard-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.08), transparent 70%);
+    animation: float 6s ease-in-out infinite;
 }
 
-#site-name a:hover {
-    opacity: 0.9;
+.header-logo {
+    width: 72px;
+    height: 72px;
+    filter: drop-shadow(0 4px 12px rgba(0,0,0,0.2));
+    animation: pulse 3s ease-in-out infinite;
+    z-index: 2;
 }
 
-/* Subtítulo discreto */
-#header p {
-    color: #1e3a8a !important;
-    margin: 5px 0 0 220px !important;
-    font-size: 13px !important;
-    font-weight: 500 !important;
+.header-content {
+    z-index: 2;
 }
 
-/* ============================================ */
-/* LINKS DO USUÁRIO - VISIBILIDADE MÁXIMA */
-/* ============================================ */
-
-/* Container dos links do usuário */
-#user-tools {
-    float: right !important;
-    margin: 0 !important;
-    padding: 10px 0 !important;
-    text-align: right !important;
+.dashboard-header h1 {
+    font-size: 42px;
+    font-weight: 800;
+    color: white;
+    margin: 0;
+    line-height: 1.2;
+    text-shadow: 0 2px 12px rgba(0,0,0,0.2);
 }
 
-/* TODOS os links e texto do usuário - AZUL ESCURO (cor do HABITAT) */
-#user-tools,
-#user-tools *,
-#user-tools a,
-#user-tools a:link,
-#user-tools a:visited {
-    color: #1e3a8a !important;
-    font-weight: 600 !important;
-    font-size: 13px !important;
-    text-decoration: none !important;
+.dashboard-header h1 .pro-text {
+    color: var(--habitat-orange);
+    text-shadow: 0 2px 12px rgba(255,140,0,0.4);
 }
 
-/* Links com padding e borda arredondada */
-#user-tools a {
-    padding: 6px 10px !important;
-    border-radius: 4px !important;
-    transition: all 0.2s ease !important;
-    display: inline-block !important;
+.dashboard-header p {
+    font-size: 16px;
+    color: rgba(255,255,255,0.95);
+    margin: 8px 0 0;
 }
 
-/* Hover nos links - LARANJA - TODOS OS LINKS */
-#user-tools a:hover,
-#user-tools a.logout:hover,
-#user-tools a[href*="logout"]:hover,
-#user-tools a[href*="password_change"]:hover {
-    color: #ffffff !important;
-    background: linear-gradient(135deg, #FF8C00 0%, #FF6B00 100%) !important;
-    transform: translateY(-1px) !important;
-    box-shadow: 0 2px 4px rgba(255, 140, 0, 0.3) !important;
+/* === STATS GRID === */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+    margin-bottom: 32px;
 }
 
-/* Link "Ver o site" específico */
-.viewsitelink,
-#user-tools .viewsitelink {
-    color: #1e3a8a !important;
-    font-weight: 600 !important;
-    background: rgba(30, 58, 138, 0.1) !important;
+.stat-card {
+    background: white;
+    padding: 32px;
+    border-radius: 16px;
+    box-shadow: var(--shadow-md);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
 }
 
-.viewsitelink:hover,
-#user-tools .viewsitelink:hover {
-    color: #ffffff !important;
-    background: #1e3a8a !important;
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: var(--gradient-primary);
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
 }
 
-/* Separadores nativos do Django - estilizados */
-#user-tools .separator,
-#user-tools span {
-    color: #1e3a8a !important;
-    font-weight: 400 !important;
+.stat-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-lg);
 }
 
-/* ============================================ */
-
-/* Container dos links do usuário */
-#user-tools {
-    float: right !important;
-    margin: 0 !important;
-    padding: 10px 0 !important;
-    text-align: right !important;
+.stat-card:hover::before {
+    transform: scaleX(1);
 }
 
-/* TODOS os links do header - AZUL ESCURO */
-#header a,
-#user-tools a,
-#header #user-tools a {
-    color: #1e3a8a !important;
-    font-weight: 600 !important;
-    font-size: 13px !important;
-    text-decoration: none !important;
-    padding: 8px 12px !important;
-    border-radius: 4px !important;
-    transition: all 0.2s ease !important;
-    display: inline-block !important;
+.stat-card.blue::before { background: var(--gradient-primary); }
+.stat-card.green::before { background: var(--gradient-success); }
+.stat-card.orange::before { background: var(--gradient-secondary); }
+.stat-card.red::before { background: var(--gradient-warning); }
+
+.stat-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+    display: inline-block;
+    filter: drop-shadow(0 2px 8px rgba(0,0,0,0.1));
 }
 
-/* Hover nos links - LARANJA */
-#header a:hover,
-#user-tools a:hover,
-#header #user-tools a:hover {
-    color: #ffffff !important;
-    background: #FF8C00 !important;
-    transform: translateY(-1px) !important;
+.stat-value {
+    font-size: 56px !important;
+    font-weight: 900 !important;
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: 12px 0 !important;
+    display: block !important;
+    line-height: 1.1 !important;
 }
 
-/* Link "View site" específico */
-.viewsitelink {
-    color: #1e3a8a !important;
-    font-weight: 600 !important;
-    background: rgba(30, 58, 138, 0.1) !important;
-    padding: 8px 12px !important;
-    border-radius: 4px !important;
+.stat-card.blue .stat-value { background: var(--gradient-primary); -webkit-background-clip: text; background-clip: text; }
+.stat-card.green .stat-value { background: var(--gradient-success); -webkit-background-clip: text; background-clip: text; }
+.stat-card.orange .stat-value { background: var(--gradient-secondary); -webkit-background-clip: text; background-clip: text; }
+.stat-card.red .stat-value { background: var(--gradient-warning); -webkit-background-clip: text; background-clip: text; }
+
+.stat-label {
+    font-size: 12px;
+    color: #7f8c8d;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    font-weight: 700;
+    display: block;
+    margin-top: 8px;
 }
 
-.viewsitelink:hover {
-    color: #ffffff !important;
-    background: #1e3a8a !important;
+.stat-link {
+    display: inline-block;
+    margin-top: 16px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: transform 0.2s;
 }
 
-/* Separadores entre links */
-/* Separadores gerenciados pelo Django */
+.stat-link:hover {
+    transform: translateX(4px);
+}
 
-/* ============================================ */
-/* SIDEBAR - Azul Suave */
-/* ============================================ */
+/* === ACTIONS === */
+.actions-section {
+    margin: 40px 0;
+}
+
+.actions-section h2 {
+    font-size: 28px;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 24px;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.actions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 20px;
+}
+
+.action-card {
+    background: white;
+    padding: 28px 24px;
+    border-radius: 12px;
+    text-align: center;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow-sm);
+    text-decoration: none;
+    color: #2c3e50;
+    display: block;
+}
+
+.action-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
+}
+
+.action-icon {
+    font-size: 40px;
+    margin-bottom: 12px;
+    display: block;
+    transition: transform 0.3s ease;
+}
+
+.action-card:hover .action-icon {
+    transform: scale(1.15);
+}
+
+.action-card span {
+    display: block;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+/* === MODULES === */
 .module {
-    background: #f0f9ff !important;
-    border: 1px solid #bfdbfe !important;
-    border-radius: 4px !important;
+    background: white;
+    border-radius: 16px;
+    padding: 28px;
+    box-shadow: var(--shadow-md);
+    margin-bottom: 24px;
 }
 
-.module caption {
-    background: linear-gradient(135deg, #FF8C00 0%, #FF6B00 100%) !important;
+.module h2 {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--habitat-blue);
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #e9ecef;
+}
+
+/* === TÍTULOS VISÍVEIS === */
+h1, #content h1, .breadcrumbs + h1 {
     color: white !important;
     font-weight: 700 !important;
-    padding: 10px !important;
-    border-radius: 4px 4px 0 0 !important;
+    font-size: 28px !important;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.3) !important;
+    padding: 16px 20px !important;
+    background: rgba(255,255,255,0.12) !important;
+    backdrop-filter: blur(8px) !important;
+    border-radius: 12px !important;
+    margin-bottom: 20px !important;
 }
 
-/* ============================================ */
-/* TABELAS - Azul Clarinho */
-/* ============================================ */
-thead th {
-    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%) !important;
-    color: #1e3a8a !important;
-    border-bottom: 2px solid #3b82f6 !important;
-    padding: 12px 10px !important;
-    font-size: 13px !important;
-}
-
-thead th a {
-    color: #1e3a8a !important;
-    font-weight: 700 !important;
-}
-
-thead th a:hover {
-    color: #FF8C00 !important;
-    text-decoration: none !important;
-}
-
-thead th.sortable a:after,
-thead th.sorted a:after {
-    color: #1e3a8a !important;
-}
-
-.results tbody tr:hover {
-    background-color: #fff7ed !important;
-}
-
-.results tbody tr:nth-child(odd) {
-    background-color: #f0f9ff !important;
-}
-
-.results tbody tr:nth-child(even) {
-    background-color: #ffffff !important;
-}
-
-/* ============================================ */
-/* BOTÕES */
-/* ============================================ */
-.button, 
-input[type="submit"], 
-.submit-row input,
-.addlink,
-.changelink {
-    background: linear-gradient(135deg, #FF8C00 0%, #FF6B00 100%) !important;
-    border: none !important;
+.fieldset h2, fieldset h2, fieldset.module h2 {
+    background: var(--gradient-primary) !important;
     color: white !important;
-    padding: 8px 16px !important;
-    border-radius: 4px !important;
+    padding: 14px 20px !important;
+    border-radius: 10px !important;
+    margin: 16px 0 12px !important;
     font-weight: 600 !important;
-    transition: all 0.3s ease !important;
+    font-size: 16px !important;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.2) !important;
 }
 
-.button:hover, 
-input[type="submit"]:hover,
-.addlink:hover,
-.changelink:hover {
-    background: linear-gradient(135deg, #FF6B00 0%, #FF4500 100%) !important;
-    transform: translateY(-1px) !important;
-    box-shadow: 0 4px 8px rgba(255, 140, 0, 0.3) !important;
+/* === GLASS === */
+.glass {
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.25);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.1);
 }
 
-.deletelink {
-    color: #dc2626 !important;
+/* === BADGES === */
+.badge {
+    display: inline-block;
+    padding: 6px 14px;
+    border-radius: 16px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
-.deletelink:hover {
-    color: #b91c1c !important;
+.badge-success { background: var(--gradient-success); color: white; }
+.badge-warning { background: var(--gradient-secondary); color: white; }
+.badge-danger { background: var(--gradient-warning); color: white; }
+
+/* === SCROLLBAR === */
+::-webkit-scrollbar { width: 10px; }
+::-webkit-scrollbar-track { background: #f1f1f1; }
+::-webkit-scrollbar-thumb { background: var(--gradient-primary); border-radius: 5px; }
+
+/* === RESPONSIVO === */
+@media (max-width: 768px) {
+    .dashboard-header { flex-direction: column; text-align: center; padding: 32px 24px; }
+    .dashboard-header h1 { font-size: 32px; }
+    .stats-grid { grid-template-columns: 1fr; }
+    .stat-value { font-size: 48px !important; }
 }
 
-/* ============================================ */
-/* LINKS - Laranja */
-/* ============================================ */
-a {
-    color: #1e3a8a !important;
-    transition: color 0.2s ease !important;
-}
-
-a:hover {
-    color: #FF8C00 !important;
-}
-
-.results a {
-    color: #1e3a8a !important;
-}
-
-.results a:hover {
-    color: #FF8C00 !important;
-}
-
-/* ============================================ */
-/* BREADCRUMBS */
-/* ============================================ */
-.breadcrumbs {
-    background: #f0f9ff !important;
-    border-bottom: 1px solid #bfdbfe !important;
-    color: #1e3a8a !important;
-    padding: 10px 20px !important;
-}
-
-.breadcrumbs a {
-    color: #1e3a8a !important;
-}
-
-.breadcrumbs a:hover {
-    color: #FF8C00 !important;
-}
-
-/* ============================================ */
-/* MENSAGENS */
-/* ============================================ */
-.success {
-    background-color: #d1fae5 !important;
-    border-color: #10b981 !important;
-    color: #065f46 !important;
-}
-
-.warning {
-    background-color: #fef3c7 !important;
-    border-color: #f59e0b !important;
-    color: #92400e !important;
-}
-
-.error {
-    background-color: #fee2e2 !important;
-    border-color: #ef4444 !important;
-    color: #991b1b !important;
-}
-
-/* ============================================ */
-/* FOOTER */
-/* ============================================ */
-#footer {
-    background: linear-gradient(135deg, #e8f4f8 0%, #dbeafe 100%) !important;
-    border-top: 2px solid #bfdbfe !important;
-    color: #1e3a8a !important;
-    text-align: center !important;
-    padding: 15px !important;
-    font-size: 12px !important;
-}
-
-#footer strong {
-    color: #FF8C00 !important;
-    font-weight: 700 !important;
-}
-
-/* ============================================ */
-/* FORMULÁRIOS */
-/* ============================================ */
-.form-row {
-    padding: 10px !important;
-}
-
-img[alt="True"], img[alt="False"],
-.vCheckboxLabel {
-    vertical-align: middle !important;
-}
-
-/* ============================================ */
-/* FORÇAR HOVER LARANJA EM TODOS OS LINKS */
-/* Regra adicional para garantir 100% */
-/* ============================================ */
-
-/* Pega QUALQUER link dentro de user-tools, sem exceção */
-#user-tools > a:hover,
-#user-tools a:hover,
-div#user-tools a:hover,
-#header #user-tools a:hover,
-#user-tools > a[href]:hover,
-a.logout:hover,
-a[href*="logout/"]:hover,
-a[href$="/logout/"]:hover {
-    color: #ffffff !important;
-    background: linear-gradient(135deg, #FF8C00 0%, #FF6B00 100%) !important;
-    transform: translateY(-1px) !important;
-    box-shadow: 0 2px 4px rgba(255, 140, 0, 0.3) !important;
-    padding: 6px 10px !important;
-    border-radius: 4px !important;
-}
-
-/* Força absoluta - último recurso */
-#user-tools *:hover[href] {
-    color: #ffffff !important;
-    background: #FF8C00 !important;
-}
-
-
-/* ============================================ */
-/* HOVER LARANJA - BOTÃO "ENCERRAR SESSÃO" */
-/* (é um button, não um link!) */
-/* ============================================ */
-
-/* Estilização do botão de logout */
-#logout-form,
-#logout-form button,
-button[type="submit"][name="logout"],
-form[id*="logout"] button {
-    display: inline-block !important;
-    background: transparent !important;
-    border: none !important;
-    color: #1e3a8a !important;
-    font-weight: 600 !important;
-    font-size: 13px !important;
-    cursor: pointer !important;
-    padding: 6px 10px !important;
-    border-radius: 4px !important;
-    transition: all 0.2s ease !important;
-    text-decoration: none !important;
-}
-
-/* HOVER LARANJA no botão de logout */
-#logout-form button:hover,
-button[type="submit"][name="logout"]:hover,
-form[id*="logout"] button:hover,
-#user-tools button:hover {
-    color: #ffffff !important;
-    background: linear-gradient(135deg, #FF8C00 0%, #FF6B00 100%) !important;
-    transform: translateY(-1px) !important;
-    box-shadow: 0 2px 4px rgba(255, 140, 0, 0.3) !important;
-}
-
-/* Garantir que o form não quebre o layout */
-#logout-form {
-    display: inline !important;
-    margin: 0 !important;
-    padding: 0 !important;
-}
-
+html { scroll-behavior: smooth; }

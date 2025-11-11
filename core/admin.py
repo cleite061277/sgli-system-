@@ -2,7 +2,6 @@
 from django.contrib import admin
 from core.models import ConfiguracaoSistema, LogGeracaoComandas
 from django.contrib.auth.admin import UserAdmin
-from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django.utils import timezone
 from .forms import PagamentoAdminForm
 from .models import Fiador, Usuario, Locador, Imovel, Locatario, Locacao, Comanda, Pagamento, TemplateContrato
@@ -18,32 +17,14 @@ from docx.enum.text import WD_ALIGN_PARAGRAPH
 from datetime import datetime
 from io import BytesIO
 from .contrato_generator import gerar_contrato_pdf, gerar_contrato_docx
-
-
-# ════════════════════════════════════════════════════════════
-# USUARIO ADMIN - AUTENTICAÇÃO CORRIGIDA
-# ════════════════════════════════════════════════════════════
-
-class UsuarioCreationForm(UserCreationForm):
-    """Form para criar novos usuários"""
-    class Meta:
-        model = Usuario
-        fields = ('username', 'email', 'tipo_usuario')
-
-class UsuarioChangeForm(UserChangeForm):
-    """Form para editar usuários"""
-    class Meta:
-        model = Usuario
-        fields = '__all__'
+from django.utils.html import format_html
+from django.urls import reverse
 
 @admin.register(Usuario)
-class UsuarioAdmin(UserAdmin):
-    """Admin customizado para Usuario com autenticação correta"""
+class UsuarioAdmin(admin.ModelAdmin):
+    """Admin organizado para Usuario"""
     
-    form = UsuarioChangeForm
-    add_form = UsuarioCreationForm
-    
-    list_display = ['username', 'email', 'tipo_usuario', 'is_staff', 'is_active', 'date_joined']
+    list_display = ['username', 'get_full_name', 'email', 'tipo_usuario', 'is_staff', 'is_active', 'date_joined']
     list_filter = ['tipo_usuario', 'is_active', 'is_staff', 'date_joined']
     search_fields = ['username', 'email', 'first_name', 'last_name', 'cpf']
     
@@ -67,34 +48,11 @@ class UsuarioAdmin(UserAdmin):
         }),
     )
     
-    add_fieldsets = (
-        (None, {
-            'classes': ('wide',),
-            'fields': ('username', 'email', 'password1', 'password2'),
-        }),
-        ('👤 Informações', {
-            'fields': ('first_name', 'last_name', 'tipo_usuario'),
-        }),
-        ('🔑 Permissões', {
-            'fields': ('is_staff', 'is_active'),
-        }),
-    )
-    
     readonly_fields = ['date_joined', 'last_login']
-    
-    def save_model(self, request, obj, form, change):
-        """Garante que usuários tenham acesso ao admin"""
-        if not change:
-            if not obj.is_staff:
-                obj.is_staff = True
-        super().save_model(request, obj, form, change)
 
 
-# ════════════════════════════════════════════════════════════
 
-from django.utils.html import format_html
-from django.urls import reverse
-
+@admin.register(Locador)
 class LocadorAdmin(admin.ModelAdmin):
     """Admin organizado para Locador"""
     
@@ -242,7 +200,6 @@ class LocatarioAdmin(admin.ModelAdmin):
 
 
 @admin.register(Locacao)
-
 class LocacaoAdmin(admin.ModelAdmin):
     """Admin atualizado com geração de contratos"""
     
@@ -308,6 +265,18 @@ class LocacaoAdmin(admin.ModelAdmin):
             form.base_fields['numero_contrato'].required = False
             form.base_fields['numero_contrato'].help_text = '✨ Deixe vazio para gerar automaticamente'
         return form
+
+    def change_view(self, request, object_id, form_url='', extra_context=None):
+        """Adiciona botões de gerar contrato."""
+        extra_context = extra_context or {}
+        obj = self.get_object(request, object_id)
+        if obj:
+            from django.urls import reverse
+            extra_context['show_contrato_buttons'] = True
+            extra_context['contrato_docx_url'] = reverse('gerar_contrato_docx', args=[obj.pk])
+            extra_context['contrato_pdf_url'] = reverse('gerar_contrato_pdf', args=[obj.pk])
+        return super().change_view(request, object_id, form_url, extra_context)
+
     
     @admin.display(description='Contratos')
     def acoes_contrato(self, obj):
@@ -376,16 +345,6 @@ class LocacaoAdmin(admin.ModelAdmin):
             form.base_fields['numero_contrato'].required = False
         return form
 
-    def change_view(self, request, object_id, form_url='', extra_context=None):
-        """Adiciona botões de gerar contrato."""
-        extra_context = extra_context or {}
-        obj = self.get_object(request, object_id)
-        if obj:
-            from django.urls import reverse
-            extra_context['show_contrato_buttons'] = True
-            extra_context['contrato_docx_url'] = reverse('gerar_contrato_docx', args=[obj.pk])
-            extra_context['contrato_pdf_url'] = reverse('gerar_contrato_pdf', args=[obj.pk])
-        return super().change_view(request, object_id, form_url, extra_context)
 """
 Admin melhorado para o modelo Comanda
 Adicionar/substituir no arquivo: core/admin.py
@@ -418,6 +377,58 @@ class PagamentoInline(admin.TabularInline):
         return True
 
 
+class SaldoFilter(admin.SimpleListFilter):
+    """Filtro customizado para saldo da comanda"""
+    title = 'Saldo'
+    parameter_name = 'saldo'
+
+    def lookups(self, request, model_admin):
+        return (
+            ('positivo', 'Cliente tem crédito (Saldo +)'),
+            ('zero', 'Conta quite (Saldo = 0)'),
+            ('negativo', 'Cliente deve (Saldo -)'),
+            ('alto_positivo', 'Crédito alto (> R$ 500)'),
+            ('alto_negativo', 'Débito alto (< -R$ 500)'),
+        )
+
+    def queryset(self, request, queryset):
+        from decimal import Decimal
+        
+        if self.value() == 'positivo':
+            return queryset.annotate(
+                total_pago=models.Sum('pagamentos__valor_pago', 
+                                     filter=models.Q(pagamentos__status='confirmado'))
+            ).filter(total_pago__gt=models.F('valor_pago'))
+        
+        if self.value() == 'zero':
+            return queryset.annotate(
+                total_pago=models.Sum('pagamentos__valor_pago',
+                                     filter=models.Q(pagamentos__status='confirmado'))
+            ).filter(total_pago=models.F('valor_pago'))
+        
+        if self.value() == 'negativo':
+            return queryset.annotate(
+                total_pago=models.Sum('pagamentos__valor_pago',
+                                     filter=models.Q(pagamentos__status='confirmado'))
+            ).filter(total_pago__lt=models.F('valor_pago'))
+        
+        if self.value() == 'alto_positivo':
+            return queryset.annotate(
+                total_pago=models.Sum('pagamentos__valor_pago',
+                                     filter=models.Q(pagamentos__status='confirmado')),
+                saldo=models.F('total_pago') - models.F('valor_pago')
+            ).filter(saldo__gt=Decimal('500.00'))
+        
+        if self.value() == 'alto_negativo':
+            return queryset.annotate(
+                total_pago=models.Sum('pagamentos__valor_pago',
+                                     filter=models.Q(pagamentos__status='confirmado')),
+                saldo=models.F('total_pago') - models.F('valor_pago')
+            ).filter(saldo__lt=Decimal('-500.00'))
+        
+        return queryset
+
+
 @admin.register(Comanda)
 class ComandaAdmin(admin.ModelAdmin):
     """Admin melhorado para Comanda com organização por seções"""
@@ -428,12 +439,14 @@ class ComandaAdmin(admin.ModelAdmin):
         'mes_ano_referencia',
         'vencimento_colorido',
         'valor_total_formatado',
+        'saldo_display',
         'status_badge',
         'dias_vencimento',
-    ]
+        ]
     
     list_filter = [
         'status',
+        SaldoFilter,
         'data_vencimento',
         'mes_referencia',
         'ano_referencia',
@@ -461,6 +474,33 @@ class ComandaAdmin(admin.ModelAdmin):
     
     inlines = [PagamentoInline]
     
+    def save_formset(self, request, form, formset, change):
+        """
+        Preenche usuario_registro_id com PK do usuário.
+        Versão 5/5: robusta, com validação e debug.
+        """
+        instances = formset.save(commit=False)
+
+        # Validar usuário autenticado
+        if not getattr(request.user, "is_authenticated", False):
+            raise ValueError("❌ Usuário não autenticado")
+        
+        user_pk = getattr(request.user, "pk", None)
+        if not user_pk:
+            raise ValueError("❌ Usuário sem PK")
+
+        for instance in instances:
+            # Atribuir PK diretamente ao campo FK
+            if hasattr(instance, "usuario_registro_id"):
+                if not getattr(instance, "usuario_registro_id", None):
+                    instance.usuario_registro_id = user_pk
+             
+            # Salvar instância
+            instance.save()
+                    
+        # Salvar M2M
+        formset.save_m2m()
+        
     # Organizar campos em seções
     fieldsets = (
         ('📋 Informações Básicas', {
@@ -496,8 +536,8 @@ class ComandaAdmin(admin.ModelAdmin):
         }),
         ('⚖️ Ajustes Financeiros', {
             'fields': (
-                'multa',
-                'juros',
+                'valor_multa',
+                'valor_juros',
                 'desconto',
             ),
             'classes': ['collapse'],
@@ -619,12 +659,64 @@ class ComandaAdmin(admin.ModelAdmin):
             bg, fg, icone, texto
         )
     
+    def _get_dias_atraso_seguro(self, obj):
+        """
+        Método auxiliar para obter dias_atraso de forma segura.
+        Protege contra problemas de cache do Python.
+        """
+        try:
+            # Tentar acessar como property
+            attr = getattr(obj, 'dias_atraso', None)
+            
+            # Se for callable (método), chamar
+            if callable(attr):
+                return attr()
+            
+            # Se for valor direto, retornar
+            if attr is not None:
+                return attr
+            
+            # Fallback: calcular manualmente
+            if obj.data_vencimento and obj.status not in ['PAID', 'PAGA']:
+                from django.utils import timezone
+                dias = (timezone.now().date() - obj.data_vencimento).days
+                return max(0, dias)
+            
+            return 0
+        except Exception:
+            return 0
+    
+    def _get_property_seguro(self, obj, property_name, default=0):
+        """
+        Método auxiliar genérico para obter @property de forma segura.
+        Protege contra problemas de cache do Python com properties.
+        
+        Args:
+            obj: Objeto do modelo
+            property_name: Nome da property
+            default: Valor padrão se falhar
+        """
+        try:
+            attr = getattr(obj, property_name, None)
+            
+            # Se for callable (método), chamar
+            if callable(attr):
+                return attr()
+            
+            # Se for valor direto, retornar
+            if attr is not None:
+                return attr
+            
+            return default
+        except Exception:
+            return default
+    
     @admin.display(description='Atraso')
     def dias_vencimento(self, obj):
         if obj.status == 'PAID':
             return format_html('<span style="color: #28a745;">✓ Paga</span>')
         
-        dias = obj.dias_atraso
+        dias = self._get_dias_atraso_seguro(obj)  # ← USO SEGURO
         if dias == 0:
             return format_html('<span style="color: #17a2b8;">Em dia</span>')
         elif dias > 0:
@@ -638,20 +730,60 @@ class ComandaAdmin(admin.ModelAdmin):
                 abs(dias)
             )
     
+    def saldo_display(self, obj):
+        """Exibe saldo com formatação, cor e destaque visual para valores altos"""
+        from decimal import Decimal
+        
+        saldo = obj.get_saldo()
+        saldo_fmt = obj.get_saldo_formatado()
+        
+        # Definir cor e ícone
+        if saldo == 0:
+            color = '#666'  # Cinza
+            icon = '●'
+            bg_color = '#f8f9fa'
+        elif saldo > 0:
+            color = '#28a745'  # Verde
+            icon = '▲'
+            bg_color = '#d4edda'
+        else:
+            color = '#dc3545'  # Vermelho
+            icon = '▼'
+            bg_color = '#f8d7da'
+        
+        # Destaque especial para valores altos (> R$ 500 ou < -R$ 500)
+        if abs(saldo) > Decimal('500.00'):
+            return format_html(
+                '<span style="color: {}; font-weight: bold; font-size: 1.1em; '
+                'background: {}; padding: 4px 8px; border-radius: 4px; '
+                'border: 2px solid {}; display: inline-block;">'
+                '{} {}</span>',
+                color, bg_color, color, icon, saldo_fmt
+            )
+        else:
+            return format_html(
+                '<span style="color: {}; font-weight: bold;">{} {}</span>',
+                color, icon, saldo_fmt
+            )
+    
+    saldo_display.short_description = '💰 Saldo'
+    saldo_display.admin_order_field = 'valor_pago'
+    
     # Campos readonly personalizados
     
     @admin.display(description='💰 Valor Total')
     def valor_total_display(self, obj):
+        valor = self._get_property_seguro(obj, 'valor_total', default=0)
         return format_html(
             '<div style="font-size: 20px; font-weight: bold; color: #667eea; '
             'padding: 10px; background: #f0f4ff; border-radius: 8px; text-align: center;">'
             'R$ {:.2f}</div>',
-            obj.valor_total
+            valor
         )
     
     @admin.display(description='💵 Valor Pendente')
     def valor_pendente_display(self, obj):
-        pendente = obj.valor_pendente
+        pendente = self._get_property_seguro(obj, 'valor_pendente', default=0)
         cor = '#28a745' if pendente == 0 else '#dc3545'
         return format_html(
             '<div style="font-size: 18px; font-weight: bold; color: {}; '
@@ -663,7 +795,7 @@ class ComandaAdmin(admin.ModelAdmin):
     
     @admin.display(description='⏰ Dias de Atraso')
     def dias_atraso_display(self, obj):
-        dias = obj.dias_atraso
+        dias = self._get_dias_atraso_seguro(obj)  # ← USO SEGURO
         if dias == 0:
             return format_html('<span style="color: #28a745; font-size: 16px;">✓ Em dia</span>')
         elif dias > 0:
@@ -1056,7 +1188,8 @@ class LogGeracaoComandasAdmin(admin.ModelAdmin):
 class FiadorAdmin(admin.ModelAdmin):
     """Admin para Fiador."""
     
-    list_display = ['nome_completo', 'cpf', 'telefone', 'empresa_trabalho', 'created_at']
+    list_display = ['nome_completo', 'cpf', 'telefone', 'empresa_trabalho', 'created_at',
+        ]
     list_filter = ['created_at', 'is_active']
     search_fields = ['nome_completo', 'cpf', 'rg', 'email', 'telefone']
     
@@ -1085,52 +1218,6 @@ class FiadorAdmin(admin.ModelAdmin):
     
     readonly_fields = ['created_at', 'updated_at']
 
+# Override Dashboard
 from .dashboard_views import admin_index
 admin.site.index = admin_index
-
-
-# ════════════════════════════════════════════
-# ADMIN: NOTIFICAÇÕES
-# ════════════════════════════════════════════
-from core.notifications.models import NotificacaoLog
-
-@admin.register(NotificacaoLog)
-class NotificacaoLogAdmin(admin.ModelAdmin):
-    """Admin para logs de notificações"""
-    
-    list_display = [
-        'data_envio',
-        'tipo',
-        'destinatario',
-        'status',
-        'comanda_info',
-    ]
-    
-    list_filter = ['tipo', 'status', 'data_envio']
-    
-    search_fields = [
-        'destinatario',
-        'comanda__locacao__locatario__nome_razao_social',
-    ]
-    
-    readonly_fields = [
-        'comanda',
-        'tipo',
-        'destinatario',
-        'status',
-        'mensagem',
-        'data_envio',
-    ]
-    
-    def comanda_info(self, obj):
-        """Mostra informações da comanda"""
-        return f"{obj.comanda.locacao.locatario.nome_razao_social} - {obj.comanda.mes_referencia.strftime('%m/%Y')}"
-    comanda_info.short_description = 'Comanda'
-    
-    def has_add_permission(self, request):
-        """Não permite adicionar logs manualmente"""
-        return False
-    
-    def has_delete_permission(self, request, obj=None):
-        """Não permite deletar logs"""
-        return False

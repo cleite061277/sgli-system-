@@ -1,190 +1,100 @@
 """
-Tarefas Agendadas - Django-Q
-Envio automático de lembretes de vencimento
+Tasks assíncronas do Celery para notificações
 """
-from django.conf import settings
+from celery import shared_task
+from django.core.management import call_command
 from django.utils import timezone
-from datetime import timedelta, date
 from core.models import Comanda
-from core.notifications import EmailSender, WhatsAppSender, NotificacaoLog
+from core.services.email_service import EmailService
+from datetime import date, timedelta
 import logging
 
 logger = logging.getLogger(__name__)
 
 
-def enviar_lembretes_vencimento():
+@shared_task(name='core.tasks.enviar_notificacoes_task')
+def enviar_notificacoes_task():
     """
-    Tarefa agendada: Envia lembretes de vencimento
-    Executa diariamente e envia para comandas que vencem em X dias
+    Task principal: envia todas as notificações diárias
+    Agendada para rodar às 8h todos os dias
     """
-    logger.info("=" * 50)
-    logger.info("INICIANDO ENVIO DE LEMBRETES")
-    logger.info("=" * 50)
+    logger.info("🚀 Iniciando task de envio de notificações")
     
-    # Verificar se notificações estão ativas
-    if not settings.NOTIFICACOES_ATIVAS:
-        logger.info("Notificações desativadas. Abortando.")
-        return {
-            'status': 'desativado',
-            'mensagem': 'Notificações estão desativadas no .env'
-        }
-    
-    # Calcular data alvo (hoje + X dias)
-    dias_antecedencia = settings.DIAS_ANTECEDENCIA_LEMBRETE
-    data_alvo = date.today() + timedelta(days=dias_antecedencia)
-    
-    logger.info(f"Buscando comandas que vencem em {data_alvo.strftime('%d/%m/%Y')}")
-    logger.info(f"({dias_antecedencia} dias de antecedência)")
-    
-    # Buscar comandas que vencem na data alvo e estão pendentes
-    comandas = Comanda.objects.filter(
-        data_vencimento=data_alvo,
-        status='PENDENTE'
-    ).select_related('locacao', 'locacao__imovel', 'locacao__locatario')
-    
-    total_comandas = comandas.count()
-    logger.info(f"Encontradas {total_comandas} comandas para notificar")
-    
-    if total_comandas == 0:
-        logger.info("Nenhuma comanda encontrada. Finalizando.")
-        return {
-            'status': 'ok',
-            'total': 0,
-            'enviados': 0,
-            'mensagem': 'Nenhuma comanda para notificar hoje'
-        }
-    
-    # Contadores
-    emails_enviados = 0
-    whatsapp_enviados = 0
-    erros = 0
-    
-    # Inicializar senders
-    email_sender = EmailSender()
-    whatsapp_sender = WhatsAppSender()
-    
-    # Processar cada comanda
-    for comanda in comandas:
-        locatario = comanda.locacao.locatario
-        logger.info(f"\n--- Processando Comanda #{comanda.id} ---")
-        logger.info(f"Locatário: {locatario.nome_razao_social}")
-        
-        # Enviar Email
-        if settings.ENVIAR_EMAIL:
-            logger.info("Enviando email...")
-            sucesso, mensagem = email_sender.enviar_comanda(comanda)
-            
-            # Registrar log
-            NotificacaoLog.objects.create(
-                comanda=comanda,
-                tipo='EMAIL',
-                destinatario=locatario.email or 'N/A',
-                status='ENVIADO' if sucesso else 'ERRO',
-                mensagem=mensagem
-            )
-            
-            if sucesso:
-                emails_enviados += 1
-                logger.info(f"✅ Email: {mensagem}")
-            else:
-                erros += 1
-                logger.error(f"❌ Email: {mensagem}")
-        
-        # Enviar WhatsApp
-        if settings.ENVIAR_WHATSAPP:
-            logger.info("Enviando WhatsApp...")
-            sucesso, mensagem = whatsapp_sender.enviar_comanda(comanda)
-            
-            # Registrar log
-            NotificacaoLog.objects.create(
-                comanda=comanda,
-                tipo='WHATSAPP',
-                destinatario=locatario.telefone or 'N/A',
-                status='ENVIADO' if sucesso else 'ERRO',
-                mensagem=mensagem
-            )
-            
-            if sucesso:
-                whatsapp_enviados += 1
-                logger.info(f"✅ WhatsApp: {mensagem}")
-            else:
-                erros += 1
-                logger.error(f"❌ WhatsApp: {mensagem}")
-    
-    # Resumo
-    logger.info("\n" + "=" * 50)
-    logger.info("RESUMO DO ENVIO")
-    logger.info("=" * 50)
-    logger.info(f"Total de comandas: {total_comandas}")
-    logger.info(f"Emails enviados: {emails_enviados}")
-    logger.info(f"WhatsApp enviados: {whatsapp_enviados}")
-    logger.info(f"Erros: {erros}")
-    logger.info("=" * 50)
-    
-    return {
-        'status': 'ok',
-        'total': total_comandas,
-        'emails': emails_enviados,
-        'whatsapp': whatsapp_enviados,
-        'erros': erros,
-        'data_alvo': data_alvo.strftime('%d/%m/%Y')
-    }
+    try:
+        call_command('enviar_notificacoes')
+        logger.info("✅ Task de notificações concluída com sucesso")
+        return {'status': 'success', 'timestamp': timezone.now().isoformat()}
+    except Exception as e:
+        logger.error(f"❌ Erro na task de notificações: {e}")
+        return {'status': 'error', 'error': str(e)}
 
 
-def enviar_lembrete_manual(comanda_id):
+@shared_task(name='core.tasks.verificar_vencimentos_urgentes_task')
+def verificar_vencimentos_urgentes_task():
     """
-    Envia lembrete manualmente para uma comanda específica
+    Task de backup: verifica vencimentos urgentes (hoje e amanhã)
+    Roda a cada hora como rede de segurança
+    """
+    logger.info("🔍 Verificando vencimentos urgentes")
     
-    Args:
-        comanda_id: UUID da comanda
+    hoje = date.today()
+    amanha = hoje + timedelta(days=1)
+    enviados = 0
+    
+    try:
+        # Comandas que vencem hoje
+        comandas_hoje = Comanda.objects.filter(
+            data_vencimento=hoje,
+            status__in=['PENDING', 'OVERDUE'],
+            notificacao_enviada_vencimento=False,
+            is_active=True
+        )
         
-    Returns:
-        dict: Resultado do envio
+        for comanda in comandas_hoje:
+            if EmailService.enviar_notificacao(comanda, 'VEN'):
+                comanda.notificacao_enviada_vencimento = True
+                comanda.save(update_fields=['notificacao_enviada_vencimento', 'updated_at'])
+                enviados += 1
+        
+        # Comandas que vencem amanhã
+        comandas_amanha = Comanda.objects.filter(
+            data_vencimento=amanha,
+            status__in=['PENDING', 'OVERDUE'],
+            notificacao_enviada_1dia=False,
+            is_active=True
+        )
+        
+        for comanda in comandas_amanha:
+            if EmailService.enviar_notificacao(comanda, '1D'):
+                comanda.notificacao_enviada_1dia = True
+                comanda.save(update_fields=['notificacao_enviada_1dia', 'updated_at'])
+                enviados += 1
+        
+        logger.info(f"✅ Verificação urgente concluída: {enviados} notificações enviadas")
+        return {'status': 'success', 'enviados': enviados}
+        
+    except Exception as e:
+        logger.error(f"❌ Erro na verificação urgente: {e}")
+        return {'status': 'error', 'error': str(e)}
+
+
+@shared_task(name='core.tasks.enviar_notificacao_individual_task')
+def enviar_notificacao_individual_task(comanda_id, tipo_notificacao):
+    """
+    Task para envio individual (útil para testes ou envios manuais)
     """
     try:
         comanda = Comanda.objects.get(id=comanda_id)
+        sucesso = EmailService.enviar_notificacao(comanda, tipo_notificacao)
         
-        email_sender = EmailSender()
-        whatsapp_sender = WhatsAppSender()
-        
-        resultados = {
-            'comanda_id': str(comanda_id),
-            'locatario': comanda.locacao.locatario.nome_razao_social,
+        return {
+            'status': 'success' if sucesso else 'failed',
+            'comanda': comanda.numero_comanda,
+            'tipo': tipo_notificacao
         }
-        
-        # Enviar Email
-        if settings.ENVIAR_EMAIL:
-            sucesso, mensagem = email_sender.enviar_comanda(comanda)
-            resultados['email'] = {'sucesso': sucesso, 'mensagem': mensagem}
-            
-            NotificacaoLog.objects.create(
-                comanda=comanda,
-                tipo='EMAIL',
-                destinatario=comanda.locacao.locatario.email or 'N/A',
-                status='ENVIADO' if sucesso else 'ERRO',
-                mensagem=mensagem
-            )
-        
-        # Enviar WhatsApp
-        if settings.ENVIAR_WHATSAPP:
-            sucesso, mensagem = whatsapp_sender.enviar_comanda(comanda)
-            resultados['whatsapp'] = {'sucesso': sucesso, 'mensagem': mensagem}
-            
-            NotificacaoLog.objects.create(
-                comanda=comanda,
-                tipo='WHATSAPP',
-                destinatario=comanda.locacao.locatario.telefone or 'N/A',
-                status='ENVIADO' if sucesso else 'ERRO',
-                mensagem=mensagem
-            )
-        
-        return resultados
-        
     except Comanda.DoesNotExist:
-        return {
-            'erro': f'Comanda {comanda_id} não encontrada'
-        }
+        logger.error(f"Comanda {comanda_id} não encontrada")
+        return {'status': 'error', 'error': 'Comanda não encontrada'}
     except Exception as e:
-        return {
-            'erro': str(e)
-        }
+        logger.error(f"Erro ao enviar notificação individual: {e}")
+        return {'status': 'error', 'error': str(e)}

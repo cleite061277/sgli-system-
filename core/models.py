@@ -4,7 +4,8 @@ from decimal import Decimal
 from typing import Optional
 from datetime import date, timedelta
 
-from django.db import models
+from django.db import models, transaction, IntegrityError
+from django.db.models import F
 from django.contrib.auth.models import AbstractUser
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
@@ -732,16 +733,37 @@ class Locatario(BaseModel):
 
 class Locacao(BaseModel):
     """Lease/rental agreement model."""
+    
     def save(self, *args, **kwargs):
-        """Gera número automático se vazio."""
+        """Gera numero_contrato sequencial único se não existir."""
         if not self.numero_contrato:
-            from datetime import datetime
-            ano = datetime.now().year
-            mes = str(datetime.now().month).zfill(2)
-            cpf_cnpj = self.locatario.cpf_cnpj.replace(".", "").replace("-", "").replace("/", "")[:6] if self.locatario else "000000"
-            codigo_imovel = self.imovel.codigo_imovel if self.imovel else "XXXX"
-            self.numero_contrato = f"{ano}{mes}{cpf_cnpj}{codigo_imovel}"
+            from django.utils import timezone
+            import re
+            
+            hoje = timezone.now()
+            ano_mes = f"{hoje.year}{hoje.month:02d}"
+            
+            # Extrair últimos 6 dígitos do CPF/CNPJ do locatário
+            cpf_cnpj = re.sub(r'\D', '', self.locatario.cpf_cnpj)  # Remove não-dígitos
+            cpf_6dig = cpf_cnpj[-6:] if len(cpf_cnpj) >= 6 else cpf_cnpj.zfill(6)
+            
+            # Pegar primeiros 4 caracteres do código do imóvel
+            codigo_imovel = self.imovel.codigo_imovel[:5].upper() if self.imovel.codigo_imovel else "XXXX"
+            
+            # Formato: YYYYMM-XXXXXX-XXXX (ex: 202511123456-A101)
+            numero_base = f"{ano_mes}{cpf_6dig}{codigo_imovel}"
+            
+            # Verificar se já existe (caso improvável de colisão)
+            numero_final = numero_base
+            contador = 1
+            while Locacao.objects.filter(numero_contrato=numero_final).exists():
+                numero_final = f"{numero_base}-{contador}"
+                contador += 1
+            
+            self.numero_contrato = numero_final
+        
         super().save(*args, **kwargs)
+    
     class StatusLocacao(models.TextChoices):
         ATIVA = 'ACTIVE', _('Ativa')
         INATIVA = 'INACTIVE', _('Inativa')
@@ -807,10 +829,52 @@ class Locacao(BaseModel):
     def __str__(self) -> str:
         return f"Contrato {self.numero_contrato} - {self.locatario.nome_razao_social}"
     
+    @classmethod
+    def get_contratos_ativos_count(cls):
+        """Retorna contagem de contratos ativos."""
+        return cls.objects.filter(status=cls.StatusLocacao.ATIVA).count()
+    
+    @classmethod
+    def get_contratos_vencendo(cls, dias=60):
+        """Retorna contratos que vencem em X dias."""
+        from django.utils import timezone
+        from datetime import timedelta
+        
+        data_limite = timezone.now().date() + timedelta(days=dias)
+        return cls.objects.filter(
+            status=cls.StatusLocacao.ATIVA,
+            data_fim__lte=data_limite,
+            data_fim__gte=timezone.now().date()
+        ).count()
+    
     class Meta:
         verbose_name = _('Locação')
         verbose_name_plural = _('Locações')
         db_table = 'core_locacao'
+
+
+# ============================================================================
+# PAGAMENTO CHOICES (Global - usadas por Comanda e Pagamento)
+# ============================================================================
+
+class FormaPagamento(models.TextChoices):
+    """Formas de pagamento disponíveis no sistema"""
+    DINHEIRO = 'dinheiro', _('Dinheiro')
+    PIX = 'pix', _('PIX')
+    TRANSFERENCIA = 'transferencia', _('Transferência Bancária')
+    BOLETO = 'boleto', _('Boleto')
+    CARTAO_CREDITO = 'cartao_credito', _('Cartão de Crédito')
+    CARTAO_DEBITO = 'cartao_debito', _('Cartão de Débito')
+    CHEQUE = 'cheque', _('Cheque')
+
+class StatusPagamento(models.TextChoices):
+    """Status de pagamento"""
+    PENDENTE = 'pendente', _('Pendente')
+    CONFIRMADO = 'confirmado', _('Confirmado')
+    CANCELADO = 'cancelado', _('Cancelado')
+    ESTORNADO = 'estornado', _('Estornado')
+
+
 # ============================================================================
 # COMANDA MODEL (Sistema Financeiro)
 # ============================================================================
@@ -866,10 +930,11 @@ class Comanda(BaseModel):
     
     # Valores da cobrança
     valor_aluguel = models.DecimalField(
-        max_digits=10,
-        decimal_places=2,
-        validators=[MinValueValidator(Decimal('0.00'))],
-        verbose_name=_('Valor do Aluguel'),
+    	max_digits=10,
+    	decimal_places=2,
+    	default=Decimal('0.00'),  # ← ADICIONAR
+    	validators=[MinValueValidator(Decimal('0.00'))],
+    	verbose_name=_('Valor do Aluguel'),
         help_text=_('Valor do aluguel no mês de referência')
     )
     
@@ -918,7 +983,7 @@ class Comanda(BaseModel):
         help_text=_('Débitos diversos (multas, juros, etc.)')
     )
     
-    multa = models.DecimalField(
+    valor_multa = models.DecimalField(
         max_digits=10,
         decimal_places=2,
         default=Decimal('0.00'),
@@ -927,7 +992,7 @@ class Comanda(BaseModel):
         help_text=_('Multa por atraso no pagamento')
     )
     
-    juros = models.DecimalField(
+    valor_juros = models.DecimalField(
         max_digits=10,
         decimal_places=2,
         default=Decimal('0.00'),
@@ -963,8 +1028,9 @@ class Comanda(BaseModel):
     )
     
     forma_pagamento = models.CharField(
-        max_length=100,
+        max_length=20,
         blank=True,
+        choices=FormaPagamento.choices,
         verbose_name=_('Forma de Pagamento'),
         help_text=_('Forma de pagamento utilizada')
     )
@@ -993,6 +1059,16 @@ class Comanda(BaseModel):
         verbose_name='Notificação de atraso enviada'
     )
     
+    notificacao_enviada_10dias = models.BooleanField(
+        default=False,
+        verbose_name='Notificação 10 dias enviada'
+    )
+    
+    notificacao_enviada_vencimento = models.BooleanField(
+        default=False,
+        verbose_name='Notificação dia vencimento enviada'
+    )
+    
     observacoes = models.TextField(
         blank=True,
         verbose_name=_('Observações'),
@@ -1008,8 +1084,8 @@ class Comanda(BaseModel):
         valor_administracao = self.valor_administracao or Decimal("0.00")
         outros_creditos = self.outros_creditos or Decimal("0.00")
         outros_debitos = self.outros_debitos or Decimal("0.00")
-        multa = self.multa or Decimal("0.00")
-        juros = self.juros or Decimal("0.00")
+        multa = self.valor_multa or Decimal("0.00")
+        juros = self.valor_juros or Decimal("0.00")
         desconto = self.desconto or Decimal("0.00")
         
         total = (
@@ -1029,6 +1105,31 @@ class Comanda(BaseModel):
     def valor_pendente(self) -> Decimal:
         """Calculate pending amount."""
         return max(self.valor_total - self.valor_pago, Decimal('0.00'))
+    
+    def get_saldo(self):
+        """
+        Calcula saldo: Total pago - Valor da comanda
+        Positivo = a favor do cliente (pagou a mais)
+        Negativo = a favor do locatário (deve)
+        """
+        total_pago = self.pagamentos.filter(
+            status="confirmado"
+        ).aggregate(
+            total=models.Sum('valor_pago')
+        )['total'] or Decimal('0.00')
+        
+        saldo = total_pago - self.valor_pago
+        return saldo
+    
+    def get_saldo_formatado(self):
+        """Retorna saldo formatado em R$ com sinal"""
+        saldo = self.get_saldo()
+        if saldo == 0:
+            return "R$ 0,00"
+        elif saldo > 0:
+            return f"+R$ {saldo:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.')
+        else:
+            return f"-R$ {abs(saldo):,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.')
     
     @property
     def is_vencida(self) -> bool:
@@ -1070,8 +1171,8 @@ class Comanda(BaseModel):
         
         dias_atraso = (data_referencia - self.data_vencimento).days
         
-        # Calculate late fee (2% of rent after 1 day)
-        multa = self.valor_aluguel * Decimal('0.02') if dias_atraso >= 1 else Decimal('0.00')
+        # Calculate late fee (10% of rent after 1 day)
+        multa = self.valor_aluguel * Decimal('0.10') if dias_atraso >= 1 else Decimal('0.00')
         
         # Calculate interest (1% per month, pro-rata daily)
         juros_mensal = Decimal('0.01')  # 1% per month
@@ -1089,11 +1190,11 @@ class Comanda(BaseModel):
             return
         
         valores = self.calcular_multa_juros()
-        self.multa = valores['multa']
-        self.juros = valores['juros']
+        self.valor_multa = valores['multa']
+        self.valor_juros = valores['juros']
         
         if salvar:
-            self.save(update_fields=['multa', 'juros', 'updated_at'])
+            self.save(update_fields=['valor_multa', 'valor_juros', 'updated_at'])
     
     def clean(self) -> None:
         """Validate model data."""
@@ -1103,49 +1204,70 @@ class Comanda(BaseModel):
             if abs(self.valor_pago - self.valor_total) > Decimal('0.01'):  # Allow small rounding differences
                 raise ValidationError(_('Valor pago não pode ser maior que o valor total.'))
     
-    def save(self, *args, **kwargs) -> None:
-        """Override save to update status based on payment."""
-        # Auto-update status based on payment
-        if self.valor_pago >= self.valor_total and self.valor_total > 0:
-            self.status = self.StatusComanda.PAGA
-        elif self.valor_pago > 0:
-            self.status = self.StatusComanda.PARCIALMENTE_PAGA
-        elif self.is_vencida:
-            self.status = self.StatusComanda.VENCIDA
+    def save(self, *args, **kwargs):
+        """
+        Save override para Comanda: gera numero_comanda no formato YYYYMM-XXXX.
+        Usa retry atômico para evitar colisões UNIQUE.
+        """
+        from django.db import transaction, IntegrityError
+        
+        # Se não tiver numero_comanda, delega ao save padrão
+        if not hasattr(self, 'numero_comanda'):
+            return super(type(self), self).save(*args, **kwargs)
+        
+        # Se já existe numero_comanda (edição), salva normalmente
+        if self.numero_comanda:
+            return super().save(*args, **kwargs)
+        
+        # mes_referencia é DateField -> extrair ano e mês
+        if hasattr(self, 'mes_referencia') and getattr(self.mes_referencia, 'month', None):
+            when_year = int(self.mes_referencia.year)
+            when_month = int(self.mes_referencia.month)
         else:
-            self.status = self.StatusComanda.PENDENTE
+            # Fallback
+            when_year = int(self.ano_referencia)
+            when_month = int(self.mes_referencia)
         
-        # Generate automatic number if not provided
-        if not self.numero_comanda:
-            self.numero_comanda = self._gerar_numero_automatico()
-            
-        super().save(*args, **kwargs)
-    
-    def _gerar_numero_automatico(self) -> str:
-        """Generate automatic invoice number in YYYYMM-XXXX format."""
-        prefix = f"{self.ano_referencia}{self.mes_referencia:02d}"
+        prefix = f"{when_year}{when_month:02d}"
         
-        # Find the last invoice for this month/year
-        last_comanda = (Comanda.objects
-                       .filter(numero_comanda__startswith=prefix)
-                       .order_by('-numero_comanda')
-                       .first())
+        MAX_ATTEMPTS = 8
+        last_exc = None
         
-        if last_comanda:
+        for attempt in range(MAX_ATTEMPTS):
             try:
-                last_seq = int(last_comanda.numero_comanda.split('-')[1])
-                new_seq = last_seq + 1
-            except (IndexError, ValueError):
-                new_seq = 1
-        else:
-            new_seq = 1
+                with transaction.atomic():
+                    last = (Comanda.objects
+                           .filter(numero_comanda__startswith=prefix)
+                           .order_by('-numero_comanda')
+                           .first())
+                    
+                    if last and getattr(last, 'numero_comanda', None):
+                        try:
+                            last_seq = int(last.numero_comanda.split('-')[-1])
+                            new_seq = last_seq + 1
+                        except (IndexError, ValueError):
+                            new_seq = 1
+                    else:
+                        new_seq = 1
+                    
+                    self.numero_comanda = f"{prefix}-{new_seq:04d}"
+                    super().save(*args, **kwargs)
+                
+                return
+                
+            except IntegrityError as exc:
+                last_exc = exc
+                self.numero_comanda = None
+                continue
         
-        return f"{prefix}-{new_seq:04d}"
+        raise IntegrityError(
+            f"Não foi possível gerar numero_comanda único após {MAX_ATTEMPTS} tentativas"
+        ) from last_exc
     
     def __str__(self) -> str:
         return f"Comanda {self.numero_comanda} - {self.mes_referencia:02d}/{self.ano_referencia}"
-    
-    class Meta:
+    	
+class Meta:
         verbose_name = _('Comanda')
         verbose_name_plural = _('Comandas')
         db_table = 'core_comanda'
@@ -1161,21 +1283,14 @@ class Pagamento(BaseModel):
     Payment tracking model with complete audit trail.
     Tracks individual payments made against comandas.
     """
-    
-    class FormaPagamento(models.TextChoices):
-        DINHEIRO = 'dinheiro', _('Dinheiro')
-        PIX = 'pix', _('PIX')
-        TRANSFERENCIA = 'transferencia', _('Transferência Bancária')
-        BOLETO = 'boleto', _('Boleto')
-        CARTAO_CREDITO = 'cartao_credito', _('Cartão de Crédito')
-        CARTAO_DEBITO = 'cartao_debito', _('Cartão de Débito')
-        CHEQUE = 'cheque', _('Cheque')
-    
-    class StatusPagamento(models.TextChoices):
-        PENDENTE = 'pendente', _('Pendente')
-        CONFIRMADO = 'confirmado', _('Confirmado')
-        CANCELADO = 'cancelado', _('Cancelado')
-        ESTORNADO = 'estornado', _('Estornado')
+    FORMA_PAGAMENTO_CHOICES = (
+        ('BO', _('Boleto')),
+        ('PI', _('Pix')),
+        ('TR', _('Transferência')),
+        ('DE', _('Dinheiro')),
+        ('CH', _('Cheque')),
+        ('OU', _('Outro')),
+    )
     
     # Relacionamentos
     comanda = models.ForeignKey(
@@ -1193,12 +1308,10 @@ class Pagamento(BaseModel):
     )
     
     # Identificação
-    numero_pagamento = models.CharField(
-        max_length=50,
+    numero_pagamento = models.CharField(max_length=50,
         unique=True,
         editable=False,
-        verbose_name=_('Número do Pagamento')
-    )
+        verbose_name=_('Número do Pagamento'))
     
     # Valores
     valor_pago = models.DecimalField(
@@ -1245,30 +1358,16 @@ class Pagamento(BaseModel):
         verbose_name=_('Observações')
     )
     
-    def save(self, *args, **kwargs):
-        """Generate automatic payment number."""
-        if not self.numero_pagamento:
-            self.numero_pagamento = self._gerar_numero_automatico()
-        
-        # Auto-confirmar se não tiver data de confirmação
-        if self.status == self.StatusPagamento.CONFIRMADO and not self.data_confirmacao:
-            from django.utils import timezone
-            self.data_confirmacao = timezone.now()
-        
-        super().save(*args, **kwargs)
-        
-        # Atualizar valor pago na comanda
-        self._atualizar_comanda()
-    
     def _gerar_numero_automatico(self):
         """Generate sequential payment number."""
         from django.utils import timezone
         hoje = timezone.now()
         prefixo = f"PAG{hoje.year}{hoje.month:02d}"
         
+        # Usar select_for_update para evitar race condition
         ultimo = Pagamento.objects.filter(
             numero_pagamento__startswith=prefixo
-        ).order_by('-numero_pagamento').first()
+        ).select_for_update().order_by('-numero_pagamento').first()
         
         if ultimo:
             try:
@@ -1284,7 +1383,7 @@ class Pagamento(BaseModel):
     def _atualizar_comanda(self):
         """Update comanda's paid value based on confirmed payments."""
         total_pago = self.comanda.pagamentos.filter(
-            status=self.StatusPagamento.CONFIRMADO
+            status="confirmado"
         ).aggregate(
             total=models.Sum('valor_pago')
         )['total'] or Decimal('0.00')
@@ -1295,6 +1394,20 @@ class Pagamento(BaseModel):
     def __str__(self):
         return f"{self.numero_pagamento} - {self.forma_pagamento} - R$ {self.valor_pago}"
     
+
+    def save(self, *args, **kwargs):
+        """Gera numero_pagamento sequencial único"""
+        if not self.numero_pagamento:
+            from django.utils import timezone
+            hoje = timezone.now()
+            prefix = f"PAG{hoje.year}{hoje.month:02d}"
+            
+            # Usar SequenceCounter para garantir unicidade
+            seq = SequenceCounter.get_next(prefix)
+            self.numero_pagamento = f"{prefix}-{seq:04d}"
+        
+        super().save(*args, **kwargs)
+
     class Meta:
         verbose_name = _('Pagamento')
         verbose_name_plural = _('Pagamentos')
@@ -1323,6 +1436,24 @@ def validar_arquivo_template(arquivo):
 # ============================================================================
 # TEMPLATE CONTRATO MODEL
 # ============================================================================
+
+    ## AUTO-GENERATED NUMERO_PAGAMENTO - inserido em 2025-11-04T03:43:30.631563Z
+    def _generate_numero(self):
+        """Gera um identificador curto único baseado em UUID."""
+        import uuid
+        return uuid.uuid4().hex[:12].upper()
+    
+    def save(self, *args, **kwargs):
+        """Garante numero_pagamento único antes de salvar."""
+        if not getattr(self, 'numero_pagamento', None):
+            for _ in range(10):
+                candidate = self._generate_numero()
+                if not type(self).objects.filter(numero_pagamento=candidate).exists():
+                    self.numero_pagamento = candidate
+                    break
+            else:
+                raise ValueError('Não foi possível gerar numero_pagamento único após várias tentativas.')
+        return super(type(self), self).save(*args, **kwargs)
 
 class TemplateContrato(BaseModel):
     """Template de contrato customizável."""
@@ -1430,12 +1561,6 @@ class ConfiguracaoSistema(models.Model):
     def __str__(self):
         return f"Configurações (Vencimento: dia {self.dia_vencimento_padrao})"
     
-    def save(self, *args, **kwargs):
-        # Garantir que existe apenas uma instância (Singleton)
-        self.pk = 1
-        super().save(*args, **kwargs)
-    
-    @classmethod
     def get_config(cls):
         """Retorna a configuração única do sistema"""
         config, created = cls.objects.get_or_create(pk=1)
@@ -1470,3 +1595,117 @@ class LogGeracaoComandas(models.Model):
     def __str__(self):
         return f"Geração {self.mes_referencia.strftime('%m/%Y')} - {self.comandas_geradas} comandas"
 
+
+
+class LogNotificacao(BaseModel):
+    """Log de notificações enviadas"""
+    
+    class TipoNotificacao(models.TextChoices):
+        LEMBRETE_10_DIAS = '10D', _('Lembrete 10 dias')
+        LEMBRETE_7_DIAS = '7D', _('Lembrete 7 dias')
+        LEMBRETE_1_DIA = '1D', _('Lembrete 1 dia')
+        DIA_VENCIMENTO = 'VEN', _('Dia do vencimento')
+        ATRASO_1_DIA = 'ATR1', _('Atraso 1 dia')
+        ATRASO_7_DIAS = 'ATR7', _('Atraso 7 dias')
+        ATRASO_14_DIAS = 'ATR14', _('Atraso 14 dias')
+        ATRASO_21_DIAS = 'ATR21', _('Atraso 21 dias')
+    
+    comanda = models.ForeignKey(
+        'Comanda',
+        on_delete=models.CASCADE,
+        related_name='logs_notificacao',
+        verbose_name=_('Comanda')
+    )
+    
+    tipo_notificacao = models.CharField(
+        max_length=10,
+        choices=TipoNotificacao.choices,
+        verbose_name=_('Tipo de Notificação')
+    )
+    
+    destinatario_email = models.EmailField(
+        verbose_name=_('Email Destinatário')
+    )
+    
+    enviado_em = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name=_('Enviado em')
+    )
+    
+    sucesso = models.BooleanField(
+        default=True,
+        verbose_name=_('Enviado com sucesso')
+    )
+    
+    mensagem_erro = models.TextField(
+        blank=True,
+        verbose_name=_('Mensagem de erro')
+    )
+    
+    def __str__(self):
+        return f"{self.get_tipo_notificacao_display()} - {self.comanda.numero_comanda}"
+    
+    class Meta:
+        verbose_name = _('Log de Notificação')
+        verbose_name_plural = _('Logs de Notificações')
+        ordering = ['-enviado_em']
+
+
+class SequenceCounter(models.Model):
+    """Contador sequencial thread-safe para gerar números únicos"""
+    prefix = models.CharField(max_length=20, unique=True, db_index=True)
+    current_value = models.IntegerField(default=0)
+    
+    class Meta:
+        db_table = 'core_sequence_counter'
+        verbose_name = 'Contador de Sequência'
+        verbose_name_plural = 'Contadores de Sequência'
+    
+    @classmethod
+    def get_next(cls, prefix):
+        """
+        Retorna próximo número da sequência de forma atômica e robusta.
+        Usa select_for_update + F() para incremento atômico no DB.
+        """
+        import logging
+        logger = logging.getLogger(__name__)
+        
+        MAX_ATTEMPTS = 5
+        last_exc = None
+        
+        for attempt in range(MAX_ATTEMPTS):
+            try:
+                with transaction.atomic():
+                    # get_or_create COM select_for_update para lock
+                    counter, created = cls.objects.select_for_update().get_or_create(
+                        prefix=prefix,
+                        defaults={'current_value': 0}
+                    )
+                    
+                    # Incrementar usando F() para atomicidade no DB
+                    counter.current_value = F('current_value') + 1
+                    counter.save(update_fields=['current_value'])
+                    
+                    # Refresh para obter valor real
+                    counter.refresh_from_db()
+                    
+                    return counter.current_value
+                    
+            except IntegrityError as exc:
+                last_exc = exc
+                logger.warning(
+                    f"SequenceCounter.get_next IntegrityError na tentativa {attempt+1} "
+                    f"para '{prefix}': {exc}"
+                )
+                continue
+        
+        # Esgotou tentativas
+        raise IntegrityError(
+            f"Não foi possível obter sequência para '{prefix}' após {MAX_ATTEMPTS} tentativas"
+        ) from last_exc
+# Importa ComandaStatus criado em core/comanda_status.py para registrar o model no app.
+try:
+    from .comanda_status import ComandaStatus  # noqa: F401
+except Exception:
+    # Se houver problema (ex.: erro de sintaxe no arquivo), não quebremos a importação global.
+    pass

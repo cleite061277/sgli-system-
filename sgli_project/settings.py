@@ -11,11 +11,12 @@ import dj_database_url  # Certifique-se de que dj-database-url está instalado (
 IS_PRODUCTION = os.environ.get('DEBUG', 'False') == 'False'
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = config('SECRET_KEY')
+SECRET_KEY = config('SECRET_KEY', default='django-insecure-CHANGE-THIS-IN-PRODUCTION')
 DEBUG = config('DEBUG', default=False, cast=bool)
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost').split(',')
 
 INSTALLED_APPS = [
+    'core.apps.CoreConfig',  # ← DEVE VIR PRIMEIRO para templates customizados
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -26,7 +27,6 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'corsheaders',
     'django_filters',
-    'core.apps.CoreConfig',
 ]
 
 MIDDLEWARE = [
@@ -46,8 +46,7 @@ ROOT_URLCONF = 'sgli_project.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates', BASE_DIR / 'core',
-    'django_q',  'templates'],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -101,6 +100,7 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # Diretórios adicionais para collectstatic
 STATICFILES_DIRS = [
@@ -133,54 +133,6 @@ SECURE_CONTENT_TYPE_NOSNIFF = True
     
 
 
-# Base directory
-BASE_DIR = Path(__file__).resolve().parent.parent
-
-# Static files (CSS, JavaScript, Images)
-STATIC_URL = '/static/'
-
-# Diretórios adicionais para collectstatic
-STATICFILES_DIRS = [
-    BASE_DIR / 'static',
-]
-
-# Garantir que existe um lugar para arquivos estáticos
-
-# WhiteNoise configuration
-if IS_PRODUCTION:
-    STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
-    
-    # WhiteNoise middleware (já deve estar, mas garantir)
-    if 'whitenoise.middleware.WhiteNoiseMiddleware' not in MIDDLEWARE:
-        # Adicionar após SecurityMiddleware
-        middleware_list = list(MIDDLEWARE)
-        security_index = middleware_list.index('django.middleware.security.SecurityMiddleware')
-        middleware_list.insert(security_index + 1, 'whitenoise.middleware.WhiteNoiseMiddleware')
-        MIDDLEWARE = middleware_list
-
-# ════════════════════════════════════════════
-# STATIC FILES - CONFIGURAÇÃO LIMPA
-# ════════════════════════════════════════════
-STATIC_URL = '/static/'
-
-# Diretórios adicionais para collectstatic
-STATICFILES_DIRS = [
-    BASE_DIR / 'static',
-]
-STATIC_ROOT = BASE_DIR / 'staticfiles'
-
-# Se estiver em produção, usar WhiteNoise
-if IS_PRODUCTION:
-    # WhiteNoise
-    STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
-    
-    # Garantir que WhiteNoise está no middleware
-    if 'whitenoise.middleware.WhiteNoiseMiddleware' not in MIDDLEWARE:
-        MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
-
-
-# ════════════════════════════════════════════
-# CSRF TRUSTED ORIGINS - CORREÇÃO COMPLETA
 # ════════════════════════════════════════════
 if IS_PRODUCTION:
     # Pegar domínio da variável ALLOWED_HOSTS
@@ -272,3 +224,45 @@ if IS_PRODUCTION:
 LOGIN_URL = '/admin/login/'
 LOGIN_REDIRECT_URL = '/admin/'
 LOGOUT_REDIRECT_URL = '/admin/login/'
+
+# Fallback para SQLite em desenvolvimento (se DATABASE_URL não existir)
+import os
+_DATABASE_URL = os.environ.get('DATABASE_URL')
+
+if not _DATABASE_URL:
+    import warnings
+    warnings.warn("DATABASE_URL não encontrada. Usando SQLite como fallback.")
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
+
+
+# ════════════════════════════════════════════
+# EMAIL CONFIGURATION
+# ════════════════════════════════════════════
+EMAIL_BACKEND = config('EMAIL_BACKEND', default='django.core.mail.backends.console.EmailBackend')
+EMAIL_HOST = config('EMAIL_HOST', default='smtp.gmail.com')
+EMAIL_PORT = config('EMAIL_PORT', default=587, cast=int)
+EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'True') == 'True'
+EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='')
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
+DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='HABITAT PRO <noreply@habitatpro.com>')
+
+
+# ════════════════════════════════════════════
+# CELERY CONFIGURATION
+# ════════════════════════════════════════════
+CELERY_BROKER_URL = os.getenv('REDIS_URL', 'redis://localhost:6379/0')
+CELERY_RESULT_BACKEND = os.getenv('REDIS_URL', 'redis://localhost:6379/0')
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'America/Sao_Paulo'
+CELERY_TASK_TRACK_STARTED = True
+CELERY_TASK_TIME_LIMIT = 30 * 60  # 30 minutos
+
+# URL do site (ajuste em produção)
+SITE_URL = config('SITE_URL', default='http://localhost:8000')

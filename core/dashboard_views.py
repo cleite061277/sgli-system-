@@ -14,10 +14,11 @@ def admin_index(request):
     data_limite = hoje + timedelta(days=60)
     
     total_imoveis = Imovel.objects.filter(is_active=True).count()
+    # ✅ CORREÇÃO: status='ACTIVE' (valor do DB) ao invés de 'ATIVA' (label)
     contratos_ativos = Locacao.objects.filter(status='ACTIVE', is_active=True).count()
     total_locatarios = Locatario.objects.filter(is_active=True).count()
     contratos_vencendo = Locacao.objects.filter(
-        status='ACTIVE',
+        status='ACTIVE',  # ✅ CORRIGIDO
         data_fim__gte=hoje,
         data_fim__lte=data_limite,
         is_active=True

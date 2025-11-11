@@ -1,71 +1,63 @@
 # Python
+*.pyc
+__pycache__/
 *.py[cod]
 *$py.class
 *.so
 .Python
-__pycache__/
-*.pyc
 venv/
 env/
-ENV/
-*.egg-info/
-dist/
-build/
 
 # Django
 *.log
 db.sqlite3
 db.sqlite3-journal
-/media
-/staticfiles
-/static
+media/
+staticfiles/
 
-# Backups
+# Backups e temporários
+*.bak
 *.backup
-*.backup_*
-backups/
-backups_sgli/
-backup_*/
+*.BACKUP_*
+*.BROKEN_*
+*.CORRUPTED_*
+*_backup_*
+backups_*/
+correcoes_*/
+disaster_recovery/
+
+# Celery
+celerybeat-schedule.db
+celerybeat.pid
 
 # IDEs
 .vscode/
 .idea/
 *.swp
 *.swo
-*~
 
-# Environment variables
-.env
-.env.local
-.env.*.local
-*.env.backup*
-
-# OS
+# Sistema
 .DS_Store
 Thumbs.db
-*.bak
 
-# Railway
-.railway/
+# Migrations backup
+migrations_backup_*/
 
-# Documentação local
-*.txt.backup
-IMPLEMENTACAO_*.txt
+# Scripts e logs temporários
+fix_*.sh
+test_*.sh
+diagnostic_*.sh
+diagnostico_*.txt
+system_status.txt
+*.md
+desktop.sh
 
-# Documentação com secrets
-ATIVAR_NOTIFICACOES.txt
-RESUMO_TECNICO.txt
-IMPLEMENTACAO_*.txt
-
-# Backups grandes
-*.tar.gz
-*.zip
-backups/
-backups_sgli/
-backup_*/
-
-# Secrets
-*.env
-.env.*
-*.pem
-*.key
+# Arquivos específicos do projeto
+.maintenance_schedule
+current_requirements.txt
+reports/
+scripts/
+txt/
+admin .py
+*ok_*.py
+models.py

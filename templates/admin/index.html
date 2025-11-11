@@ -4,235 +4,222 @@
 {% block extrahead %}
 {{ block.super }}
 <style>
-/* ================================================== */
-/*        HABITAT PRO - DASHBOARD MODERNA             */
-/* ================================================== */
+/* ═══════════════════════════════════════════════════════════ */
+/*         HABITAT PRO - DASHBOARD (FORÇA TOTAL)               */
+/* ═══════════════════════════════════════════════════════════ */
 
-/* Container principal */
+/* RESET COMPLETO */
 #content {
     padding: 0 !important;
     margin: 0 !important;
+    background: #f8fafc !important;
 }
 
-/* Hero Section - Logo e Boas-vindas */
+#content h1,
+#content-main {
+    display: none !important;
+}
+
+.dashboard-container {
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* ──────────────────────────────────────────────────────────── */
+/*                       HERO SECTION                            */
+/* ──────────────────────────────────────────────────────────── */
 .dashboard-hero {
-    background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #60a5fa 100%);
-    padding: 60px 40px;
-    text-align: center;
-    color: white;
-    box-shadow: 0 4px 20px rgba(30, 58, 138, 0.3);
-    position: relative;
-    overflow: hidden;
-}
-
-.dashboard-hero::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    right: -50%;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-    animation: pulse 15s ease-in-out infinite;
-}
-
-@keyframes pulse {
-    0%, 100% { transform: scale(1); opacity: 0.3; }
-    50% { transform: scale(1.1); opacity: 0.5; }
+    background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #60a5fa 100%) !important;
+    padding: 60px 40px !important;
+    text-align: center !important;
+    color: white !important;
+    box-shadow: 0 4px 20px rgba(30, 58, 138, 0.3) !important;
+    position: relative !important;
+    overflow: hidden !important;
 }
 
 .hero-logo {
-    width: 280px;
-    height: auto;
-    margin: 0 auto 30px;
-    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
-    position: relative;
-    z-index: 1;
+    width: 280px !important;
+    height: auto !important;
+    max-width: 90% !important;
+    margin: 0 auto 30px !important;
+    display: block !important;
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2)) !important;
 }
 
 .hero-title {
-    font-size: 48px;
-    font-weight: 800;
-    margin: 20px 0 10px;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-    letter-spacing: 2px;
-    position: relative;
-    z-index: 1;
+    font-size: 48px !important;
+    font-weight: 800 !important;
+    margin: 20px 0 10px !important;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3) !important;
+    letter-spacing: 2px !important;
+    line-height: 1.2 !important;
+    color: white !important;
 }
 
 .hero-title .habitat {
-    color: #ffffff;
+    color: #ffffff !important;
 }
 
 .hero-title .pro {
-    color: #FF8C00;
+    color: #FF8C00 !important;
 }
 
 .hero-subtitle {
-    font-size: 18px;
-    opacity: 0.95;
-    margin-bottom: 30px;
-    font-weight: 400;
-    position: relative;
-    z-index: 1;
+    font-size: 18px !important;
+    opacity: 0.95 !important;
+    margin-bottom: 30px !important;
+    font-weight: 400 !important;
+    color: white !important;
 }
 
 .hero-welcome {
-    font-size: 16px;
-    background: rgba(255,255,255,0.2);
-    display: inline-block;
-    padding: 12px 30px;
-    border-radius: 30px;
-    backdrop-filter: blur(10px);
-    margin-top: 10px;
-    position: relative;
-    z-index: 1;
+    font-size: 16px !important;
+    background: rgba(255,255,255,0.2) !important;
+    display: inline-block !important;
+    padding: 12px 30px !important;
+    border-radius: 30px !important;
+    margin-top: 10px !important;
+    color: white !important;
 }
 
-/* Estatísticas em Cards */
+/* ──────────────────────────────────────────────────────────── */
+/*                  ESTATÍSTICAS (CARDS)                         */
+/* ──────────────────────────────────────────────────────────── */
 .dashboard-stats {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 25px;
-    padding: 40px;
-    background: #f8fafc;
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)) !important;
+    gap: 25px !important;
+    padding: 40px !important;
+    background: #f8fafc !important;
 }
 
 .stat-card {
-    background: white;
-    border-radius: 12px;
-    padding: 25px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    transition: all 0.3s ease;
-    border-left: 4px solid #3b82f6;
+    background: white !important;
+    border-radius: 12px !important;
+    padding: 25px !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08) !important;
+    transition: all 0.3s ease !important;
+    border-left: 4px solid #3b82f6 !important;
+    text-align: center !important;
 }
 
 .stat-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 20px rgba(30, 58, 138, 0.15);
+    transform: translateY(-5px) !important;
+    box-shadow: 0 8px 20px rgba(30, 58, 138, 0.15) !important;
 }
 
-.stat-card.orange {
-    border-left-color: #FF8C00;
-}
-
-.stat-card.green {
-    border-left-color: #10b981;
-}
-
-.stat-card.red {
-    border-left-color: #ef4444;
-}
+.stat-card.orange { border-left-color: #FF8C00 !important; }
+.stat-card.green { border-left-color: #10b981 !important; }
+.stat-card.red { border-left-color: #ef4444 !important; }
 
 .stat-icon {
-    font-size: 36px;
-    margin-bottom: 15px;
+    font-size: 48px !important;
+    margin-bottom: 15px !important;
+    display: block !important;
 }
 
 .stat-value {
-    font-size: 32px;
-    font-weight: 700;
-    color: #1e3a8a;
-    margin: 10px 0;
+    font-size: 42px !important;
+    font-weight: 700 !important;
+    color: #1e3a8a !important;
+    margin: 10px 0 !important;
+    line-height: 1 !important;
 }
 
 .stat-label {
-    font-size: 14px;
-    color: #64748b;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    font-weight: 600;
+    font-size: 14px !important;
+    color: #64748b !important;
+    text-transform: uppercase !important;
+    letter-spacing: 1px !important;
+    font-weight: 600 !important;
+    margin-top: 10px !important;
 }
 
 .stat-link {
-    display: inline-block;
-    margin-top: 10px;
-    color: #3b82f6;
-    text-decoration: none;
-    font-size: 13px;
-    font-weight: 600;
-    transition: color 0.2s;
+    display: inline-block !important;
+    margin-top: 15px !important;
+    color: #3b82f6 !important;
+    text-decoration: none !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
 }
 
 .stat-link:hover {
-    color: #FF8C00;
+    color: #FF8C00 !important;
 }
 
-/* Ações Rápidas */
+/* ──────────────────────────────────────────────────────────── */
+/*                      AÇÕES RÁPIDAS                            */
+/* ──────────────────────────────────────────────────────────── */
 .quick-actions {
-    padding: 40px;
-    background: white;
+    padding: 40px !important;
+    background: white !important;
 }
 
 .quick-actions h2 {
-    font-size: 24px;
-    color: #1e3a8a;
-    margin-bottom: 25px;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    gap: 10px;
+    font-size: 24px !important;
+    color: #1e3a8a !important;
+    margin-bottom: 25px !important;
+    font-weight: 700 !important;
 }
 
 .actions-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 20px;
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) !important;
+    gap: 20px !important;
 }
 
 .action-card {
-    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-    border: 2px solid #bfdbfe;
-    border-radius: 8px;
-    padding: 20px;
-    text-align: center;
-    text-decoration: none;
-    color: #1e3a8a;
-    transition: all 0.3s ease;
-    font-weight: 600;
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%) !important;
+    border: 2px solid #bfdbfe !important;
+    border-radius: 8px !important;
+    padding: 20px !important;
+    text-align: center !important;
+    text-decoration: none !important;
+    color: #1e3a8a !important;
+    font-weight: 600 !important;
+    display: block !important;
+    transition: all 0.3s ease !important;
 }
 
 .action-card:hover {
-    background: linear-gradient(135deg, #FF8C00 0%, #FF6B00 100%);
-    color: white;
-    border-color: #FF8C00;
-    transform: translateY(-3px);
-    box-shadow: 0 4px 12px rgba(255, 140, 0, 0.3);
+    background: linear-gradient(135deg, #FF8C00 0%, #FF6B00 100%) !important;
+    color: white !important;
+    border-color: #FF8C00 !important;
+    transform: translateY(-3px) !important;
+    box-shadow: 0 4px 12px rgba(255, 140, 0, 0.3) !important;
+    text-decoration: none !important;
 }
 
 .action-icon {
-    font-size: 32px;
-    margin-bottom: 10px;
-    display: block;
+    font-size: 32px !important;
+    margin-bottom: 10px !important;
+    display: block !important;
 }
 
-/* Footer Dashboard */
+/* ──────────────────────────────────────────────────────────── */
+/*                         FOOTER                                */
+/* ──────────────────────────────────────────────────────────── */
 .dashboard-footer {
-    text-align: center;
-    padding: 30px;
-    background: #f8fafc;
-    color: #64748b;
-    font-size: 13px;
+    text-align: center !important;
+    padding: 30px !important;
+    background: #f8fafc !important;
+    color: #64748b !important;
+    font-size: 13px !important;
 }
 
 .dashboard-footer strong {
-    color: #1e3a8a;
+    color: #1e3a8a !important;
 }
 
-/* Responsivo */
+/* ──────────────────────────────────────────────────────────── */
+/*                       RESPONSIVO                              */
+/* ──────────────────────────────────────────────────────────── */
 @media (max-width: 768px) {
-    .hero-title {
-        font-size: 32px;
-    }
-    
-    .dashboard-stats,
-    .quick-actions {
-        padding: 20px;
-    }
-    
-    .stat-card {
-        padding: 20px;
-    }
+    .hero-title { font-size: 32px !important; }
+    .dashboard-stats, .quick-actions { padding: 20px !important; }
 }
 </style>
 {% endblock %}
@@ -242,7 +229,10 @@
     
     <!-- Hero Section -->
     <div class="dashboard-hero">
-        <img src="{% static 'images/habitat_pro_logo.png' %}" alt="HABITAT PRO" class="hero-logo">
+        <img src="{% static 'images/habitat_pro_logo.png' %}" 
+             alt="HABITAT PRO Logo" 
+             class="hero-logo"
+             onerror="this.style.display='none';">
         <h1 class="hero-title">
             <span class="habitat">HABITAT</span> <span class="pro">PRO</span>
         </h1>
@@ -255,30 +245,30 @@
     <!-- Estatísticas -->
     <div class="dashboard-stats">
         <div class="stat-card">
-            <div class="stat-icon">🏢</div>
+            <span class="stat-icon">🏢</span>
             <div class="stat-value">{{ total_imoveis|default:"0" }}</div>
             <div class="stat-label">Imóveis Cadastrados</div>
             <a href="{% url 'admin:core_imovel_changelist' %}" class="stat-link">Ver todos →</a>
         </div>
 
         <div class="stat-card orange">
-            <div class="stat-icon">📋</div>
+            <span class="stat-icon">📋</span>
             <div class="stat-value">{{ contratos_ativos|default:"0" }}</div>
             <div class="stat-label">Contratos Ativos</div>
-            <a href="{% url 'admin:core_locacao_changelist' %}?status__exact=ATIVA" class="stat-link">Ver contratos →</a>
+            <a href="{% url 'admin:core_locacao_changelist' %}" class="stat-link">Ver contratos →</a>
         </div>
 
         <div class="stat-card green">
-            <div class="stat-icon">👥</div>
+            <span class="stat-icon">👥</span>
             <div class="stat-value">{{ total_locatarios|default:"0" }}</div>
             <div class="stat-label">Locatários</div>
             <a href="{% url 'admin:core_locatario_changelist' %}" class="stat-link">Ver todos →</a>
         </div>
 
         <div class="stat-card red">
-            <div class="stat-icon">⚠️</div>
+            <span class="stat-icon">⚠️</span>
             <div class="stat-value">{{ contratos_vencendo|default:"0" }}</div>
-            <div class="stat-label">Contratos Vencendo em 60 dias</div>
+            <div class="stat-label">Vencendo em 60 dias</div>
             <a href="{% url 'admin:core_locacao_changelist' %}" class="stat-link">Ver detalhes →</a>
         </div>
     </div>
@@ -305,11 +295,11 @@
             </a>
             <a href="{% url 'admin:core_templatecontrato_changelist' %}" class="action-card">
                 <span class="action-icon">📄</span>
-                Templates Contratos
+                Templates
             </a>
-            <a href="{% url 'admin:core_locacao_changelist' %}" class="action-card">
+            <a href="{% url 'admin:core_comanda_changelist' %}" class="action-card">
                 <span class="action-icon">📊</span>
-                Relatórios
+                Comandas
             </a>
         </div>
     </div>
