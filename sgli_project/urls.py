@@ -72,9 +72,9 @@ urlpatterns = [
 #         name='api_mensagem_comanda'),
     
     # === COMANDA WEB ===
-    path('comanda/<uuid:comanda_id>/<str:token>/', 
-##         comanda_web_view, 
-         name='comanda_web'),
+#    path('comanda/<uuid:comanda_id>/<str:token>/', 
+###         comanda_web_view, 
+#         name='comanda_web'),
     
     # === CONTRATOS ===
     path('contrato/<uuid:locacao_id>/docx/', 
