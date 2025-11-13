@@ -1095,16 +1095,23 @@ class Comanda(BaseModel):
             valor_administracao + 
             outros_debitos + 
             multa + 
-            juros + 
-            outros_creditos
-        ) - desconto
+            juros
+        ) - outros_creditos - desconto  # ✅ CORRIGIDO: outros_creditos SUBTRAI
         
         return max(total, Decimal("0.00"))
-    
+        
     @property
     def valor_pendente(self) -> Decimal:
         """Calculate pending amount."""
-        return max(self.valor_total - self.valor_pago, Decimal('0.00'))
+        # Calcular total pago confirmado
+        total_pago = self.pagamentos.filter(
+            status='confirmado'
+        ).aggregate(total=Sum('valor_pago'))['total'] or Decimal('0.00')
+        
+        # Pendente = Valor total - Total pago
+        pendente = self.valor_total - total_pago
+        
+        return max(pendente, Decimal('0.00'))
     
     def get_saldo(self):
         """
@@ -1118,9 +1125,14 @@ class Comanda(BaseModel):
             total=models.Sum('valor_pago')
         )['total'] or Decimal('0.00')
         
-        saldo = total_pago - self.valor_pago
+        # Saldo = Total pago - Valor da comanda
+        # Usa valor_total que já calcula corretamente
+        # Positivo = cliente pagou a mais (tem crédito)
+        # Negativo = cliente deve (débito)
+        saldo = total_pago - self.valor_total
         return saldo
-    
+        
+          
     def get_saldo_formatado(self):
         """Retorna saldo formatado em R$ com sinal"""
         saldo = self.get_saldo()
@@ -1709,3 +1721,48 @@ try:
 except Exception:
     # Se houver problema (ex.: erro de sintaxe no arquivo), não quebremos a importação global.
     pass
+    
+# ============================================================
+# SIGNALS - Atualização Automática de Status da Comanda
+# ============================================================
+
+from django.db.models.signals import post_save, post_delete
+from django.dispatch import receiver
+from django.db.models import Sum
+
+@receiver([post_save, post_delete], sender=Pagamento)
+def atualizar_status_comanda(sender, instance, **kwargs):
+    """
+    Atualiza automaticamente o status e data_pagamento da Comanda
+    quando um Pagamento é criado, atualizado ou deletado.
+    """
+    comanda = instance.comanda
+    
+    # Calcular total pago confirmado
+    total_pago = comanda.pagamentos.filter(
+        status='confirmado'
+    ).aggregate(total=Sum('valor_pago'))['total'] or Decimal('0.00')
+    
+    # Calcular valor total da comanda
+    valor_comanda = comanda.valor_total
+    
+    
+    # Atualizar status baseado no total pago
+    if total_pago >= valor_comanda and valor_comanda > 0:
+        comanda.status = Comanda.StatusComanda.PAGA
+        # Atualizar data_pagamento com data do último pagamento confirmado
+        ultimo_pag = comanda.pagamentos.filter(
+            status='confirmado'
+        ).order_by('-data_pagamento').first()
+        if ultimo_pag:
+            comanda.data_pagamento = ultimo_pag.data_pagamento
+    elif total_pago > 0:
+        comanda.status = Comanda.StatusComanda.PARCIALMENTE_PAGA
+        comanda.data_pagamento = None
+    else:
+        comanda.status = Comanda.StatusComanda.PENDENTE
+        comanda.data_pagamento = None
+    
+    # Salvar alterações
+    comanda.save(update_fields=['status', 'data_pagamento', 'updated_at'])
+    

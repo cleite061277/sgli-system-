@@ -317,7 +317,7 @@ def gerar_contrato_docx(request, locacao_id):
         
     except Exception as e:
         messages.error(request, f'❌ Erro ao gerar contrato: {str(e)}')
-        return redirect('admin:core_locacao_change', pk)
+        return redirect('admin:core_locacao_change', locacao_id)
 
 
 @staff_member_required

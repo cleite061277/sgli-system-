@@ -19,6 +19,7 @@ from io import BytesIO
 from .contrato_generator import gerar_contrato_pdf, gerar_contrato_docx
 from django.utils.html import format_html
 from django.urls import reverse
+from django.db.models import Sum, Q, F, Count
 
 @admin.register(Usuario)
 class UsuarioAdmin(admin.ModelAdmin):
@@ -381,7 +382,7 @@ class SaldoFilter(admin.SimpleListFilter):
     """Filtro customizado para saldo da comanda"""
     title = 'Saldo'
     parameter_name = 'saldo'
-
+    
     def lookups(self, request, model_admin):
         return (
             ('positivo', 'Cliente tem crédito (Saldo +)'),
@@ -390,43 +391,40 @@ class SaldoFilter(admin.SimpleListFilter):
             ('alto_positivo', 'Crédito alto (> R$ 500)'),
             ('alto_negativo', 'Débito alto (< -R$ 500)'),
         )
-
+    
     def queryset(self, request, queryset):
+        """
+        NOTA: Como valor_total é @property e não campo DB,
+        filtramos em Python em vez de SQL.
+        """
         from decimal import Decimal
         
-        if self.value() == 'positivo':
-            return queryset.annotate(
-                total_pago=models.Sum('pagamentos__valor_pago', 
-                                     filter=models.Q(pagamentos__status='confirmado'))
-            ).filter(total_pago__gt=models.F('valor_pago'))
+        if not self.value():
+            return queryset
         
-        if self.value() == 'zero':
-            return queryset.annotate(
-                total_pago=models.Sum('pagamentos__valor_pago',
-                                     filter=models.Q(pagamentos__status='confirmado'))
-            ).filter(total_pago=models.F('valor_pago'))
+        # Buscar todas as comandas e filtrar em Python
+        comandas_filtradas = []
         
-        if self.value() == 'negativo':
-            return queryset.annotate(
-                total_pago=models.Sum('pagamentos__valor_pago',
-                                     filter=models.Q(pagamentos__status='confirmado'))
-            ).filter(total_pago__lt=models.F('valor_pago'))
+        for comanda in queryset:
+            try:
+                saldo = comanda.get_saldo()  # Usa método que calcula correto
+                
+                if self.value() == 'positivo' and saldo > 0:
+                    comandas_filtradas.append(comanda.pk)
+                elif self.value() == 'zero' and saldo == 0:
+                    comandas_filtradas.append(comanda.pk)
+                elif self.value() == 'negativo' and saldo < 0:
+                    comandas_filtradas.append(comanda.pk)
+                elif self.value() == 'alto_positivo' and saldo > Decimal('500.00'):
+                    comandas_filtradas.append(comanda.pk)
+                elif self.value() == 'alto_negativo' and saldo < Decimal('-500.00'):
+                    comandas_filtradas.append(comanda.pk)
+            except Exception:
+                # Se erro ao calcular saldo, pular
+                continue
         
-        if self.value() == 'alto_positivo':
-            return queryset.annotate(
-                total_pago=models.Sum('pagamentos__valor_pago',
-                                     filter=models.Q(pagamentos__status='confirmado')),
-                saldo=models.F('total_pago') - models.F('valor_pago')
-            ).filter(saldo__gt=Decimal('500.00'))
-        
-        if self.value() == 'alto_negativo':
-            return queryset.annotate(
-                total_pago=models.Sum('pagamentos__valor_pago',
-                                     filter=models.Q(pagamentos__status='confirmado')),
-                saldo=models.F('total_pago') - models.F('valor_pago')
-            ).filter(saldo__lt=Decimal('-500.00'))
-        
-        return queryset
+        # Retornar queryset filtrado
+        return queryset.filter(pk__in=comandas_filtradas)
 
 
 @admin.register(Comanda)
@@ -466,7 +464,7 @@ class ComandaAdmin(admin.ModelAdmin):
         'created_at',
         'updated_at',
         'valor_total_display',
-        'valor_pendente_display',
+        'saldo_display',
         'dias_atraso_display',
     ]
     
@@ -546,7 +544,7 @@ class ComandaAdmin(admin.ModelAdmin):
             'fields': (
                 'valor_total_display',
                 'valor_pago',
-                'valor_pendente_display',
+                'saldo_display',
             )
         }),
         ('💳 Pagamento', {
@@ -773,25 +771,26 @@ class ComandaAdmin(admin.ModelAdmin):
     
     @admin.display(description='💰 Valor Total')
     def valor_total_display(self, obj):
-        valor = self._get_property_seguro(obj, 'valor_total', default=0)
-        return format_html(
-            '<div style="font-size: 20px; font-weight: bold; color: #667eea; '
-            'padding: 10px; background: #f0f4ff; border-radius: 8px; text-align: center;">'
-            'R$ {:.2f}</div>',
-            valor
-        )
-    
-    @admin.display(description='💵 Valor Pendente')
-    def valor_pendente_display(self, obj):
-        pendente = self._get_property_seguro(obj, 'valor_pendente', default=0)
-        cor = '#28a745' if pendente == 0 else '#dc3545'
-        return format_html(
-            '<div style="font-size: 18px; font-weight: bold; color: {}; '
-            'padding: 10px; background: #f8f9fa; border-radius: 8px; text-align: center;">'
-            'R$ {:.2f}</div>',
-            cor,
-            pendente
-        )
+        """Exibe valor total formatado"""
+        try:
+            # Chamar property diretamente (não usar _get_property_seguro)
+            valor = obj.valor_total
+        
+            if valor is None or valor <= 0:
+                return '-'
+        
+            # Formatar para padrão brasileiro
+            valor_formatado = f'{valor:,.2f}'.replace(',', 'X').replace('.', ',').replace('X', '.')
+        
+            return format_html(
+                '<div style="font-size: 20px; font-weight: bold; color: #667eea; '
+                'padding: 10px; background: #f0f4ff; border-radius: 8px; text-align: center;">'
+                'R$ {}</div>',
+                valor_formatado
+            )
+        except Exception as e:
+            return '-'
+          
     
     @admin.display(description='⏰ Dias de Atraso')
     def dias_atraso_display(self, obj):
