@@ -20,15 +20,48 @@ from .contrato_generator import gerar_contrato_pdf, gerar_contrato_docx
 from django.utils.html import format_html
 from django.urls import reverse
 from django.db.models import Sum, Q, F, Count
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from django.contrib.auth.forms import UserCreationForm, UserChangeForm
+
+class UsuarioCreationForm(UserCreationForm):
+    """Form para criação de usuário com senha criptografada"""
+    class Meta:
+        model = Usuario
+        fields = ('username', 'email', 'first_name', 'last_name', 'cpf', 'telefone', 'tipo_usuario')
+
+class UsuarioChangeForm(UserChangeForm):
+    """Form para edição de usuário"""
+    class Meta:
+        model = Usuario
+        fields = '__all__'
 
 @admin.register(Usuario)
-class UsuarioAdmin(admin.ModelAdmin):
-    """Admin organizado para Usuario"""
+class UsuarioAdmin(BaseUserAdmin):
+    """Admin organizado para Usuario com senha criptografada"""
+    
+    # Forms corretos que criptografam senha
+    add_form = UsuarioCreationForm
+    form = UsuarioChangeForm
     
     list_display = ['username', 'get_full_name', 'email', 'tipo_usuario', 'is_staff', 'is_active', 'date_joined']
     list_filter = ['tipo_usuario', 'is_active', 'is_staff', 'date_joined']
     search_fields = ['username', 'email', 'first_name', 'last_name', 'cpf']
     
+    # Fieldsets para ADICIONAR usuário (usa password1 e password2)
+    add_fieldsets = (
+        (None, {
+            'classes': ('wide',),
+            'fields': ('username', 'password1', 'password2'),
+        }),
+        ('👤 Dados Pessoais', {
+            'fields': ('first_name', 'last_name', 'email', 'cpf', 'telefone', 'avatar')
+        }),
+        ('🎭 Perfil do Sistema', {
+            'fields': ('tipo_usuario',)
+        }),
+    )
+    
+    # Fieldsets para EDITAR usuário (usa password widget especial)
     fieldsets = (
         ('🔐 Autenticação', {
             'fields': ('username', 'password')
@@ -50,6 +83,32 @@ class UsuarioAdmin(admin.ModelAdmin):
     )
     
     readonly_fields = ['date_joined', 'last_login']
+    
+    def save_model(self, request, obj, form, change):
+        """
+        Garante que senha é criptografada e flags são setadas corretamente.
+        """
+        # Se é novo usuário, a senha já vem criptografada do UserCreationForm
+        # Apenas garantir flags corretas
+        
+        # Garantir is_active = True para novos usuários
+        if not change:
+            obj.is_active = True
+        
+        # Garantir is_staff = True para Admin e Gerente
+        if obj.tipo_usuario in ['ADMIN', 'GERENTE']:
+            obj.is_staff = True
+        
+        super().save_model(request, obj, form, change)
+        
+        # Mensagem de sucesso
+        if not change:
+            self.message_user(
+                request,
+                f'✅ Usuário {obj.username} criado com sucesso! '
+                f'Tipo: {obj.get_tipo_usuario_display()}',
+                level='success'
+            )
 
 
 
