@@ -1,0 +1,182 @@
+/* ================================================== */
+/*    SGLI - CSS CUSTOMIZADO - LABELS EM NEGRITO     */
+/*    FORÇA MÁXIMA - TODOS OS SELETORES POSSÍVEIS    */
+/* ================================================== */
+
+/* ============================================ */
+/* SEÇÃO 1: LABELS DE FORMULÁRIOS */
+/* ============================================ */
+
+/* Todos os labels possíveis */
+label,
+.form-row label,
+.field-box label,
+div.form-row > div > label,
+.form-group label,
+.aligned label,
+label[for],
+.field label,
+.fieldBox label,
+.form-row > label,
+div label {
+    font-weight: 700 !important;
+    font-weight: bold !important;
+}
+
+/* Labels específicos por classe */
+.vTextField label,
+.vDateField label,
+.vTimeField label,
+.vURLField label,
+.vIntegerField label,
+.vBigIntegerField label,
+.vForeignKeyRawIdAdminField label,
+.vManyToManyRawIdAdminField label {
+    font-weight: 700 !important;
+}
+
+/* ============================================ */
+/* SEÇÃO 2: CABEÇALHOS DE SEÇÕES */
+/* ============================================ */
+
+/* Títulos de módulos e fieldsets */
+.module caption,
+.module h2,
+fieldset.module h2,
+.inline-group h2,
+fieldset h2,
+h2.subhead,
+fieldset > h2,
+.collapse h2,
+.module > h2 {
+    font-weight: 700 !important;
+    font-size: 14px !important;
+    color: #417690 !important;
+}
+
+/* ============================================ */
+/* SEÇÃO 3: TABELAS E COLUNAS */
+/* ============================================ */
+
+/* Cabeçalhos de tabelas */
+th,
+th.column-header,
+th.sortable,
+th.sortable a,
+thead th,
+.results th,
+table thead th {
+    font-weight: 700 !important;
+}
+
+/* ============================================ */
+/* SEÇÃO 4: INLINES (Pagamentos, etc) */
+/* ============================================ */
+
+/* Labels em inlines */
+.inline-group .form-row label,
+.inline-related .form-row label,
+.tabular tr th,
+.tabular thead th,
+.inline-related fieldset label,
+.tabular .form-row label {
+    font-weight: 700 !important;
+}
+
+/* ============================================ */
+/* SEÇÃO 5: CAMPOS READONLY */
+/* ============================================ */
+
+/* Labels de campos readonly */
+.readonly label,
+div.readonly label,
+.form-row.readonly label {
+    font-weight: 700 !important;
+}
+
+/* ============================================ */
+/* SEÇÃO 6: BOTÕES */
+/* ============================================ */
+
+/* Botões de ação */
+.submit-row input[type="submit"],
+.button,
+input[type="submit"],
+input[type="button"],
+button,
+.addlink,
+.changelink,
+.deletelink {
+    font-weight: 600 !important;
+}
+
+/* ============================================ */
+/* SEÇÃO 7: FORÇA BRUTA FINAL */
+/* ============================================ */
+
+/* Se NADA funcionar, força TUDO */
+* label {
+    font-weight: 700 !important;
+}
+
+/* Especificamente para o Django Admin */
+#content label,
+#content-main label,
+.form-horizontal label,
+.aligned label {
+    font-weight: 700 !important;
+}
+
+/* Para os textos de ajuda NÃO ficarem em negrito */
+.help,
+p.help,
+.helptext,
+span.helptext,
+div.help {
+    font-weight: normal !important;
+}
+
+/* ================================================== */
+/*           HABITAT PRO - BRANDING                   */
+/* ================================================== */
+
+/* Logo no topo do admin */
+#site-name {
+    background: url('/static/images/habitat_pro_logo.png') no-repeat left center;
+    background-size: 200px auto;
+    padding-left: 220px !important;
+    min-height: 60px;
+    display: flex;
+    align-items: center;
+}
+
+#site-name a {
+    color: #FF8C00 !important;
+    font-weight: bold !important;
+    font-size: 24px !important;
+}
+
+/* Ajustar header do admin */
+#header {
+    background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%) !important;
+    padding: 15px 20px !important;
+}
+
+/* Cores do tema HABITAT PRO */
+.button, input[type="submit"], .submit-row input {
+    background-color: #FF8C00 !important;
+    border-color: #FF6B00 !important;
+}
+
+.button:hover, input[type="submit"]:hover {
+    background-color: #FF6B00 !important;
+}
+
+/* Links em laranja */
+a {
+    color: #FF8C00 !important;
+}
+
+a:hover {
+    color: #FF6B00 !important;
+}

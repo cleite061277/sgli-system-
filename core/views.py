@@ -202,17 +202,32 @@ def pagina_recibo_pagamento(request, pagamento_id):
                     messages.error(request, '❌ Locatário não possui email cadastrado!')
                 else:
                     assunto = f'Recibo de Pagamento - {pagamento.numero_pagamento}'
+                    
+                    # ✅ CORREÇÃO #4: Email detalhado do recibo
                     corpo = f'''
 Prezado(a) {locatario.nome_razao_social},
 
-Segue em anexo o recibo de pagamento referente ao imóvel {imovel.endereco}, {imovel.numero}.
+Segue em anexo o recibo de pagamento referente ao imóvel:
+📍 {imovel.endereco}, {imovel.numero}
 
-Valor pago: R$ {pagamento.valor_pago}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+💰 DETALHAMENTO DO PAGAMENTO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Recibo Nº: {pagamento.numero_pagamento}
 Data: {pagamento.data_pagamento.strftime('%d/%m/%Y')}
 Forma: {pagamento.get_forma_pagamento_display()}
 
+Valor Pago: R$ {pagamento.valor_pago:,.2f}
+
+Referente à:
+- Comanda: {comanda.numero_comanda}
+- Vencimento: {comanda.data_vencimento.strftime('%d/%m/%Y')}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
 Atenciosamente,
-HABITAT PRO
+HABITAT PRO v1.0
 Sistema de Gestão Imobiliária
 '''
                     
@@ -239,8 +254,8 @@ Sistema de Gestão Imobiliária
         
         elif action == 'whatsapp':
             try:
-                from core.notifications.message_formatter import MessageFormatter
                 import urllib.parse
+                from decimal import Decimal
                 
                 # Telefone do locatário
                 telefone = locatario.telefone if locatario else None
@@ -260,13 +275,40 @@ Sistema de Gestão Imobiliária
                         f'/pagamento/{pagamento.id}/recibo/'
                     )
                     
-                    # Formatar mensagem usando MessageFormatter (com link)
-                    mensagem = MessageFormatter.formatar_mensagem_whatsapp_recibo(
-                        pagamento, 
-                        recibo_url=recibo_url
-                    )
+                    # ✅ CORREÇÃO #5: Mensagem WhatsApp detalhada do recibo
+                    mensagem = f'''🧾 *RECIBO DE PAGAMENTO*
+
+Olá *{locatario.nome_razao_social}*!
+
+Confirmamos o recebimento do seu pagamento:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+📋 *DADOS DO PAGAMENTO*
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔢 Recibo: *{pagamento.numero_pagamento}*
+📅 Data: *{pagamento.data_pagamento.strftime('%d/%m/%Y')}*
+💳 Forma: *{pagamento.get_forma_pagamento_display()}*
+
+💰 Valor Pago: *R$ {pagamento.valor_pago:,.2f}*
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+📍 *REFERENTE A:*
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🏠 Imóvel: {imovel.endereco}, {imovel.numero}
+📋 Comanda: {comanda.numero_comanda}
+📆 Vencimento: {comanda.data_vencimento.strftime('%d/%m/%Y')}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔗 Ver recibo completo:
+{recibo_url}
+
+_Documento gerado via HABITAT PRO v1.0_
+'''
                     
-                    # URL WhatsApp (igual comandas)
+                    # URL WhatsApp
                     mensagem_encoded = urllib.parse.quote(mensagem)
                     whatsapp_url = f'https://wa.me/{telefone_limpo}?text={mensagem_encoded}'
                     
@@ -308,3 +350,189 @@ def visualizar_recibo_pagamento(request, pagamento_id):
     
     return render(request, 'admin/recibo_modal.html', context)
 
+
+
+@staff_member_required
+def comanda_web_view(request, comanda_id):
+    """Página web da comanda com lógica inteligente de status"""
+    from django.shortcuts import render, get_object_or_404
+    from .models import Comanda
+    from django.utils import timezone
+    from decimal import Decimal
+    
+    comanda = get_object_or_404(Comanda, id=comanda_id)
+    loc = comanda.locacao
+    
+    hoje = timezone.now().date()
+    dias_atraso = (hoje - comanda.data_vencimento).days if hoje > comanda.data_vencimento else 0
+    
+    # ✅ LÓGICA INTELIGENTE DE STATUS E OBSERVAÇÕES
+    status_comanda = comanda.status
+    saldo = comanda.get_saldo() if hasattr(comanda, 'get_saldo') else (comanda.valor_pago - comanda.valor_total)
+    
+    # Determinar mensagem baseada no status
+    if status_comanda == 'PAID' or status_comanda == 'PAGA':
+        if saldo > 0:
+            # Pago a maior - tem crédito
+            mensagem_status = f'✅ Comanda QUITADA. Crédito de R$ {abs(saldo):,.2f} para o locatário.'
+            tipo_alerta = 'success'
+            mostrar_alerta_atraso = False
+        else:
+            # Pago exato
+            mensagem_status = '✅ Comanda PAGA com sucesso.'
+            tipo_alerta = 'success'
+            mostrar_alerta_atraso = False
+    elif status_comanda == 'PARTIAL':
+        # Pagamento parcial
+        saldo_restante = abs(saldo) if saldo < 0 else comanda.valor_total - comanda.valor_pago
+        mensagem_status = f'⚡ Pagamento PARCIAL efetuado. Saldo restante: R$ {saldo_restante:,.2f}'
+        tipo_alerta = 'warning'
+        mostrar_alerta_atraso = dias_atraso > 0
+    elif status_comanda == 'OVERDUE':
+        # Vencida
+        mensagem_status = f'⚠️ Comanda VENCIDA há {dias_atraso} dia(s).'
+        tipo_alerta = 'danger'
+        mostrar_alerta_atraso = True
+    elif status_comanda == 'CANCELLED' or status_comanda == 'CANCELED':
+        # Cancelada
+        mensagem_status = '🚫 Comanda CANCELADA.'
+        tipo_alerta = 'secondary'
+        mostrar_alerta_atraso = False
+    else:
+        # Pendente
+        if dias_atraso > 0:
+            mensagem_status = f'⏳ Comanda PENDENTE (vencida há {dias_atraso} dia(s)).'
+            tipo_alerta = 'danger'
+            mostrar_alerta_atraso = True
+        else:
+            mensagem_status = '⏳ Comanda PENDENTE de pagamento.'
+            tipo_alerta = 'info'
+            mostrar_alerta_atraso = False
+    
+    # Adicionar frase de aviso
+    aviso_pagamento = "Pague seus débitos em dia e evite multas, juros e outras correções conforme contrato de locação."
+    
+    context = {
+        'titulo': f'Comanda {comanda.numero_comanda}',
+        'comanda': comanda,
+        'locacao': loc,
+        'locatario_nome': loc.locatario.nome_razao_social,
+        'imovel_endereco': f'{loc.imovel.endereco}, {loc.imovel.numero}',
+        'numero_comanda': comanda.numero_comanda,
+        'data_vencimento': comanda.data_vencimento.strftime('%d/%m/%Y'),
+        'valor_aluguel': f'{comanda.valor_aluguel:,.2f}',
+        'valor_condominio': f'{comanda.valor_condominio:,.2f}',
+        'valor_iptu': f'{comanda.valor_iptu:,.2f}',
+        'valor_multa': f'{comanda.valor_multa:,.2f}',
+        'valor_juros': f'{comanda.valor_juros:,.2f}',
+        'valor_total': f'{comanda.valor_total:,.2f}',
+        'valor_pago': f'{comanda.valor_pago:,.2f}',
+        'saldo': f'{abs(saldo):,.2f}',
+        'tem_multa_juros': (comanda.valor_multa > 0 or comanda.valor_juros > 0),
+        'dias_atraso': dias_atraso,
+        'status_comanda': status_comanda,
+        'mensagem_status': mensagem_status,
+        'tipo_alerta': tipo_alerta,
+        'mostrar_alerta_atraso': mostrar_alerta_atraso,
+        'aviso_pagamento': aviso_pagamento,
+        'mensagem': f'Comanda referente ao imóvel {loc.imovel.endereco}.',
+    }
+    
+    return render(request, 'admin/comanda_web.html', context)
+
+
+@staff_member_required
+def enviar_comanda_email(request, comanda_id):
+    """Envia comanda por email com detalhamento completo e aviso"""
+    from django.shortcuts import get_object_or_404, redirect
+    from django.contrib import messages
+    from django.core.mail import EmailMessage
+    from django.conf import settings
+    from .models import Comanda
+    from decimal import Decimal
+    
+    comanda = get_object_or_404(Comanda, id=comanda_id)
+    loc = comanda.locacao.locatario
+    imovel = comanda.locacao.imovel
+    
+    if not loc.email:
+        messages.error(request, f'❌ Locatário sem email!')
+        return redirect('admin:core_comanda_changelist')
+    
+    try:
+        url = request.build_absolute_uri(f'/comanda/{comanda.id}/web/')
+        
+        # ✅ LÓGICA INTELIGENTE DE STATUS
+        status_comanda = comanda.status
+        saldo = comanda.get_saldo() if hasattr(comanda, 'get_saldo') else (comanda.valor_pago - comanda.valor_total)
+        
+        # Determinar observação baseada no status
+        if status_comanda in ['PAID', 'PAGA']:
+            if saldo > 0:
+                obs_status = f'\n✅ COMANDA QUITADA\nCrédito de R$ {abs(saldo):,.2f} para o locatário.\n'
+            else:
+                obs_status = '\n✅ COMANDA PAGA\n'
+        elif status_comanda == 'PARTIAL':
+            saldo_restante = abs(saldo) if saldo < 0 else comanda.valor_total - comanda.valor_pago
+            obs_status = f'\n⚡ PAGAMENTO PARCIAL EFETUADO\nSaldo restante: R$ {saldo_restante:,.2f}\n'
+        elif status_comanda == 'OVERDUE':
+            from django.utils import timezone
+            dias = (timezone.now().date() - comanda.data_vencimento).days
+            obs_status = f'\n⚠️ COMANDA VENCIDA\nVencida há {dias} dia(s).\n'
+        else:
+            obs_status = '\n⏳ COMANDA PENDENTE DE PAGAMENTO\n'
+        
+        corpo = f'''
+Prezado(a) {loc.nome_razao_social},
+
+Segue comanda de pagamento referente ao imóvel:
+📍 {imovel.endereco}, {imovel.numero}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+💰 DETALHAMENTO DA COMANDA
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Comanda Nº: {comanda.numero_comanda}
+Vencimento: {comanda.data_vencimento.strftime('%d/%m/%Y')}
+
+VALORES:
+  • Aluguel: R$ {comanda.valor_aluguel:,.2f}
+  • Condomínio: R$ {comanda.valor_condominio:,.2f}
+  • IPTU: R$ {comanda.valor_iptu:,.2f}'''
+
+        # Adicionar multa/juros se houver
+        if comanda.valor_multa > 0 or comanda.valor_juros > 0:
+            corpo += f'''
+  • Multa (10%): R$ {comanda.valor_multa:,.2f}
+  • Juros (1% a.m.): R$ {comanda.valor_juros:,.2f}'''
+
+        corpo += f'''
+
+TOTAL: R$ {comanda.valor_total:,.2f}
+{obs_status}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔗 Ver comanda completa:
+{url}
+
+⚠️ IMPORTANTE:
+Pague seus débitos em dia e evite multas, juros e outras 
+correções conforme contrato de locação.
+
+Atenciosamente,
+HABITAT PRO v1.0
+Sistema de Gestão Imobiliária
+'''
+        
+        email = EmailMessage(
+            subject=f'Comanda de Pagamento - {comanda.numero_comanda}',
+            body=corpo,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            to=[loc.email],
+        )
+        email.send()
+        messages.success(request, f'📧 Email enviado para {loc.email}!')
+    except Exception as e:
+        messages.error(request, f'❌ Erro: {e}')
+    
+    return redirect('admin:core_comanda_changelist')

@@ -1,0 +1,62 @@
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from . import views
+from .views import teste_simples
+from .views_django_simples import relatorio_financeiro_django, lista_pagamentos, listar_documentos, download_documento
+from .views_financeiro_simples import resumo_financeiro_publico
+from .views_financeiro_simples import resumo_financeiro_publico
+from .views_financeiro import resumo_financeiro, dashboard_financeiro, dashboard_documentos, detalhe_comanda
+from .views_gerar_comandas import gerar_comandas_view, preview_comandas_view
+from . import admin_views
+
+# Criar router da API
+router = DefaultRouter()
+
+# Registrar todos os ViewSets básicos
+router.register(r'usuarios', views.UsuarioViewSet, basename='usuario')
+router.register(r'locadores', views.LocadorViewSet, basename='locador')
+router.register(r'imoveis', views.ImovelViewSet, basename='imovel')
+router.register(r'locatarios', views.LocatarioViewSet, basename='locatario')
+router.register(r'locacoes', views.LocacaoViewSet, basename='locacao')
+router.register(r'comandas', views.ComandaViewSet, basename='comanda')
+router.register(r'pagamentos', views.PagamentoViewSet, basename='pagamento')
+
+urlpatterns = [
+    # API endpoints
+    path('api/', include(router.urls)),
+    
+    # Authentication
+    path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+    path('teste/', teste_simples, name='teste_simples'),
+    path('documentos/', listar_documentos, name='listar_documentos'),
+    path('documentos/download/<str:filename>', download_documento, name='download_documento'),
+    path('financeiro/', relatorio_financeiro_django, name='financeiro_django'),
+    path('api/financeiro/resumo/', resumo_financeiro, name='resumo_financeiro'),
+    path('api/financeiro/publico/', resumo_financeiro_publico, name='resumo_publico'),
+    path('api/financeiro/publico/', resumo_financeiro_publico, name='resumo_publico'),
+    path('dashboard/financeiro/', dashboard_financeiro, name='dashboard_financeiro'),
+    path('dashboard/documentos/', dashboard_documentos, name='dashboard_documentos'),
+    path('api/financeiro/comanda/<str:numero_comanda>/', detalhe_comanda, name='detalhe_comanda'),
+]
+
+# Relatórios
+from core.views_relatorios import dashboard_relatorios, relatorio_inadimplencia, relatorio_imoveis
+
+urlpatterns += [
+    path('relatorios/', dashboard_relatorios, name='dashboard_relatorios'),
+    path('relatorios/inadimplencia/', relatorio_inadimplencia, name='relatorio_inadimplencia'),
+    path('relatorios/imoveis/', relatorio_imoveis, name='relatorio_imoveis'),
+# Geração de comandas via web
+    path('gerar-comandas/', gerar_comandas_view, name='gerar_comandas'),
+    path('preview-comandas/',preview_comandas_view, name='preview_comandas'),
+    path('admin/locacao/<uuid:pk>/contrato/pdf/', admin_views.download_contrato_pdf, name='gerar_contrato_pdf'),
+    path('admin/locacao/<uuid:pk>/contrato/docx/', admin_views.download_contrato_docx, name='gerar_contrato_docx'),
+]
+
+# Geração de Contratos
+from .views_gerar_contrato import gerar_contrato_docx, gerar_contrato_pdf
+
+urlpatterns += [
+    path('locacao/<uuid:pk>/gerar-contrato/docx/', gerar_contrato_docx, name='gerar_contrato_docx'),
+    path('locacao/<uuid:pk>/gerar-contrato/pdf/', gerar_contrato_pdf, name='gerar_contrato_pdf'),
+]

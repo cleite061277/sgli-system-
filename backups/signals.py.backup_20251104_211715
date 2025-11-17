@@ -1,0 +1,42 @@
+from django.db.models.signals import post_save, post_delete
+from django.dispatch import receiver
+from django.db.models import Sum
+import logging
+
+from .models import Pagamento, Comanda  # importe explicitamente os modelos usados
+
+logger = logging.getLogger(__name__)
+
+
+@receiver(post_save, sender=Pagamento)
+@receiver(post_delete, sender=Pagamento)
+def atualizar_valor_pago_comanda(sender, instance, **kwargs):
+    """
+    Ao salvar/deletar um Pagamento, recalcula o valor_pago agregado da Comanda.
+    - Usa aggregate(Sum(...)) com import explícito.
+    - Atualiza a Comanda via QuerySet.update() para evitar triggers recursivos de save().
+    - Trata exceções e registra logs sem propagar exceção para o fluxo do admin.
+    """
+    try:
+        comanda_id = getattr(instance, 'comanda_id', None)
+        if not comanda_id:
+            # nada a fazer quando a referência não estiver presente
+            return
+
+        total = (
+            Pagamento.objects
+            .filter(comanda_id=comanda_id)
+            .aggregate(total=Sum('valor_pago'))['total'] or 0
+        )
+
+        # Atualiza diretamente no banco para evitar entrar recursivamente em Comanda.save()
+        Comanda.objects.filter(pk=comanda_id).update(valor_pago=total)
+
+    except Exception as exc:
+        logger.exception(
+            "Erro ao atualizar valor_pago da Comanda %s ao processar Pagamento %s: %s",
+            getattr(instance, 'comanda_id', '?'),
+            getattr(instance, 'pk', '?'),
+            exc
+        )
+        # Não re-raise: evitar quebrar o fluxo do admin caso o signal falhe.

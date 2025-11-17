@@ -1,0 +1,25 @@
+/* 
+ * Comanda Admin - Customizações
+ * HABITAT PRO - Sistema de Gestão de Imóveis
+ */
+
+/* Melhorias visuais futuras podem ser adicionadas aqui */
+
+.comanda-highlight {
+    background-color: #fff9e6;
+    padding: 10px;
+    border-left: 4px solid #f39c12;
+}
+
+.comanda-vencida {
+    background-color: #ffe6e6;
+    border-left: 4px solid #e74c3c;
+}
+
+/* Aumentar legibilidade de valores monetários */
+.field-valor_total,
+.field-valor_aluguel,
+.field-valor_condominio {
+    font-weight: 600;
+    font-size: 14px;
+}

@@ -1,0 +1,741 @@
+from .models import TemplateContrato
+from django.db.models import Sum, Value, Q
+from django.db.models.functions import Coalesce
+from decimal import Decimal
+from django.utils.html import format_html
+
+# Limpado e corrigido por Copilot — versão recomendada
+from django.contrib import admin
+import uuid
+from django.db import transaction, IntegrityError
+from django.utils import timezone
+from django.utils.html import format_html
+from django.urls import reverse
+from django.db.models import Sum, Q
+
+from .models import (
+    Usuario, Locador, Imovel, Locatario, Locacao,
+    Comanda, Pagamento, Fiador, TemplateContrato,
+    ConfiguracaoSistema, LogGeracaoComandas
+)
+
+from .forms import PagamentoAdminForm
+
+# FormSet customizado para preencher usuario_registro
+from django.forms import BaseInlineFormSet
+
+class UsuarioAdmin(admin.ModelAdmin):
+    """Admin organizado para Usuario"""
+    list_display = ['username', 'get_full_name', 'email', 'tipo_usuario', 'is_staff', 'is_active', 'date_joined']
+    list_filter = ['tipo_usuario', 'is_active', 'is_staff', 'date_joined']
+    search_fields = ['username', 'email', 'first_name', 'last_name', 'cpf']
+
+    fieldsets = (
+        ('🔐 Autenticação', {'fields': ('username', 'password')}),
+        ('👤 Dados Pessoais', {'fields': ('first_name', 'last_name', 'email', 'cpf', 'telefone', 'avatar')}),
+        ('🎭 Perfil do Sistema', {'fields': ('tipo_usuario',)}),
+        ('🔑 Permissões', {
+            'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions'),
+            'classes': ['collapse'],
+        }),
+        ('📅 Datas Importantes', {
+            'fields': ('date_joined', 'last_login'),
+            'classes': ['collapse'],
+        }),
+    )
+    readonly_fields = ['date_joined', 'last_login']
+
+
+# -----------------------
+# Locador
+# -----------------------
+@admin.register(Locador)
+class LocadorAdmin(admin.ModelAdmin):
+    list_display = [
+        'nome_razao_social',
+        'representante',
+        'tipo_locador',
+        'cpf_cnpj',
+        'telefone',
+        'email',
+        'is_active',
+    ]
+    list_filter = ['tipo_locador', 'is_active', 'created_at']
+    search_fields = ['nome_razao_social', 'representante', 'cpf_cnpj', 'email', 'telefone']
+
+    fieldsets = (
+        ('📋 Dados Básicos', {'fields': ('usuario', 'tipo_locador', 'nome_razao_social', 'representante', 'cpf_cnpj')}),
+        ('📞 Contatos', {'fields': ('telefone', 'email')}),
+        ('🏠 Endereço', {'fields': ('endereco_completo', 'cep')}),
+        ('📝 Observações', {'fields': ('observacoes',), 'classes': ['collapse']}),
+        ('🕐 Metadados', {'fields': ('created_at', 'updated_at', 'is_active'), 'classes': ['collapse']}),
+    )
+    readonly_fields = ['created_at', 'updated_at']
+
+
+# -----------------------
+# Imóvel
+# -----------------------
+@admin.register(Imovel)
+class ImovelAdmin(admin.ModelAdmin):
+    list_display = ['codigo_imovel', 'tipo_imovel', 'status', 'endereco', 'cidade', 'valor_aluguel', 'locador', 'is_active']
+    list_filter = ['tipo_imovel', 'status', 'cidade', 'estado', 'is_active', 'created_at']
+    search_fields = ['codigo_imovel', 'endereco', 'bairro', 'cidade', 'locador__nome_razao_social']
+
+    fieldsets = (
+        ('📋 Informações Básicas', {'fields': ('locador', 'codigo_imovel', 'tipo_imovel', 'status')}),
+        ('📍 Endereço', {'fields': ('endereco', 'numero', 'bairro', 'cidade', 'estado', 'cep')}),
+        ('📏 Características', {'fields': ('area_total', 'quartos', 'banheiros')}),
+        ('💰 Valores', {'fields': ('valor_aluguel', 'valor_condominio')}),
+        ('⚡ Utilidades / Contas', {
+            'fields': ('conta_agua_esgoto', 'numero_hidrometro', 'unidade_consumidora_energia'),
+            'description': 'Informações de contas de consumo do imóvel'
+        }),
+        ('📝 Descrição', {'fields': ('descricao',), 'classes': ['collapse']}),
+        ('🕐 Metadados', {'fields': ('created_at', 'updated_at', 'is_active'), 'classes': ['collapse']}),
+    )
+    readonly_fields = ['created_at', 'updated_at']
+
+
+# -----------------------
+# Locatário
+# -----------------------
+@admin.register(Locatario)
+class LocatarioAdmin(admin.ModelAdmin):
+    list_display = ['nome_razao_social', 'cpf_cnpj', 'telefone', 'email', 'empresa_trabalho', 'tem_fiador', 'is_active']
+    list_filter = ['created_at', 'is_active']
+    search_fields = ['nome_razao_social', 'cpf_cnpj', 'rg', 'email', 'telefone', 'empresa_trabalho']
+
+    fieldsets = (
+        ('📋 Dados Pessoais', {'fields': ('nome_razao_social', 'cpf_cnpj', 'rg', 'data_nascimento')}),
+        ('👨‍👩‍👦 Filiação', {'fields': ('nome_pai', 'nome_mae'), 'classes': ['collapse']}),
+        ('📞 Contatos', {'fields': ('telefone', 'email', 'outro_telefone', ('nome_contato_emergencia', 'telefone_contato_emergencia'))}),
+        ('🏠 Endereço', {'fields': ('endereco_completo',)}),
+        ('💼 Dados Profissionais', {'fields': ('empresa_trabalho', 'endereco_empresa', 'telefone_empresa', 'contato_empresa', 'tempo_empresa', 'renda_mensal')}),
+        ('🛡️ Garantia', {'fields': ('fiador',), 'description': 'Selecione um fiador cadastrado ou deixe em branco se não houver'}),
+        ('🕐 Metadados', {'fields': ('created_at', 'updated_at', 'is_active'), 'classes': ['collapse']}),
+    )
+    readonly_fields = ['created_at', 'updated_at']
+
+    @admin.display(description='Fiador', boolean=True)
+    def tem_fiador(self, obj):
+        return obj.fiador is not None
+
+
+# -----------------------
+# Locação (contratos)
+# -----------------------
+@admin.register(Locacao)
+class LocacaoAdmin(admin.ModelAdmin):
+    """Admin atualizado com geração de contratos"""
+    list_display = ('numero_contrato', 'imovel', 'locatario', 'status', 'data_inicio', 'data_fim')
+    list_filter = ('status', 'is_active', 'created_at')
+    search_fields = ('numero_contrato', 'imovel__codigo_imovel', 'locatario__nome_razao_social')
+    readonly_fields = ['created_at', 'updated_at']
+
+    actions = ['gerar_contrato_pdf_action', 'gerar_contrato_docx_action', 'gerar_contrato']
+
+    fieldsets = (
+        ('📋 Informações Básicas', {
+            'fields': ('numero_contrato', 'imovel', 'locatario', 'status'),
+            'description': '⚠️ Deixe o número do contrato VAZIO para gerar automaticamente'
+        }),
+        ('📅 Datas', {'fields': ('data_inicio', 'data_fim')}),
+        ('💰 Valores', {'fields': ('valor_aluguel', 'dia_vencimento')}),
+        ('🕐 Metadados', {'fields': ('created_at', 'updated_at', 'is_active'), 'classes': ['collapse']}),
+    )
+
+    def get_form(self, request, obj=None, **kwargs):
+        """Remove required do numero_contrato para permitir geração automática"""
+        form = super().get_form(request, obj, **kwargs)
+        if 'numero_contrato' in form.base_fields:
+            form.base_fields['numero_contrato'].required = False
+            form.base_fields['numero_contrato'].help_text = '✨ Deixe vazio para gerar automaticamente'
+        return form
+
+    def change_view(self, request, object_id, form_url='', extra_context=None):
+        """Adiciona botões de gerar contrato."""
+        extra_context = extra_context or {}
+        obj = self.get_object(request, object_id)
+        if obj:
+            extra_context['show_contrato_buttons'] = True
+            extra_context['contrato_docx_url'] = reverse('gerar_contrato_docx', args=[obj.pk])
+            extra_context['contrato_pdf_url'] = reverse('gerar_contrato_pdf', args=[obj.pk])
+        return super().change_view(request, object_id, form_url, extra_context)
+
+    @admin.action(description='📄 Gerar Contrato PDF')
+    def gerar_contrato_pdf_action(self, request, queryset):
+        if queryset.count() == 1:
+            from .contrato_generator import gerar_contrato_pdf
+            return gerar_contrato_pdf(queryset.first())
+        else:
+            self.message_user(request, '❌ Selecione apenas UMA locação', level='error')
+
+    @admin.action(description='📝 Gerar Contrato DOCX')
+    def gerar_contrato_docx_action(self, request, queryset):
+        if queryset.count() == 1:
+            from .contrato_generator import gerar_contrato_docx
+            return gerar_contrato_docx(queryset.first())
+        else:
+            self.message_user(request, '❌ Selecione apenas UMA locação', level='error')
+
+    def gerar_contrato(self, request, queryset):
+        """Gerar contratos em Word (bulk action)."""
+        from .document_generator import DocumentGenerator
+        generator = DocumentGenerator()
+
+        contratos_gerados = []
+        for locacao in queryset:
+            try:
+                filename = generator.gerar_contrato_locacao(locacao.id)
+                contratos_gerados.append(filename)
+            except Exception as e:
+                self.message_user(request, f'Erro ao gerar contrato {locacao.numero_contrato}: {e}', level='ERROR')
+
+        if contratos_gerados:
+            self.message_user(request, f'{len(contratos_gerados)} contrato(s) gerado(s) com sucesso!')
+
+
+# -----------------------
+# Comanda
+# -----------------------
+
+
+class PagamentoInline(admin.TabularInline):
+    model = Pagamento
+    extra = 0
+    fields = ['data_pagamento', 'valor_pago', 'forma_pagamento', 'status', 'comprovante', 'recibo_actions']
+    readonly_fields = ['numero_pagamento', 'created_at', 'recibo_actions']
+
+    def get_formset(self, request, obj=None, **kwargs):
+        formset = super().get_formset(request, obj, **kwargs)
+        formset.request = request
+        return formset
+
+    @admin.display(description='Recibo')
+    def recibo_actions(self, obj):
+        if not obj or not obj.pk:
+            return '-'
+
+        status = (getattr(obj, 'status', '') or '').lower()
+        is_confirmed = status == 'confirmado' or status == getattr(obj.StatusPagamento, 'CONFIRMADO', '').lower()
+
+        try:
+            view_url = reverse('pagina_recibo_pagamento', args=[obj.pk])
+            download_url = reverse('download_recibo_pagamento', args=[obj.pk])
+        except Exception:
+            view_url = f'/pagamento/{obj.pk}/recibo/'
+            download_url = f'/pagamento/{obj.pk}/recibo/download/'
+
+        if not is_confirmed:
+            return format_html('<span style="color: #999; font-style: italic;">Aguardando confirmação</span>')
+
+        return format_html(
+            '<a class="button" href="{}" target="_blank" style="background:#28a745;color:#fff;margin-right:6px;">🧾 Ver</a>'
+            '<a class="button" href="{}" target="_blank" style="background:#667eea;color:#fff;margin-right:6px;">📥 Word</a>'
+            '<a class="button" href="{}" style="background:#3b82f6;color:#fff;margin-right:6px;">📧 Email</a>',
+            view_url, download_url, view_url
+        )
+
+    def save_new(self, form, formset, commit=True):
+        obj = super().save_new(form, formset, commit=False)
+        if not obj.usuario_registro_id and hasattr(formset, 'request'):
+            obj.usuario_registro = formset.request.user
+        if commit:
+            obj.save()
+        return obj
+
+    def has_delete_permission(self, request, obj=None):
+        if obj and getattr(obj, 'status', None) == 'confirmado':
+            return False
+        return True
+
+@admin.register(Comanda)
+class ComandaAdmin(admin.ModelAdmin):
+# --- Adicionado automaticamente: Saldo e Dias de Atraso (congelados em quitacao) ---
+    from django.db.models import Sum, Value, Q  # noqa: F401
+    from django.db.models.functions import Coalesce  # noqa: F401
+    from decimal import Decimal  # noqa: F401
+    from django.utils.html import format_html  # noqa: F401
+
+    def get_queryset(self, request):
+        """
+        Anota total_pago (soma de pagamentos confirmados) para otimizar exibição/ordenação.
+        Usa Coalesce + Sum com filtro para status confirmado.
+        """
+        from django.db.models import Sum, Value, Q
+        from django.db.models.functions import Coalesce
+
+        qs = super().get_queryset(request)
+        qs = qs.annotate(
+            total_pago=Coalesce(
+                Sum('pagamentos__valor_pago', filter=Q(pagamentos__status__iexact='confirmado')),
+                Value(0)
+            )
+        )  
+        return qs
+
+    def saldo_display(self, obj):
+        from decimal import Decimal
+        from django.utils.html import format_html
+        try:
+            total_pago = getattr(obj, 'total_pago', None)
+            if total_pago is None:
+                # fallback: usar método injetado ou campo
+                total_pago = obj.calcular_total_pago() if hasattr(obj, 'calcular_total_pago') else (getattr(obj, 'valor_pago', Decimal('0.00')))
+            valor_total = obj.valor_total() if callable(getattr(obj, 'valor_total', None)) else (getattr(obj, 'valor_total', 0) or Decimal('0.00'))
+            saldo = Decimal(total_pago or 0) - Decimal(valor_total)
+        except Exception:
+            saldo = Decimal('0.00')
+        formatted = f"R$ {saldo:,.2f}"
+        if saldo > 0:
+            return format_html('<span style="color:green;">+{}</span>', formatted)
+        elif saldo < 0:
+            return format_html('<span style="color:red;">{}</span>', formatted)
+        return formatted
+    saldo_display.short_description = 'Saldo'
+    saldo_display.admin_order_field = 'total_pago'
+
+    def dias_atraso_display(self, obj):
+        from django.utils.html import format_html
+        try:
+            dias = obj.dias_atraso() if hasattr(obj, 'dias_atraso') else 0
+        except Exception:
+            dias = 0
+        if dias == 0:
+            return format_html('<span style="color:green;">Em dia</span>')
+        return format_html('<span style="color:#dc3545;">{} dia(s)</span>', dias)
+    dias_atraso_display.short_description = 'Atraso'
+    """Admin melhorado para Comanda com organização por seções"""
+    list_display = [
+        'numero_comanda_link',
+        'locacao_info',
+        'mes_ano_referencia',
+        'vencimento_colorido',
+        'valor_total_formatado',
+        'status_badge',
+        'dias_vencimento',
+        'painel_whatsapp_button',
+    ]
+    list_filter = [
+        'status',
+        'data_vencimento',
+        'mes_referencia',
+        'ano_referencia',
+        'locacao__imovel__tipo_imovel',
+    ]
+    search_fields = [
+        'numero_comanda',
+        'locacao__numero_contrato',
+        'locacao__locatario__nome_razao_social',
+        'locacao__imovel__codigo_imovel',
+        'locacao__imovel__endereco',
+    ]
+    readonly_fields = [
+        'numero_comanda',
+        'created_at',
+        'updated_at',
+        'valor_total_display',
+        'valor_pendente_display',
+        'dias_atraso_display',
+    ]
+    date_hierarchy = 'data_vencimento'
+    inlines = [PagamentoInline]
+    
+    def save_formset(self, request, form, formset, change):
+        """Apenas preenche usuario_registro - modelo gera numero_pagamento"""
+        instances = formset.save(commit=False)
+        
+        for instance in instances:
+            if isinstance(instance, Pagamento) and not instance.usuario_registro_id:
+                instance.usuario_registro = request.user
+        
+        formset.save()  # Modelo faz o resto
+    def get_formsets_with_inlines(self, request, obj=None):
+        for inline in self.get_inline_instances(request, obj):
+            formset = inline.get_formset(request, obj)
+            if hasattr(formset, 'admin_request'):
+                formset.admin_request = request
+            yield formset, inline
+            
+
+    fieldsets = (
+        ('📋 Informações Básicas', {'fields': ('numero_comanda', 'locacao', ('mes_referencia', 'ano_referencia'), 'status')}),
+        ('📅 Datas', {'fields': ('data_vencimento', 'data_pagamento', 'dias_atraso_display')}),
+        ('💰 Valores Base', {'fields': ('valor_aluguel', 'valor_condominio', 'valor_iptu', 'valor_administracao'), 'description': 'Valores base calculados automaticamente na geração'}),
+        ('➕ Valores Adicionais', {'fields': ('outros_debitos', 'outros_creditos'), 'description': 'AQUI você adiciona despesas extras: água, luz, gás, reparos, etc.'}),
+        ('⚖️ Ajustes Financeiros', {'fields': ('valor_multa', 'valor_juros', 'desconto'), 'classes': ['collapse']}),
+        ('💵 Totalizadores', {'fields': ('valor_total_display', 'valor_pago', 'valor_pendente_display')}),
+        ('💳 Pagamento', {'fields': ('forma_pagamento', 'comprovante_pagamento'), 'classes': ['collapse']}),
+        ('🔔 Notificações', {'fields': ('notificacao_enviada_7dias', 'notificacao_enviada_1dia', 'notificacao_atraso_enviada'), 'classes': ['collapse']}),
+        ('📝 Observações', {'fields': ('observacoes',), 'classes': ['collapse']}),
+        ('🕐 Metadados', {'fields': ('created_at', 'updated_at', 'is_active'), 'classes': ['collapse']}),
+    )
+
+    actions = [
+        'aplicar_multas_juros',
+        'marcar_como_paga',
+        'cancelar_comandas',
+        'exportar_para_excel',
+    ]
+
+    # Display helpers
+    @admin.display(description='Número', ordering='numero_comanda')
+    def numero_comanda_link(self, obj):
+        url = reverse('admin:core_comanda_change', args=[obj.id])
+        return format_html('<a href="{}" style="font-weight: bold; color: #667eea;">{}</a>', url, obj.numero_comanda)
+
+    @admin.display(description='Locação')
+    def locacao_info(self, obj):
+        return format_html(
+            '<strong>{}</strong><br><small style="color: #666;">{}</small>',
+            obj.locacao.locatario.nome_razao_social,
+            obj.locacao.imovel.codigo_imovel
+        )
+
+    @admin.display(description='Mês/Ano', ordering='mes_referencia')
+    def mes_ano_referencia(self, obj):
+        # mes_referencia pode ser um date ou inteiro; ajustar conforme modelo
+        try:
+            return obj.mes_referencia.strftime('%m/%Y')
+        except Exception:
+            return f'{obj.mes_referencia}/{obj.ano_referencia}'
+
+    @admin.display(description='Vencimento', ordering='data_vencimento')
+    def vencimento_colorido(self, obj):
+        hoje = timezone.now().date()
+        if getattr(obj, 'status', None) == 'PAGA' or getattr(obj, 'status', None) == 'PAID':
+            cor = '#28a745'
+            icone = '✓'
+        elif obj.data_vencimento < hoje:
+            cor = '#dc3545'
+            icone = '⚠️'
+        elif obj.data_vencimento == hoje:
+            cor = '#ffc107'
+            icone = '⏰'
+        else:
+            cor = '#17a2b8'
+            icone = '📅'
+        return format_html('<span style="color: {};">{} {}</span>', cor, icone, obj.data_vencimento.strftime('%d/%m/%Y'))
+
+    @admin.display(description='Valor Total', ordering='valor_aluguel')
+    def valor_total_formatado(self, obj):
+        valor = getattr(obj, 'valor_total', 0) or 0
+        try:
+            numero = float(valor)
+        except Exception:
+            numero = 0.0
+        cor = '#28a745' if getattr(obj, 'status', None) in ('PAID', 'PAGA') else '#333'
+        formatted = f'{numero:,.2f}'
+        return format_html(
+            '<strong style="color: {}; font-size: 15px;">R$ {}</strong>',
+            cor,
+            formatted
+        )
+
+    @admin.display(description='Status')
+    def status_badge(self, obj):
+        badges = {
+            'PENDING': ('⏳', 'Pendente', '#ffc107', '#000'),
+            'PAID': ('✅', 'Paga', '#28a745', '#fff'),
+            'OVERDUE': ('❌', 'Vencida', '#dc3545', '#fff'),
+            'PARTIAL': ('⚡', 'Parcial', '#17a2b8', '#fff'),
+            'CANCELLED': ('🚫', 'Cancelada', '#6c757d', '#fff'),
+            'PAGA': ('✅', 'Paga', '#28a745', '#fff'),
+        }
+        icone, texto, bg, fg = badges.get(getattr(obj, 'status', None), ('?', getattr(obj, 'status', ''), '#ccc', '#000'))
+        return format_html('<span style="background: {}; color: {}; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: bold;">{} {}</span>', bg, fg, icone, texto)
+
+    @admin.display(description='Atraso')
+    def dias_vencimento(self, obj):
+        if getattr(obj, 'status', None) in ('PAID', 'PAGA'):
+            return format_html('<span style="color: #28a745;">✓ Paga</span>')
+        dias = obj.dias_atraso() if hasattr(obj, 'dias_atraso') else 0
+        if dias == 0:
+            return format_html('<span style="color: #17a2b8;">Em dia</span>')
+        elif dias > 0:
+            return format_html('<span style="color:#dc3545; font-weight: bold;">{} dia(s)</span>', dias)
+        else:
+            return format_html('<span style="color:#666;">{} dia(s)</span>', abs(dias))
+
+    @admin.display(description='💰 Valor Total')
+    def valor_total_display(self, obj):
+        try:
+            numero = float(getattr(obj, 'valor_total', 0) or 0)
+        except Exception:
+            numero = 0.0
+        formatted = f'{numero:,.2f}'
+        return format_html(
+            '<div style="font-size: 20px; font-weight: bold; color: #667eea; '
+            'padding: 10px; background: #f0f4ff; border-radius: 8px; text-align: center;">'
+            'R$ {}</div>',
+            formatted
+    )
+        
+    @admin.display(description='💵 Valor Pendente')
+    def valor_pendente_display(self, obj):
+        try:
+            pendente = float(getattr(obj, 'valor_pendente', 0) or 0)
+        except Exception:
+            pendente = 0.0
+        cor = '#28a745' if pendente == 0 else '#dc3545'
+        formatted = f'{pendente:,.2f}'
+        return format_html(
+            '<div style="font-size: 18px; font-weight: bold; color: {}; '
+            'padding: 10px; background: #f8f9fa; border-radius: 8px; text-align: center;">'
+            'R$ {}</div>',
+            cor,
+            formatted
+    )
+
+    @admin.display(description='⏰ Dias de Atraso')
+    def dias_atraso_display(self, obj):
+            dias = obj.dias_atraso() if hasattr(obj, 'dias_atraso') else 0
+            if dias == 0:
+                return format_html('<span style="color: #28a745; font-size: 16px;">✓ Em dia</span>')
+            elif dias > 0:
+                return format_html('<span style="color: #dc3545; font-size: 16px; font-weight: bold;">⚠️ {} dia(s) de atraso</span>', dias)
+            else:
+                return format_html('<span style="color: #17a2b8; font-size: 16px;">📅 Vence em {} dia(s)</span>', abs(dias))
+    
+    # Botão para enviar WhatsApp (implementação defensiva)
+    @admin.display(description='WhatsApp')
+    def painel_whatsapp_button(self, obj):
+        """
+        Gera botão/link para abrir o WhatsApp com uma mensagem PRE-PREENCHIDA que inclui a
+        discriminação dos itens que compõem o valor da comanda (aluguel, condomínio, IPTU,
+        administração, juros, multa, descontos, outros) e, ao final, o total da comanda.
+        
+        Regras:
+        - Tenta reutilizar um formatter existente (ex.: core.notifications.message_formatter)
+        se existir uma função apropriada (defensive import).
+        - Senão, monta a mensagem localmente com os campos do modelo Comanda.
+        - Remove caracteres não numéricos do telefone e valida tamanho mínimo.
+        - Pode prefixar um DDI padrão via settings.WHATSAPP_DEFAULT_DDI se o telefone não
+        tiver DDI (opcional).
+        - Se algo falhar, retorna '-' para não quebrar o admin.
+        """
+        from django.utils.html import format_html
+        from urllib.parse import quote_plus
+        from decimal import Decimal
+        from django.conf import settings
+        
+        try:
+         # 1) localizar telefone de forma defensiva (várias possibilidades)
+         telefone = None
+         if getattr(obj, 'locacao', None):
+          loc = obj.locacao
+          telefone = getattr(getattr(loc, 'locatario', None), 'telefone', None) or telefone
+          telefone = getattr(getattr(loc, 'usuario_registro', None), 'telefone', None) or telefone
+          # fallback: telefone direto no objeto
+          telefone = telefone or getattr(obj, 'telefone', None) or getattr(obj, 'telefone_contato', None)
+         
+         if not telefone:
+         return '-'
+         
+         # extrair apenas dígitos
+         digits = ''.join(ch for ch in str(telefone) if ch.isdigit())
+         # Se não há DDI e houver DDI padrão em settings, prefixa
+         if getattr(settings, "WHATSAPP_DEFAULT_DDI", None) and len(digits) <= 11:
+         digits = f"{settings.WHATSAPP_DEFAULT_DDI}{digits}"
+         
+         # validação simples: exige pelo menos 8 dígitos (ajuste se necessário)
+         if len(digits) < 8:
+         return '-'
+         
+         # 2) tentar usar um formatter existente (se houver) - integração opcional
+         texto = None
+         try:
+         # ajustar o import/nome se a sua repo usar outro local/nome
+         from core.notifications import message_formatter as mf  # defensive import
+         if hasattr(mf, "format_comanda_whatsapp"):
+         texto = mf.format_comanda_whatsapp(obj)
+         elif hasattr(mf, "format_whatsapp_message"):
+         texto = mf.format_whatsapp_message(obj)
+         except Exception:
+         texto = None
+         
+         # 3) se não houver formatter, montar a mensagem itemizada localmente
+         if not texto:
+         # Campos que compõem a comanda (ajuste se seu modelo usar nomes diferentes)
+         def dec(field):
+         try:
+         raw = getattr(obj, field, None)
+         return Decimal(raw or 0)
+         except Exception:
+         return Decimal(0)
+         
+         itens = []
+         # adicionar somente itens não-zero, na ordem desejada
+         mapping = [
+         ("Aluguel", "valor_aluguel"),
+         ("Condomínio", "valor_condominio"),
+         ("IPTU", "valor_iptu"),
+         ("Administração", "valor_administracao"),
+         ("Outros (crédito)", "outros_creditos"),   # se for crédito (reduz)
+         ("Outros (débito)", "outros_debitos"),
+         ("Multa", "valor_multa"),
+         ("Juros", "valor_juros"),
+         ("Desconto", "desconto"),
+         ]
+         
+         # Coletar valores (tratamento especial para créditos/descontos)
+         for label, field in mapping:
+         val = dec(field)
+         # mostrar Desconto/Outros (crédito) com sinal negativo no texto, se positivo no DB
+         if val and val != Decimal("0"):
+         # para créditos/descontos indicamos com "-" na mensagem
+         if field in ("outros_creditos", "desconto"):
+         itens.append(f"{label}: -R$ {abs(val):,.2f}")
+         else:
+         itens.append(f"{label}: R$ {val:,.2f}")
+         
+         # Tentar obter total oficial da comanda (se houver método)
+         total_oficial = None
+         try:
+         if callable(getattr(obj, "valor_total", None)):
+         total_oficial = obj.valor_total()
+         else:
+         total_oficial = dec("valor_total")
+         except Exception:
+         total_oficial = None
+         
+         # Se total_oficial for None ou zero, calcular a partir dos campos
+         if total_oficial in (None, 0):
+         # soma: itens positivos - (descontos + outros_creditos)
+         soma_positivos = sum(dec(f) for _, f in mapping if f not in ("desconto", "outros_creditos"))
+         soma_creditos = dec("desconto") + dec("outros_creditos")
+         total_calculado = soma_positivos - soma_creditos
+         total_used = total_calculado
+         else:
+         total_used = Decimal(total_oficial or 0)
+         
+         # montar texto com identificação e itemização
+         partes = []
+         partes.append(f"Olá! Recibo da comanda {getattr(obj, 'numero_comanda', '')}")
+         # opcional informação de locatário/nome
+         nome = None
+         try:
+         if getattr(obj, "locacao", None):
+         nome = getattr(getattr(obj.locacao, "locatario", None), "nome_razao_social", None) \
+         or getattr(getattr(obj.locacao, "usuario_registro", None), "get_full_name", None)
+         if not nome:
+         nome = getattr(obj, "locacao_info", None) or ""
+         except Exception:
+         nome = ""
+         if nome:
+         partes.append(f"Cliente: {nome}")
+         
+         partes.append("")  # linha em branco antes dos itens
+         partes.append("Itens:")
+         for it in itens:
+         partes.append(f"- {it}")
+         
+         partes.append("")  # linha em branco antes do total
+         partes.append(f"Total: R$ {Decimal(total_used):,.2f}")
+         
+         texto = "\n".join(partes)
+         
+         # 4) codificar e construir URL
+         texto_enc = quote_plus(texto)
+         wa_url = f"https://wa.me/{digits}?text={texto_enc}"
+         
+        return format_html('<a class="button" href="{}" target="_blank">💬 WhatsApp</a>', wa_url)
+        
+        except Exception:
+        return '-'
+        
+        # Ações customizadas
+        @admin.action(description='⚖️ Aplicar multas e juros')
+        def aplicar_multas_juros(self, request, queryset):
+        comandas_vencidas = queryset.filter(data_vencimento__lt=timezone.now().date(), status__in=['PENDING', 'OVERDUE', 'PARTIAL'])
+        atualizadas = 0
+        for comanda in comandas_vencidas:
+        try:
+        comanda.aplicar_multa_juros(salvar=True)
+        atualizadas += 1
+        except Exception:
+        continue
+        self.message_user(request, f'✅ Multas e juros aplicados em {atualizadas} comanda(s).', level='success')
+        
+        @admin.action(description='✅ Marcar como pagas')
+        def marcar_como_paga(self, request, queryset):
+        atualizadas = 0
+        for comanda in queryset:
+        if getattr(comanda, 'status', None) not in ('PAID', 'PAGA'):
+        comanda.valor_pago = comanda.valor_total
+        comanda.data_pagamento = timezone.now().date()
+        comanda.status = 'PAID'
+        comanda.save()
+        atualizadas += 1
+        self.message_user(request, f'✅ {atualizadas} comanda(s) marcada(s) como pagas.', level='success')
+        
+        @admin.action(description='🚫 Cancelar comandas')
+        def cancelar_comandas(self, request, queryset):
+        atualizadas = queryset.update(status='CANCELLED')
+        self.message_user(request, f'🚫 {atualizadas} comanda(s) cancelada(s).', level='warning')
+        
+        @admin.action(description='📊 Exportar para Excel')
+        def exportar_para_excel(self, request, queryset):
+        import csv
+        from django.http import HttpResponse
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="comandas.csv"'
+        response.write('\ufeff'.encode('utf-8'))
+        writer = csv.writer(response, delimiter=';')
+        writer.writerow([
+        'Número', 'Locação', 'Locatário', 'Imóvel', 'Mês/Ano', 'Vencimento',
+        'Valor Aluguel', 'Valor Condomínio', 'Outros Débitos', 'Outros Créditos',
+        'Multa', 'Juros', 'Desconto', 'Valor Total', 'Valor Pago', 'Valor Pendente', 'Status',
+        ])
+        for comanda in queryset:
+        writer.writerow([
+        comanda.numero_comanda,
+        comanda.locacao.numero_contrato,
+        comanda.locacao.locatario.nome_razao_social,
+        comanda.locacao.imovel.codigo_imovel,
+        getattr(comanda, 'mes_referencia', '').strftime('%m/%Y') if getattr(comanda, 'mes_referencia', None) else '',
+        comanda.data_vencimento.strftime('%d/%m/%Y') if comanda.data_vencimento else '',
+        str(comanda.valor_aluguel).replace('.', ','),
+        str(getattr(comanda, 'valor_condominio', 0)).replace('.', ','),
+        str(getattr(comanda, 'outros_debitos', 0)).replace('.', ','),
+        str(getattr(comanda, 'outros_creditos', 0)).replace('.', ','),
+        str(getattr(comanda, 'multa', 0)).replace('.', ','),
+        str(getattr(comanda, 'juros', 0)).replace('.', ','),
+        str(getattr(comanda, 'desconto', 0)).replace('.', ','),
+        str(getattr(comanda, 'valor_total', 0)).replace('.', ','),
+        str(getattr(comanda, 'valor_pago', 0)).replace('.', ','),
+        str(getattr(comanda, 'valor_pendente', 0)).replace('.', ','),
+        comanda.get_status_display() if hasattr(comanda, 'get_status_display') else comanda.status,
+        ])
+        self.message_user(request, f'📊 {queryset.count()} comanda(s) exportada(s) com sucesso.', level='success')
+        return response
+        
+        def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return qs.select_related('locacao', 'locacao__locatario', 'locacao__imovel', 'locacao__imovel__locador')
+        
+        
+        def has_add_permission(self, request):
+        """Permite criação no Admin"""
+        return super().has_add_permission(request)
+        
+        def has_delete_permission(self, request, obj=None):
+        return False
+        
+        @admin.display(description='Mês', ordering='mes_referencia')
+        def mes_referencia_formatado(self, obj):
+        return obj.mes_referencia.strftime('%B/%Y').capitalize()
+        
+        @admin.display(description='Sucesso')
+        def sucesso_badge(self, obj):
+        if obj.sucesso:
+        return format_html('<span style="background: #28a745; color: white; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: bold;">✅ Sucesso</span>')
+        else:
+        return format_html('<span style="background: #dc3545; color: white; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: bold;">❌ Erro</span>')
+        
+        
+        # -----------------------
+        # Pagamento
+# -----------------------
+@admin.register(Pagamento)

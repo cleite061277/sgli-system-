@@ -1,0 +1,228 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block title %}Painel WhatsApp - HABITAT PRO{% endblock %}
+
+{% block extrastyle %}
+<style>
+    body {
+        background: #f8f9fa;
+        font-family: system-ui, -apple-system, sans-serif;
+    }
+    
+    .container-painel {
+        max-width: 1400px;
+        margin: 20px auto;
+        padding: 0 20px;
+    }
+    
+    .header-painel {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 30px;
+        border-radius: 12px;
+        margin-bottom: 30px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    
+    .header-painel h1 {
+        margin: 0 0 10px 0;
+        font-size: 32px;
+        font-weight: 600;
+    }
+    
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+    
+    .stat-card {
+        background: white;
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        border-left: 4px solid #667eea;
+    }
+    
+    .stat-card .label {
+        font-size: 14px;
+        color: #6c757d;
+        margin-bottom: 8px;
+    }
+    
+    .stat-card .value {
+        font-size: 28px;
+        font-weight: 600;
+        color: #212529;
+    }
+    
+    .comandas-list {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        overflow: hidden;
+    }
+    
+    .comanda-item {
+        padding: 20px;
+        border-bottom: 1px solid #e9ecef;
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr auto;
+        gap: 20px;
+        align-items: center;
+        transition: background 0.2s;
+    }
+    
+    .comanda-item:hover {
+        background: #f8f9fa;
+    }
+    
+    .comanda-info h3 {
+        margin: 0 0 5px 0;
+        font-size: 16px;
+        color: #212529;
+    }
+    
+    .comanda-info p {
+        margin: 0;
+        font-size: 14px;
+        color: #6c757d;
+    }
+    
+    .comanda-valor {
+        font-size: 20px;
+        font-weight: 600;
+        color: #212529;
+    }
+    
+    .comanda-status {
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        text-align: center;
+    }
+    
+    .status-PENDING { background: #fef3c7; color: #92400e; }
+    .status-PAGA { background: #d1fae5; color: #065f46; }
+    .status-ATRASADA { background: #fee2e2; color: #991b1b; }
+    
+    .btn-whatsapp {
+        background: #25D366;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.2s;
+    }
+    
+    .btn-whatsapp:hover {
+        background: #20BA56;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(37, 211, 102, 0.3);
+    }
+    
+    .filtros {
+        background: white;
+        padding: 20px;
+        border-radius: 12px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-painel">
+    <div class="header-painel">
+        <h1>💬 Painel WhatsApp</h1>
+        <p>Envio de comandas por WhatsApp</p>
+    </div>
+    
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="label">📋 Total de Comandas</div>
+            <div class="value">{{ total_comandas }}</div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="label">⏳ Pendentes</div>
+            <div class="value">{{ total_pendentes }}</div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="label">✅ Pagas</div>
+            <div class="value">{{ total_pagas }}</div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="label">⚠️ Vencidas</div>
+            <div class="value">{{ total_vencidas }}</div>
+        </div>
+    </div>
+    
+    <div class="comandas-list">
+        {% for comanda in comandas %}
+        <div class="comanda-item">
+            <div class="comanda-info">
+                <h3>🏠 {{ comanda.locacao.imovel.endereco }}, {{ comanda.locacao.imovel.numero }}</h3>
+                <p>👤 {{ comanda.locacao.locatario.nome_razao_social }}</p>
+                <p>📅 Vencimento: {{ comanda.data_vencimento|date:"d/m/Y" }}</p>
+            </div>
+            
+            <div class="comanda-valor">
+                R$ {{ comanda.valor_total|floatformat:2 }}
+            </div>
+            
+            <div>
+                <span class="comanda-status status-{{ comanda.status }}">
+                    {{ comanda.get_status_display }}
+                </span>
+            </div>
+            
+            <div>
+                <button class="btn-whatsapp" onclick="enviarWhatsApp('{{ comanda.id }}')">
+                    💬 WhatsApp
+                </button>
+            </div>
+        </div>
+        {% empty %}
+        <div class="comanda-item">
+            <p>Nenhuma comanda encontrada para este mês.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+async function enviarWhatsApp(comandaId) {
+    try {
+        const response = await fetch(`/admin/whatsapp/gerar-mensagem/${comandaId}/`);
+        const data = await response.json();
+        
+        if (data.success) {
+            // Abrir WhatsApp em nova aba
+            window.open(data.whatsapp_url, '_blank');
+            
+            // Toast de confirmação
+            const toast = document.createElement('div');
+            toast.textContent = '✅ WhatsApp abrindo...';
+            toast.style.cssText = 'position: fixed; top: 20px; right: 20px; background: #25D366; color: white; padding: 15px 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); z-index: 9999;';
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        } else {
+            alert('❌ Erro: ' + data.error);
+        }
+    } catch (error) {
+        alert('❌ Erro ao gerar mensagem: ' + error);
+    }
+}
+</script>
+{% endblock %}

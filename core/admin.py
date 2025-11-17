@@ -271,6 +271,7 @@ class LocacaoAdmin(admin.ModelAdmin):
         'data_fim',
         'valor_aluguel',
         'status',
+        'alerta_vencimento',
         'acoes_contrato',
     ]
     
@@ -349,6 +350,43 @@ class LocacaoAdmin(admin.ModelAdmin):
             )
         return '-'
     
+    
+    @admin.display(description='⚠️ Alerta', ordering='data_fim')
+    def alerta_vencimento(self, obj):
+        """Exibe alerta para contratos vencendo em até 60 dias"""
+        from django.utils import timezone
+        from django.utils.html import format_html
+        
+        if not obj.data_fim:
+            return '-'
+        
+        hoje = timezone.now().date()
+        dias_restantes = (obj.data_fim - hoje).days
+        
+        if 0 <= dias_restantes <= 60:
+            if dias_restantes <= 7:
+                cor, icon = '#dc3545', '🚨'
+            elif dias_restantes <= 30:
+                cor, icon = '#fd7e14', '⚠️'
+            else:
+                cor, icon = '#ffc107', '⏰'
+            
+            return format_html(
+                '<span style="color: {}; font-weight: bold; background: {}20; '
+                'padding: 4px 10px; border-radius: 12px; font-size: 12px;">'
+                '{} {} dia(s)</span>',
+                cor, cor, icon, dias_restantes
+            )
+        elif dias_restantes < 0:
+            return format_html(
+                '<span style="color: #dc3545; font-weight: bold; background: #dc354520; '
+                'padding: 4px 10px; border-radius: 12px; font-size: 12px;">'
+                '❌ Vencido há {} dia(s)</span>',
+                abs(dias_restantes)
+            )
+        else:
+            return format_html('<span style="color: #28a745;">✅ OK</span>')
+
     @admin.action(description='📄 Gerar Contrato PDF')
     def gerar_contrato_pdf_action(self, request, queryset):
         """Action para gerar PDF"""
@@ -497,6 +535,7 @@ class ComandaAdmin(admin.ModelAdmin):
         'vencimento_colorido',
         'valor_total_formatado',
         'saldo_display',
+        'acoes_envio',
         'status_badge',
         'dias_vencimento',
         ]
@@ -787,6 +826,125 @@ class ComandaAdmin(admin.ModelAdmin):
                 abs(dias)
             )
     
+
+    @admin.display(description='📤 Ações')
+    def acoes_envio(self, obj):
+        """Botões para enviar comanda com mensagem WhatsApp detalhada e status inteligente"""
+        from django.utils.html import format_html
+        import urllib.parse
+        from decimal import Decimal
+        
+        loc = obj.locacao.locatario
+        imovel = obj.locacao.imovel
+        tel = ''.join(filter(str.isdigit, loc.telefone or ''))
+        if tel and not tel.startswith('55'):
+            tel = '55' + tel
+        
+        # ✅ LÓGICA INTELIGENTE DE STATUS
+        status_comanda = obj.status
+        saldo = obj.get_saldo() if hasattr(obj, 'get_saldo') else (obj.valor_pago - obj.valor_total)
+        
+        # Determinar observação baseada no status
+        if status_comanda in ['PAID', 'PAGA']:
+            if saldo > 0:
+                obs_status = f'''
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ *STATUS*
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+Comanda QUITADA
+Crédito de *R$ {abs(saldo):,.2f}* para o locatário'''
+            else:
+                obs_status = '''
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ *STATUS*
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+Comanda PAGA'''
+        elif status_comanda == 'PARTIAL':
+            saldo_restante = abs(saldo) if saldo < 0 else obj.valor_total - obj.valor_pago
+            obs_status = f'''
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚡ *STATUS*
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+Pagamento PARCIAL efetuado
+Saldo restante: *R$ {saldo_restante:,.2f}*'''
+        elif status_comanda == 'OVERDUE':
+            from django.utils import timezone
+            dias = (timezone.now().date() - obj.data_vencimento).days
+            obs_status = f'''
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚠️ *STATUS*
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+Comanda VENCIDA há {dias} dia(s)'''
+        else:
+            obs_status = '''
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+⏳ *STATUS*
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+Comanda PENDENTE de pagamento'''
+        
+        # ✅ MENSAGEM WHATSAPP COM DETALHAMENTO COMPLETO E AVISO
+        msg = f'''📋 *COMANDA DE PAGAMENTO*
+
+Olá *{loc.nome_razao_social}*!
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+💰 *VALORES DA COMANDA*
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Comanda: *{obj.numero_comanda}*
+Vencimento: *{obj.data_vencimento.strftime('%d/%m/%Y')}*
+
+DETALHAMENTO:
+  • Aluguel: R$ {obj.valor_aluguel:,.2f}
+  • Condomínio: R$ {obj.valor_condominio:,.2f}
+  • IPTU: R$ {obj.valor_iptu:,.2f}'''
+
+        # Adicionar multa/juros se houver
+        if obj.valor_multa > 0 or obj.valor_juros > 0:
+            msg += f'''
+  • Multa (10%): R$ {obj.valor_multa:,.2f}
+  • Juros (1% a.m.): R$ {obj.valor_juros:,.2f}'''
+
+        # Adicionar outros débitos/créditos se houver
+        if obj.outros_debitos > 0:
+            msg += f'''
+  • Outras despesas: R$ {obj.outros_debitos:,.2f}'''
+        
+        if obj.outros_creditos > 0:
+            msg += f'''
+  • Créditos: R$ -{obj.outros_creditos:,.2f}'''
+
+        msg += f'''
+
+TOTAL: *R$ {obj.valor_total:,.2f}*
+{obs_status}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+📍 *IMÓVEL*
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+{imovel.endereco}, {imovel.numero}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+⚠️ *IMPORTANTE*
+Pague seus débitos em dia e evite multas, juros e outras correções conforme contrato de locação.
+
+_Documento gerado via HABITAT PRO v1.0_'''
+
+        wa_url = f'https://wa.me/{tel}?text={urllib.parse.quote(msg)}'
+        
+        return format_html(
+            '<a href="{}" target="_blank" style="background:#25D366;color:white;padding:6px 12px;border-radius:6px;text-decoration:none;font-weight:bold;font-size:11px;">💬 WhatsApp</a> '
+            '<a href="/comanda/{}/enviar-email/" style="background:#3b82f6;color:white;padding:6px 12px;border-radius:6px;text-decoration:none;font-weight:bold;font-size:11px;">📧 Email</a> '
+            '<a href="/comanda/{}/web/" target="_blank" style="background:#8b5cf6;color:white;padding:6px 12px;border-radius:6px;text-decoration:none;font-weight:bold;font-size:11px;">👁️ Ver</a>',
+            wa_url, obj.id, obj.id
+        )
+    
     def saldo_display(self, obj):
         """Exibe saldo com formatação, cor e destaque visual para valores altos"""
         from decimal import Decimal
@@ -966,8 +1124,8 @@ class ComandaAdmin(admin.ModelAdmin):
                 str(comanda.valor_condominio).replace('.', ','),
                 str(comanda.outros_debitos).replace('.', ','),
                 str(comanda.outros_creditos).replace('.', ','),
-                str(comanda.multa).replace('.', ','),
-                str(comanda.juros).replace('.', ','),
+                str(comanda.valor_multa).replace('.', ','),  # ✅ CORRIGIDO
+                str(comanda.valor_juros).replace('.', ','),  # ✅ CORRIGIDO
                 str(comanda.desconto).replace('.', ','),
                 str(comanda.valor_total).replace('.', ','),
                 str(comanda.valor_pago).replace('.', ','),
@@ -1089,7 +1247,7 @@ class PagamentoAdmin(admin.ModelAdmin):
             self.message_user(request, f'{len(recibos_gerados)} recibo(s) gerado(s) com sucesso!')
     
     gerar_recibo.short_description = "Gerar recibos Word"
-    list_display = ('numero_pagamento', 'comanda', 'locatario_nome', 'valor_pago', 'data_pagamento', 'forma_pagamento', 'status')
+    list_display = ('numero_pagamento', 'comanda', 'locatario_nome', 'valor_pago', 'data_pagamento', 'forma_pagamento', 'status', 'botao_recibo')
     list_filter = ('status', 'forma_pagamento', 'data_pagamento')
     search_fields = ('numero_pagamento', 'comanda__numero_comanda', 'comanda__locacao__locatario__nome_razao_social')
     readonly_fields = ('numero_pagamento', 'data_confirmacao', 'created_at', 'updated_at')
@@ -1120,6 +1278,24 @@ class PagamentoAdmin(admin.ModelAdmin):
         """Display tenant name in list."""
         return obj.comanda.locacao.locatario.nome_razao_social
     locatario_nome.short_description = 'Locatário'
+    @admin.display(description='🧾 Recibo')
+    def botao_recibo(self, obj):
+        """Botão para visualizar/enviar recibo"""
+        from django.utils.html import format_html
+        from django.urls import reverse
+        
+        if obj.status == 'confirmado':
+            url = reverse('pagina_recibo_pagamento', kwargs={'pagamento_id': obj.id})
+            return format_html(
+                '<a href="{}" target="_blank" style="'
+                'display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); '
+                'color: white; padding: 6px 14px; border-radius: 6px; text-decoration: none; '
+                'font-weight: bold; font-size: 12px;">🧾 Recibo</a>',
+                url
+            )
+        return format_html('<span style="color: #999; font-size: 11px;">⏳ Aguardando</span>')
+    
+
     
     def info_contrato(self, obj):
         """Display clickable contract information."""

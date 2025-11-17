@@ -1,0 +1,209 @@
+/* ================================================== */
+/*    HABITAT PRO - OPÇÃO 3 OTIMIZADA               */
+/* ================================================== */
+
+/* LABELS EM NEGRITO */
+label, .form-row label, .field-box label, div.form-row > div > label,
+.form-group label, .aligned label, label[for], .field label,
+.fieldBox label, .form-row > label, div label {
+    font-weight: 700 !important;
+}
+
+.module h2, fieldset.module h2, .inline-group h2, fieldset h2 {
+    font-weight: 700 !important;
+    font-size: 14px !important;
+    color: #1e3a8a !important;
+}
+
+th, th.column-header, th.sortable, thead th {
+    font-weight: 700 !important;
+}
+
+/* BRANDING - HEADER */
+#header {
+    background: linear-gradient(135deg, #e8f4f8 0%, #dbeafe 100%) !important;
+    border-bottom: 3px solid #1e3a8a !important;
+    padding: 15px 20px !important;
+    box-shadow: 0 2px 4px rgba(30, 58, 138, 0.1) !important;
+}
+
+#site-name {
+    background: url('/static/images/habitat_pro_logo.png') no-repeat left center;
+    background-size: 200px auto;
+    padding-left: 220px !important;
+    min-height: 60px;
+    display: flex;
+    align-items: center;
+}
+
+#site-name a {
+    text-decoration: none !important;
+    font-weight: 800 !important;
+    font-size: 28px !important;
+}
+
+#header p {
+    color: #1e3a8a !important;
+    margin: 5px 0 0 220px !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+}
+
+#header a, #user-tools a {
+    color: #1e3a8a !important;
+    font-weight: 500 !important;
+}
+
+#user-tools a:hover {
+    color: #FF8C00 !important;
+}
+
+/* TABELAS - AZUL CLARINHO COM TEXTO AZUL ESCURO */
+thead th {
+    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%) !important;
+    color: #1e3a8a !important;
+    border-bottom: 2px solid #3b82f6 !important;
+    padding: 12px 10px !important;
+    font-size: 13px !important;
+}
+
+thead th a {
+    color: #1e3a8a !important;
+    font-weight: 700 !important;
+}
+
+thead th a:hover {
+    color: #FF8C00 !important;
+    text-decoration: none !important;
+}
+
+/* Ícones de ordenação */
+thead th.sortable a:after,
+thead th.sorted a:after {
+    color: #1e3a8a !important;
+}
+
+.results tbody tr:hover {
+    background-color: #fff7ed !important;
+}
+
+.results tbody tr:nth-child(odd) {
+    background-color: #f0f9ff !important;
+}
+
+.results tbody tr:nth-child(even) {
+    background-color: #ffffff !important;
+}
+
+/* BOTÕES */
+.button, input[type="submit"], .submit-row input,
+.addlink, .changelink {
+    background: linear-gradient(135deg, #FF8C00 0%, #FF6B00 100%) !important;
+    border: none !important;
+    color: white !important;
+    padding: 8px 16px !important;
+    border-radius: 4px !important;
+    font-weight: 600 !important;
+    transition: all 0.3s ease !important;
+}
+
+.button:hover, input[type="submit"]:hover,
+.addlink:hover, .changelink:hover {
+    background: linear-gradient(135deg, #FF6B00 0%, #FF4500 100%) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 8px rgba(255, 140, 0, 0.3) !important;
+}
+
+/* LINKS */
+a {
+    color: #1e3a8a !important;
+    transition: color 0.2s ease !important;
+}
+
+a:hover {
+    color: #FF8C00 !important;
+}
+
+.results a {
+    color: #1e3a8a !important;
+}
+
+.results a:hover {
+    color: #FF8C00 !important;
+}
+
+/* SIDEBAR */
+.module {
+    background: #f0f9ff !important;
+    border: 1px solid #bfdbfe !important;
+    border-radius: 4px !important;
+}
+
+.module caption {
+    background: linear-gradient(135deg, #FF8C00 0%, #FF6B00 100%) !important;
+    color: white !important;
+    font-weight: 700 !important;
+    padding: 10px !important;
+    border-radius: 4px 4px 0 0 !important;
+}
+
+/* BREADCRUMBS */
+.breadcrumbs {
+    background: #f0f9ff !important;
+    border-bottom: 1px solid #bfdbfe !important;
+    color: #1e3a8a !important;
+    padding: 10px 20px !important;
+}
+
+.breadcrumbs a {
+    color: #1e3a8a !important;
+}
+
+.breadcrumbs a:hover {
+    color: #FF8C00 !important;
+}
+
+/* MENSAGENS */
+.success {
+    background-color: #d1fae5 !important;
+    border-color: #10b981 !important;
+    color: #065f46 !important;
+}
+
+.warning {
+    background-color: #fef3c7 !important;
+    border-color: #f59e0b !important;
+    color: #92400e !important;
+}
+
+.error {
+    background-color: #fee2e2 !important;
+    border-color: #ef4444 !important;
+    color: #991b1b !important;
+}
+
+/* FOOTER */
+#footer {
+    background: linear-gradient(135deg, #e8f4f8 0%, #dbeafe 100%) !important;
+    border-top: 2px solid #bfdbfe !important;
+    color: #1e3a8a !important;
+    text-align: center !important;
+    padding: 15px !important;
+    font-size: 12px !important;
+}
+
+#footer strong {
+    color: #FF8C00 !important;
+    font-weight: 700 !important;
+}
+
+/* FORMULÁRIOS */
+.form-row {
+    padding: 10px !important;
+}
+
+/* Checkboxes e ícones de ativo/inativo */
+img[alt="True"], img[alt="False"],
+.vCheckboxLabel {
+    vertical-align: middle !important;
+}

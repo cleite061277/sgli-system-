@@ -1,0 +1,400 @@
+{% extends 'admin/base_site.html' %}
+{% load static %}
+
+{% block extrastyle %}
+<style>
+    .whatsapp-panel {
+        padding: 20px;
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+    
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin-bottom: 30px;
+    }
+    
+    .stat-card {
+        background: white;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        border-left: 4px solid #25D366;
+    }
+    
+    .stat-card.pendente { border-left-color: #ffa500; }
+    .stat-card.vencida { border-left-color: #dc3545; }
+    .stat-card.paga { border-left-color: #28a745; }
+    
+    .stat-card h3 {
+        margin: 0 0 10px 0;
+        font-size: 14px;
+        color: #666;
+        text-transform: uppercase;
+    }
+    
+    .stat-card .value {
+        font-size: 32px;
+        font-weight: bold;
+        color: #333;
+    }
+    
+    .filters {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .filters form {
+        display: flex;
+        gap: 15px;
+        align-items: end;
+        flex-wrap: wrap;
+    }
+    
+    .filter-group {
+        flex: 1;
+        min-width: 200px;
+    }
+    
+    .filter-group label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: 600;
+        color: #333;
+    }
+    
+    .filter-group select {
+        width: 100%;
+        padding: 8px 12px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 14px;
+    }
+    
+    .comandas-list {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        overflow: hidden;
+    }
+    
+    .comanda-item {
+        padding: 20px;
+        border-bottom: 1px solid #eee;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        transition: background 0.2s;
+    }
+    
+    .comanda-item:hover {
+        background: #f8f9fa;
+    }
+    
+    .comanda-item:last-child {
+        border-bottom: none;
+    }
+    
+    .comanda-status {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        flex-shrink: 0;
+    }
+    
+    .status-PENDING { background: #fff3cd; }
+    .status-OVERDUE { background: #f8d7da; }
+    .status-PAID { background: #d4edda; }
+    .status-PARTIAL { background: #d1ecf1; }
+    
+    .comanda-info {
+        flex: 1;
+    }
+    
+    .comanda-info h3 {
+        margin: 0 0 5px 0;
+        font-size: 16px;
+        font-weight: 600;
+    }
+    
+    .comanda-info p {
+        margin: 3px 0;
+        color: #666;
+        font-size: 14px;
+    }
+    
+    .comanda-valor {
+        text-align: right;
+        margin-right: 20px;
+    }
+    
+    .comanda-valor .total {
+        font-size: 24px;
+        font-weight: bold;
+        color: #333;
+    }
+    
+    .comanda-valor .vencimento {
+        font-size: 12px;
+        color: #666;
+        margin-top: 5px;
+    }
+    
+    .comanda-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .btn-whatsapp {
+        background: #25D366;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: background 0.2s;
+        text-decoration: none;
+        font-size: 14px;
+    }
+    
+    .btn-whatsapp:hover {
+        background: #1da851;
+        color: white;
+    }
+    
+    .btn-copiar {
+        background: #007bff;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 13px;
+        transition: background 0.2s;
+    }
+    
+    .btn-copiar:hover {
+        background: #0056b3;
+    }
+    
+    .btn-copiar.copiado {
+        background: #28a745;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: #999;
+    }
+    
+    .empty-state svg {
+        width: 80px;
+        height: 80px;
+        margin-bottom: 20px;
+        opacity: 0.3;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="whatsapp-panel">
+    <h1>📱 Painel WhatsApp - Comandas</h1>
+    <p style="color: #666; margin-bottom: 30px;">
+        Visualize e copie mensagens formatadas para enviar via WhatsApp Web
+    </p>
+    
+    <!-- Estatísticas -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <h3>Total</h3>
+            <div class="value">{{ stats.total }}</div>
+        </div>
+        <div class="stat-card pendente">
+            <h3>Pendentes</h3>
+            <div class="value">{{ stats.pendentes }}</div>
+        </div>
+        <div class="stat-card vencida">
+            <h3>Vencidas</h3>
+            <div class="value">{{ stats.vencidas }}</div>
+        </div>
+        <div class="stat-card paga">
+            <h3>Pagas</h3>
+            <div class="value">{{ stats.pagas }}</div>
+        </div>
+    </div>
+    
+    <!-- Filtros -->
+    <div class="filters">
+        <form method="get">
+            <div class="filter-group">
+                <label>Mês de Referência</label>
+                <select name="mes" onchange="this.form.submit()">
+                    {% for mes in meses_disponiveis %}
+                    <option value="{{ mes.valor }}" {% if mes.valor == mes_filtro %}selected{% endif %}>
+                        {{ mes.label }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label>Status</label>
+                <select name="status" onchange="this.form.submit()">
+                    <option value="TODOS" {% if status_filtro == 'TODOS' %}selected{% endif %}>Todos</option>
+                    <option value="PENDING" {% if status_filtro == 'PENDING' %}selected{% endif %}>Pendente</option>
+                    <option value="OVERDUE" {% if status_filtro == 'OVERDUE' %}selected{% endif %}>Vencida</option>
+                    <option value="PAID" {% if status_filtro == 'PAID' %}selected{% endif %}>Paga</option>
+                </select>
+            </div>
+        </form>
+    </div>
+    
+    <!-- Lista de Comandas -->
+    <div class="comandas-list">
+        {% if comandas %}
+            {% for comanda in comandas %}
+            <div class="comanda-item">
+                <div class="comanda-status status-{{ comanda.status }}">
+                    {% if comanda.status == 'PAID' %}✓
+                    {% elif comanda.status == 'OVERDUE' %}⚠
+                    {% else %}📄{% endif %}
+                </div>
+                
+                <div class="comanda-info">
+                    <h3>{{ comanda.locacao.locatario.nome_razao_social }}</h3>
+                    <p>📍 {{ comanda.locacao.imovel.endereco }}, {{ comanda.locacao.imovel.numero }}</p>
+                    <p>🏠 Código: {{ comanda.locacao.imovel.codigo_imovel }}</p>
+                    <p>📞 {{ comanda.locacao.locatario.telefone }}</p>
+                </div>
+                
+                <div class="comanda-valor">
+                    <div class="total">R$ {{ comanda.valor_total|floatformat:2 }}</div>
+                    <div class="vencimento">
+                        Vence em: {{ comanda.data_vencimento|date:"d/m/Y" }}
+                    </div>
+                </div>
+                
+                <div class="comanda-actions">
+                    <button 
+                        class="btn-copiar" 
+                        onclick="copiarMensagem(this, '{{ comanda.id }}')"
+                        data-numero="{{ comanda.locacao.locatario.telefone }}"
+                    >
+                        📋 Copiar Mensagem
+                    </button>
+                    
+                    <a 
+                        href="https://wa.me/55{{ comanda.locacao.locatario.telefone|cut:' '|cut:'-'|cut:'('|cut:')' }}" 
+                        target="_blank"
+                        class="btn-whatsapp"
+                        onclick="copiarMensagem(this.previousElementSibling, '{{ comanda.id }}'); return true;"
+                    >
+                        💬 Abrir WhatsApp
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <h3>Nenhuma comanda encontrada</h3>
+                <p>Tente ajustar os filtros acima</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Modal de Mensagem -->
+<div id="mensagemModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 9999; align-items: center; justify-content: center;">
+    <div style="background: white; padding: 30px; border-radius: 12px; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto;">
+        <h2>Mensagem para WhatsApp</h2>
+        <textarea id="mensagemTexto" readonly style="width: 100%; height: 400px; padding: 15px; border: 1px solid #ddd; border-radius: 6px; font-family: monospace; font-size: 13px; resize: vertical;"></textarea>
+        <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: flex-end;">
+            <button onclick="fecharModal()" style="padding: 10px 20px; border: 1px solid #ddd; background: white; border-radius: 6px; cursor: pointer;">
+                Fechar
+            </button>
+            <button onclick="copiarDoModal()" class="btn-whatsapp">
+                📋 Copiar Texto
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+// Armazenar mensagens
+const mensagens = {};
+
+// Buscar mensagem da comanda
+async function buscarMensagem(comandaId) {
+    if (mensagens[comandaId]) {
+        return mensagens[comandaId];
+    }
+    
+    try {
+        const response = await fetch(`/admin/whatsapp/comanda/${comandaId}/mensagem/`);
+        const data = await response.json();
+        mensagens[comandaId] = data.mensagem;
+        return data.mensagem;
+    } catch (error) {
+        console.error('Erro ao buscar mensagem:', error);
+        return null;
+    }
+}
+
+// Copiar mensagem
+async function copiarMensagem(btn, comandaId) {
+    const mensagem = await buscarMensagem(comandaId);
+    
+    if (!mensagem) {
+        alert('Erro ao carregar mensagem');
+        return;
+    }
+    
+    // Copiar para clipboard
+    try {
+        await navigator.clipboard.writeText(mensagem);
+        
+        // Feedback visual
+        const textoOriginal = btn.innerHTML;
+        btn.innerHTML = '✓ Copiado!';
+        btn.classList.add('copiado');
+        
+        setTimeout(() => {
+            btn.innerHTML = textoOriginal;
+            btn.classList.remove('copiado');
+        }, 2000);
+    } catch (error) {
+        // Fallback: mostrar modal
+        document.getElementById('mensagemTexto').value = mensagem;
+        document.getElementById('mensagemModal').style.display = 'flex';
+    }
+}
+
+function fecharModal() {
+    document.getElementById('mensagemModal').style.display = 'none';
+}
+
+function copiarDoModal() {
+    const textarea = document.getElementById('mensagemTexto');
+    textarea.select();
+    document.execCommand('copy');
+    alert('Mensagem copiada!');
+}
+</script>
+{% endblock %}

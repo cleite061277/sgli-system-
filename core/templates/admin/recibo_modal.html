@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recibo de Pagamento - {{ pagamento.numero_pagamento }}</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+        
+        .recibo-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .info-box {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin-bottom: 25px;
+            border-radius: 5px;
+        }
+        
+        .info-box h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .info-row:last-child {
+            border-bottom: none;
+        }
+        
+        .info-label {
+            font-weight: 600;
+            color: #495057;
+        }
+        
+        .info-value {
+            color: #212529;
+        }
+        
+        .valor-destaque {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 10px;
+            text-align: center;
+            margin: 30px 0;
+        }
+        
+        .valor-destaque h2 {
+            font-size: 16px;
+            margin-bottom: 10px;
+            opacity: 0.9;
+        }
+        
+        .valor-destaque .valor {
+            font-size: 48px;
+            font-weight: bold;
+        }
+        
+        .actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 2px solid #e9ecef;
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        
+        .btn-info {
+            background: #17a2b8;
+            color: white;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .footer {
+            background: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            color: #6c757d;
+            font-size: 14px;
+        }
+        
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            
+            .actions {
+                display: none;
+            }
+            
+            .recibo-container {
+                box-shadow: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="recibo-container">
+        <div class="header">
+            <h1>🧾 RECIBO DE PAGAMENTO</h1>
+            <p>Nº {{ pagamento.numero_pagamento }}</p>
+        </div>
+        
+        <div class="content">
+            <!-- Informações do Pagamento -->
+            <div class="info-box">
+                <h3>📋 Dados do Pagamento</h3>
+                <div class="info-row">
+                    <span class="info-label">Data de Pagamento:</span>
+                    <span class="info-value">{{ pagamento.data_pagamento|date:"d/m/Y" }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Forma de Pagamento:</span>
+                    <span class="info-value">{{ pagamento.get_forma_pagamento_display }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Status:</span>
+                    <span class="info-value">{{ pagamento.get_status_display }}</span>
+                </div>
+            </div>
+            
+            <!-- Informações da Comanda -->
+            <div class="info-box">
+                <h3>📄 Referente à Comanda</h3>
+                <div class="info-row">
+                    <span class="info-label">Número da Comanda:</span>
+                    <span class="info-value">{{ comanda.numero_comanda }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Mês de Referência:</span>
+                    <span class="info-value">{{ comanda.mes_referencia|date:"m/Y" }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Vencimento:</span>
+                    <span class="info-value">{{ comanda.data_vencimento|date:"d/m/Y" }}</span>
+                </div>
+            </div>
+            
+            <!-- Informações do Locatário -->
+            <div class="info-box">
+                <h3>👤 Locatário</h3>
+                <div class="info-row">
+                    <span class="info-label">Nome:</span>
+                    <span class="info-value">{{ locatario.nome_razao_social }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">CPF/CNPJ:</span>
+                    <span class="info-value">{{ locatario.cpf_cnpj }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Telefone:</span>
+                    <span class="info-value">{{ locatario.telefone }}</span>
+                </div>
+            </div>
+            
+            <!-- Informações do Imóvel -->
+            <div class="info-box">
+                <h3>🏠 Imóvel</h3>
+                <div class="info-row">
+                    <span class="info-label">Código:</span>
+                    <span class="info-value">{{ imovel.codigo_imovel }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Endereço:</span>
+                    <span class="info-value">{{ imovel.endereco_completo }}</span>
+                </div>
+            </div>
+            
+            <!-- Valor em Destaque -->
+            <div class="valor-destaque">
+                <h2>VALOR PAGO</h2>
+                <div class="valor">R$ {{ pagamento.valor_pago|floatformat:2 }}</div>
+            </div>
+            
+            <!-- Observações -->
+            {% if pagamento.observacoes %}
+            <div class="info-box">
+                <h3>📝 Observações</h3>
+                <p>{{ pagamento.observacoes }}</p>
+            </div>
+            {% endif %}
+            
+            <!-- Ações -->
+            <div class="actions">
+                <button class="btn btn-primary" onclick="window.print()">
+                    🖨️ Imprimir
+                </button>
+                <button class="btn btn-success" onclick="enviarWhatsApp()">
+                    💬 WhatsApp
+                </button>
+                <button class="btn btn-info" onclick="enviarEmail()">
+                    📧 E-mail
+                </button>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>HABITAT PRO - Sistema de Gestão de Locação de Imóveis</p>
+            <p>Recibo gerado em {{ "now"|date:"d/m/Y às H:i" }}</p>
+        </div>
+    </div>
+    
+    <script>
+        function enviarWhatsApp() {
+            const telefone = '{{ locatario.telefone|default:"" }}';
+            const digitos = telefone.replace(/\D/g, '');
+            
+            if (!digitos) {
+                alert('Telefone do locatário não cadastrado!');
+                return;
+            }
+            
+            const mensagem = `Olá! Segue recibo de pagamento:\n\n` +
+                           `Recibo: {{ pagamento.numero_pagamento }}\n` +
+                           `Valor: R$ {{ pagamento.valor_pago|floatformat:2 }}\n` +
+                           `Data: {{ pagamento.data_pagamento|date:"d/m/Y" }}\n` +
+                           `Referente: Comanda {{ comanda.numero_comanda }}`;
+            
+            const url = `https://wa.me/${digitos}?text=${encodeURIComponent(mensagem)}`;
+            window.open(url, '_blank');
+        }
+        
+        function enviarEmail() {
+            const email = '{{ locatario.email|default:"" }}';
+            
+            if (!email) {
+                alert('E-mail do locatário não cadastrado!');
+                return;
+            }
+            
+            const assunto = `Recibo de Pagamento - ${document.querySelector('.header p').textContent}`;
+            const corpo = `Segue recibo de pagamento em anexo.`;
+            
+            window.location.href = `mailto:${email}?subject=${encodeURIComponent(assunto)}&body=${encodeURIComponent(corpo)}`;
+        }
+    </script>
+</body>
+</html>

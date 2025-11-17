@@ -1,0 +1,269 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block title %}Painel WhatsApp - Cobranças{% endblock %}
+
+{% block extrastyle %}
+<style>
+    .whatsapp-panel {
+        padding: 25px;
+        background: #f5f5f5;
+        min-height: 100vh;
+    }
+    
+    .panel-header {
+        background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+        color: white;
+        padding: 25px;
+        border-radius: 12px;
+        margin-bottom: 25px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    
+    .panel-header h1 {
+        margin: 0 0 10px 0;
+        font-size: 28px;
+        font-weight: 600;
+    }
+    
+    .panel-header p {
+        margin: 0;
+        opacity: 0.95;
+        font-size: 16px;
+    }
+    
+    .comanda-card {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+        border-left: 5px solid;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .comanda-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.18);
+    }
+    
+    .comanda-card.atrasada {
+        border-left-color: #e74c3c;
+        background: linear-gradient(to right, #fff5f5 0%, white 100%);
+    }
+    
+    .comanda-card.pendente {
+        border-left-color: #f39c12;
+        background: linear-gradient(to right, #fffaf0 0%, white 100%);
+    }
+    
+    .info-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin: 12px 0;
+        padding: 8px 0;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .info-row:last-of-type {
+        border-bottom: none;
+        margin-bottom: 20px;
+    }
+    
+    .info-label {
+        font-weight: 600;
+        color: #2c3e50;
+        font-size: 15px;
+    }
+    
+    .info-value {
+        color: #34495e;
+        font-size: 15px;
+    }
+    
+    .badge {
+        display: inline-block;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .badge-danger {
+        background: #e74c3c;
+        color: white;
+        box-shadow: 0 2px 4px rgba(231, 76, 60, 0.3);
+    }
+    
+    .badge-warning {
+        background: #f39c12;
+        color: white;
+        box-shadow: 0 2px 4px rgba(243, 156, 18, 0.3);
+    }
+    
+    .btn-whatsapp {
+        background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+        color: white;
+        border: none;
+        padding: 14px 28px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 700;
+        font-size: 15px;
+        transition: all 0.3s;
+        box-shadow: 0 4px 6px rgba(37, 211, 102, 0.3);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .btn-whatsapp:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(37, 211, 102, 0.4);
+        background: linear-gradient(135deg, #20BA5A 0%, #0F7A6A 100%);
+    }
+    
+    .btn-whatsapp:active {
+        transform: translateY(0);
+    }
+    
+    .locatario-nome {
+        font-size: 18px;
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 4px;
+    }
+    
+    .endereco-imovel {
+        color: #34495e;
+        font-weight: 600;
+        font-size: 14px;
+    }
+    
+    .comanda-numero {
+        color: #7f8c8d;
+        font-size: 13px;
+        font-family: 'Courier New', monospace;
+        background: #ecf0f1;
+        padding: 4px 8px;
+        border-radius: 4px;
+    }
+    
+    .valor-total {
+        font-size: 18px;
+        font-weight: 800;
+        color: #27ae60;
+    }
+    
+    .data-vencimento {
+        color: #e74c3c;
+        font-weight: 700;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    
+    .empty-state h2 {
+        color: #95a5a6;
+        font-size: 24px;
+        margin-top: 20px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="whatsapp-panel">
+    <div class="panel-header">
+        <h1>💬 Painel WhatsApp - Cobranças</h1>
+        <p>Clique no botão verde para copiar a mensagem e abrir o WhatsApp do locatário</p>
+    </div>
+    
+    {% if comandas %}
+        {% for comanda in comandas %}
+        <div class="comanda-card {% if comanda.is_vencida %}atrasada{% else %}pendente{% endif %}">
+            <div class="info-row" style="border-bottom: 2px solid #ecf0f1;">
+                <div>
+                    <div class="locatario-nome">{{ comanda.locacao.locatario.nome_razao_social }}</div>
+                    <div class="endereco-imovel">📍 {{ comanda.locacao.imovel.endereco }}, {{ comanda.locacao.imovel.numero }}</div>
+                </div>
+                {% if comanda.is_vencida %}
+                    <span class="badge badge-danger">⚠️ ATRASADO {{ comanda.dias_atraso }} dia{{ comanda.dias_atraso|pluralize }}</span>
+                {% else %}
+                    <span class="badge badge-warning">🔔 Vence em {{ comanda.dias_vencimento }} dia{{ comanda.dias_vencimento|pluralize }}</span>
+                {% endif %}
+            </div>
+            
+            <div class="info-row">
+                <span class="info-label">📋 Comanda:</span>
+                <span class="comanda-numero">{{ comanda.numero_comanda }}</span>
+            </div>
+            
+            <div class="info-row">
+                <span class="info-label">📅 Vencimento:</span>
+                <span class="data-vencimento">{{ comanda.data_vencimento|date:"d/m/Y" }}</span>
+            </div>
+            
+            <div class="info-row">
+                <span class="info-label">💰 Valor Total:</span>
+                <span class="valor-total">R$ {{ comanda.valor_total|floatformat:2 }}</span>
+            </div>
+            
+            <button class="btn-whatsapp" onclick="enviarWhatsApp('{{ comanda.id }}')">
+                <span style="font-size: 20px;">💬</span>
+                <span>Enviar WhatsApp</span>
+            </button>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="empty-state">
+            <div style="font-size: 64px;">📭</div>
+            <h2>Nenhuma cobrança pendente</h2>
+            <p style="color: #95a5a6; margin-top: 10px;">Todas as comandas estão em dia!</p>
+        </div>
+    {% endif %}
+</div>
+
+<script>
+async function enviarWhatsApp(comandaId) {
+    try {
+        const response = await fetch(`/admin/whatsapp/api/mensagem/${comandaId}/`);
+        const data = await response.json();
+        
+        if (data.success) {
+            await navigator.clipboard.writeText(data.mensagem);
+            window.open(data.whatsapp_link, '_blank');
+            
+            // Toast de sucesso
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #27ae60;
+                color: white;
+                padding: 16px 24px;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+                z-index: 10000;
+                font-weight: 600;
+            `;
+            toast.textContent = '✅ Mensagem copiada! WhatsApp abrindo...';
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        } else {
+            alert('❌ Erro: ' + data.error);
+        }
+    } catch (error) {
+        alert('❌ Erro ao gerar mensagem: ' + error);
+    }
+}
+</script>
+{% endblock %}

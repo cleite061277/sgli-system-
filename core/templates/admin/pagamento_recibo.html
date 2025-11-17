@@ -1,0 +1,434 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }} - HABITAT PRO</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #16a34a 0%, #22c55e 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .header .numero-recibo {
+            font-size: 18px;
+            opacity: 0.95;
+            font-weight: 500;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .success-badge {
+            background: #dcfce7;
+            border: 2px solid #16a34a;
+            color: #166534;
+            padding: 15px 20px;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 30px;
+            font-weight: 600;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .info-section {
+            margin-bottom: 30px;
+            padding-bottom: 25px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .info-section:last-of-type {
+            border-bottom: none;
+        }
+        
+        .info-section h2 {
+            color: #16a34a;
+            font-size: 18px;
+            margin-bottom: 15px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #f5f5f5;
+        }
+        
+        .info-row:last-child {
+            border-bottom: none;
+        }
+        
+        .info-label {
+            color: #666;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        
+        .info-value {
+            color: #333;
+            font-weight: 600;
+            font-size: 14px;
+            text-align: right;
+        }
+        
+        .valor-destaque {
+            background: linear-gradient(135deg, #16a34a 0%, #22c55e 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 12px;
+            text-align: center;
+            margin: 30px 0;
+            box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
+        }
+        
+        .valor-destaque .label {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .valor-destaque .valor {
+            font-size: 36px;
+            font-weight: 700;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 2px solid #f0f0f0;
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 14px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .btn-whatsapp {
+            background: #25D366;
+            color: white;
+        }
+        
+        .btn-whatsapp:hover {
+            background: #20bd5a;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4);
+        }
+        
+        .btn-email {
+            background: #3b82f6;
+            color: white;
+        }
+        
+        .btn-email:hover {
+            background: #2563eb;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+        }
+        
+        .btn-download {
+            background: #8b5cf6;
+            color: white;
+        }
+        
+        .btn-download:hover {
+            background: #7c3aed;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+        }
+        
+        .footer {
+            background: #f9fafb;
+            padding: 25px 40px;
+            text-align: center;
+            border-top: 1px solid #e5e7eb;
+        }
+        
+        .footer p {
+            color: #6b7280;
+            font-size: 13px;
+            margin: 5px 0;
+        }
+        
+        .footer .brand {
+            color: #16a34a;
+            font-weight: 600;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                border-radius: 0;
+            }
+            
+            .content {
+                padding: 25px 20px;
+            }
+            
+            .header {
+                padding: 25px 20px;
+            }
+            
+            .header h1 {
+                font-size: 24px;
+            }
+            
+            .valor-destaque .valor {
+                font-size: 28px;
+            }
+            
+            .info-row {
+                flex-direction: column;
+                gap: 5px;
+            }
+            
+            .info-value {
+                text-align: left;
+            }
+            
+            .actions {
+                flex-direction: column;
+            }
+        }
+        
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            
+            .container {
+                box-shadow: none;
+                border-radius: 0;
+            }
+            
+            .actions {
+                display: none;
+            }
+            
+            .header {
+                background: #16a34a;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            
+            .valor-destaque {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- HEADER -->
+        <div class="header">
+            <h1>🧾 RECIBO DE PAGAMENTO</h1>
+            <div class="numero-recibo">{{ pagamento.numero_pagamento }}</div>
+        </div>
+        
+        <!-- CONTENT -->
+        <div class="content">
+            <!-- BADGE DE SUCESSO -->
+            <div class="success-badge">
+                <span style="font-size: 24px;">✅</span>
+                <span>Pagamento Confirmado com Sucesso!</span>
+            </div>
+            
+            <!-- INFORMAÇÕES DO PAGAMENTO -->
+            <div class="info-section">
+                <h2>💳 Dados do Pagamento</h2>
+                
+                <div class="info-row">
+                    <span class="info-label">Recibo Nº</span>
+                    <span class="info-value">{{ pagamento.numero_pagamento }}</span>
+                </div>
+                
+                <div class="info-row">
+                    <span class="info-label">Data do Pagamento</span>
+                    <span class="info-value">{{ pagamento.data_pagamento|date:"d/m/Y" }}</span>
+                </div>
+                
+                <div class="info-row">
+                    <span class="info-label">Forma de Pagamento</span>
+                    <span class="info-value">{{ pagamento.get_forma_pagamento_display }}</span>
+                </div>
+                
+                <div class="info-row">
+                    <span class="info-label">Status</span>
+                    <span class="info-value" style="color: #16a34a;">✓ Confirmado</span>
+                </div>
+            </div>
+            
+            <!-- VALOR PAGO -->
+            <div class="valor-destaque">
+                <div class="label">Valor Recebido</div>
+                <div class="valor">R$ {{ pagamento.valor_pago|floatformat:2 }}</div>
+            </div>
+            
+            <!-- REFERENTE À -->
+            <div class="info-section">
+                <h2>📋 Referente à</h2>
+                
+                <div class="info-row">
+                    <span class="info-label">Comanda</span>
+                    <span class="info-value">{{ comanda.numero_comanda }}</span>
+                </div>
+                
+                <div class="info-row">
+                    <span class="info-label">Vencimento da Comanda</span>
+                    <span class="info-value">{{ comanda.data_vencimento|date:"d/m/Y" }}</span>
+                </div>
+            </div>
+            
+            <!-- INFORMAÇÕES DO LOCATÁRIO -->
+            <div class="info-section">
+                <h2>👤 Locatário</h2>
+                
+                <div class="info-row">
+                    <span class="info-label">Nome</span>
+                    <span class="info-value">{{ locatario.nome_razao_social }}</span>
+                </div>
+                
+                {% if locatario.cpf_cnpj %}
+                <div class="info-row">
+                    <span class="info-label">CPF/CNPJ</span>
+                    <span class="info-value">{{ locatario.cpf_cnpj }}</span>
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- INFORMAÇÕES DO IMÓVEL -->
+            <div class="info-section">
+                <h2>🏠 Imóvel</h2>
+                
+                <div class="info-row">
+                    <span class="info-label">Endereço</span>
+                    <span class="info-value">{{ imovel.endereco }}, {{ imovel.numero }}</span>
+                </div>
+                
+                {% if imovel.bairro %}
+                <div class="info-row">
+                    <span class="info-label">Bairro</span>
+                    <span class="info-value">{{ imovel.bairro }}</span>
+                </div>
+                {% endif %}
+                
+                {% if imovel.cidade %}
+                <div class="info-row">
+                    <span class="info-label">Cidade</span>
+                    <span class="info-value">{{ imovel.cidade }} - {{ imovel.estado }}</span>
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- AÇÕES -->
+            <div class="actions">
+                <form method="post" style="flex: 1;">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="whatsapp">
+                    <button type="submit" class="btn btn-whatsapp">
+                        <span>💬</span>
+                        <span>Enviar WhatsApp</span>
+                    </button>
+                </form>
+                
+                <form method="post" style="flex: 1;">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="email">
+                    <button type="submit" class="btn btn-email">
+                        <span>📧</span>
+                        <span>Enviar Email</span>
+                    </button>
+                </form>
+                
+                <a href="{% url 'download_recibo_pagamento' pagamento.id %}" class="btn btn-download">
+                    <span>📥</span>
+                    <span>Download</span>
+                </a>
+            </div>
+        </div>
+        
+        <!-- FOOTER -->
+        <div class="footer">
+            <p>Documento gerado via <span class="brand">HABITAT PRO v1.0</span></p>
+            <p>Sistema de Gestão Imobiliária</p>
+        </div>
+    </div>
+    
+    <!-- Script para redirect WhatsApp -->
+    {% if request.session.whatsapp_redirect %}
+    <script>
+        // Abrir WhatsApp em nova aba
+        window.open('{{ request.session.whatsapp_redirect }}', '_blank');
+        
+        // Limpar sessão via AJAX
+        fetch(window.location.href, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: 'action=clear_whatsapp_session'
+        });
+    </script>
+    {% endif %}
+</body>
+</html>

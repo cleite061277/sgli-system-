@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SGLI - Dashboard</title>
+    <meta charset="utf-8">
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .card { background: white; padding: 20px; margin: 10px 0; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
+        .stat-card { text-align: center; padding: 30px; }
+        .stat-number { font-size: 48px; font-weight: bold; color: #2196F3; }
+        .stat-label { font-size: 16px; color: #666; margin-top: 10px; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .btn { background: #2196F3; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; display: inline-block; margin: 5px; }
+        .btn-danger { background: #F44336; }
+        .btn-warning { background: #FF9800; }
+        .btn-success { background: #4CAF50; }
+        .financial-highlight { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+        .alert { padding: 15px; border-radius: 4px; margin: 10px 0; }
+        .alert-warning { background: #fff3cd; border: 1px solid #ffeaa7; color: #856404; }
+        .alert-danger { background: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏢 SGLI - Dashboard Geral</h1>
+            <p>Sistema de Gestão de Locação de Imóveis</p>
+        </div>
+        
+        <div class="stats">
+            <div class="card stat-card">
+                <div class="stat-number">{{ total_imoveis }}</div>
+                <div class="stat-label">Imóveis Cadastrados</div>
+            </div>
+            <div class="card stat-card">
+                <div class="stat-number">{{ imoveis_disponivel }}</div>
+                <div class="stat-label">Imóveis Disponíveis</div>
+            </div>
+            <div class="card stat-card">
+                <div class="stat-number">{{ total_locacoes }}</div>
+                <div class="stat-label">Contratos Ativos</div>
+            </div>
+            <div class="card stat-card">
+                <div class="stat-number">{{ total_locadores }}</div>
+                <div class="stat-label">Locadores</div>
+            </div>
+            <div class="card stat-card">
+                <div class="stat-number">{{ total_comandas }}</div>
+                <div class="stat-label">Comandas Total</div>
+            </div>
+            <div class="card stat-card financial-highlight">
+                <div class="stat-number">{{ comandas_pendentes }}</div>
+                <div class="stat-label">Comandas Pendentes</div>
+            </div>
+        </div>
+
+        <!-- Alertas Financeiros -->
+        {% if comandas_vencidas > 0 %}
+        <div class="alert alert-danger">
+            <strong>⚠️ Atenção!</strong> Existem {{ comandas_vencidas }} comandas vencidas que precisam de atenção imediata.
+        </div>
+        {% endif %}
+
+        {% if comandas_pendentes > 0 %}
+        <div class="alert alert-warning">
+            <strong>💰 Financeiro:</strong> {{ comandas_pendentes }} comandas pendentes. Total: R$ {{ valor_total_pendente|floatformat:2 }}
+        </div>
+        {% endif %}
+        
+        <div class="card">
+            <h3>🔗 Acesso Rápido</h3>
+            <a href="/admin/" class="btn">🔐 Painel Admin</a>
+            <a href="/api/" class="btn">📡 API REST</a>
+            <a href="/financeiro/" class="btn btn-success">💰 Dashboard Financeiro</a>
+        </div>
+
+        <div class="card">
+            <h3>💰 Módulo Financeiro</h3>
+            <p>Sistema completo de gestão financeira implementado!</p>
+            <a href="/financeiro/" class="btn btn-success">💰 Acessar Dashboard Financeiro</a>
+            <a href="/admin/core/comanda/" class="btn">📋 Gerenciar Comandas</a>
+            <a href="/api/comandas/vencidas/" class="btn btn-danger">⚠️ Comandas Vencidas</a>
+            <a href="/api/comandas/pendentes/" class="btn btn-warning">⏳ Comandas Pendentes</a>
+        </div>
+    </div>
+</body>
+</html>

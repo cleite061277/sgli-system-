@@ -1,0 +1,237 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block title %}Recibo {{ pagamento.numero_pagamento }}{% endblock %}
+
+{% block extrastyle %}
+<style>
+    .recibo-container {
+        max-width: 800px;
+        margin: 40px auto;
+        padding: 20px;
+    }
+    
+    .recibo-card {
+        background: white;
+        padding: 40px;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    
+    .recibo-header {
+        text-align: center;
+        padding: 30px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 12px 12px 0 0;
+        margin: -40px -40px 30px -40px;
+    }
+    
+    .recibo-header h1 {
+        margin: 0;
+        font-size: 28px;
+        font-weight: 700;
+        color: white;
+    }
+    
+    .info-row {
+        display: grid;
+        grid-template-columns: 150px 1fr;
+        gap: 10px;
+        padding: 12px 0;
+        border-bottom: 1px solid #e9ecef;
+    }
+    
+    .info-label {
+        font-weight: 600;
+        color: #6c757d;
+    }
+    
+    .info-value {
+        color: #212529;
+    }
+    
+    .valor-destaque {
+        text-align: center;
+        padding: 30px;
+        margin: 30px 0;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: 12px;
+    }
+    
+    .valor-destaque .label {
+        font-size: 14px;
+        color: #6c757d;
+        margin-bottom: 10px;
+    }
+    
+    .valor-destaque .valor {
+        font-size: 36px;
+        font-weight: 700;
+        color: #667eea;
+    }
+    
+    .acoes-container {
+        margin-top: 40px;
+        padding: 30px;
+        background: #f8f9fa;
+        border-radius: 12px;
+    }
+    
+    .botoes-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin-top: 20px;
+    }
+    
+    .btn-acao {
+        padding: 15px 25px;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+        text-align: center;
+        transition: all 0.2s;
+        display: block;
+    }
+    
+    .btn-email {
+        background: #667eea;
+        color: white;
+    }
+    
+    .btn-whatsapp {
+        background: #25D366;
+        color: white;
+    }
+    
+    .btn-download {
+        background: #6c757d;
+        color: white;
+    }
+    
+    .btn-acao:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+    
+    .btn-voltar {
+        display: inline-block;
+        margin-top: 20px;
+        padding: 10px 20px;
+        background: white;
+        color: #667eea;
+        border: 2px solid #667eea;
+        border-radius: 8px;
+        text-decoration: none;
+        transition: all 0.2s;
+    }
+    
+    .btn-voltar:hover {
+        background: #667eea;
+        color: white;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="recibo-container">
+    <div class="recibo-card">
+        <div class="recibo-header">
+            <h1>🧾 RECIBO DE PAGAMENTO</h1>
+        </div>
+        
+        <div class="info-row">
+            <div class="info-label">📄 Número:</div>
+            <div class="info-value">{{ pagamento.numero_pagamento }}</div>
+        </div>
+        
+        <div class="info-row">
+            <div class="info-label">📅 Data:</div>
+            <div class="info-value">{{ pagamento.data_pagamento|date:"d/m/Y" }}</div>
+        </div>
+        
+        <div class="info-row">
+            <div class="info-label">👤 Locatário:</div>
+            <div class="info-value">{{ locatario.nome_razao_social|default:"-" }}</div>
+        </div>
+        
+        <div class="info-row">
+            <div class="info-label">🏠 Imóvel:</div>
+            <div class="info-value">
+                {% if imovel %}
+                    {{ imovel.endereco }}, {{ imovel.numero }}
+                {% else %}
+                    -
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="info-row">
+            <div class="info-label">💳 Forma:</div>
+            <div class="info-value">{{ pagamento.get_forma_pagamento_display }}</div>
+        </div>
+        
+        <div class="valor-destaque">
+            <div class="label">💰 VALOR PAGO</div>
+            <div class="valor">R$ {{ pagamento.valor_pago|floatformat:2 }}</div>
+        </div>
+        
+        {% if pagamento.observacoes %}
+        <div class="info-row">
+            <div class="info-label">📝 Observações:</div>
+            <div class="info-value">{{ pagamento.observacoes }}</div>
+        </div>
+        {% endif %}
+    </div>
+    
+    <div class="acoes-container">
+        <h2>⚡ Enviar ou Baixar Recibo</h2>
+        
+        <div class="botoes-grid">
+            <form method="post" style="margin: 0;">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="email">
+                <button type="submit" class="btn-acao btn-email">
+                    📧 Enviar por Email
+                </button>
+            </form>
+            
+            <form method="post" style="margin: 0;">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="whatsapp">
+                <button type="submit" class="btn-acao btn-whatsapp">
+                    💬 Enviar WhatsApp
+                </button>
+            </form>
+            
+            <a href="/pagamento/{{ pagamento.id }}/recibo/download/" class="btn-acao btn-download" target="_blank">
+                📥 Download Word
+            </a>
+        </div>
+        
+        <a href="{% url 'admin:core_pagamento_changelist' %}" class="btn-voltar">
+            ← Voltar para Pagamentos
+        </a>
+    </div>
+</div>
+
+<script>
+// Redirect automático para WhatsApp (se houver)
+{% if request.session.whatsapp_redirect %}
+window.open('{{ request.session.whatsapp_redirect }}', '_blank');
+// Limpar session via AJAX
+fetch('{% url "pagina_recibo_pagamento" pagamento.id %}', {
+    method: 'POST',
+    headers: {
+        'X-CSRFToken': '{{ csrf_token }}',
+        'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: 'action=clear_whatsapp_session'
+});
+{% endif %}
+</script>
+{% endblock %}

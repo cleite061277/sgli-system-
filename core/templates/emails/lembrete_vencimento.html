@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+        .content { background: #f9f9f9; padding: 30px; }
+        .valores { background: white; padding: 20px; border-radius: 8px; margin: 20px 0; }
+        .secao { margin: 15px 0; padding: 15px; border-left: 4px solid #667eea; background: white; }
+        .total { background: #667eea; color: white; padding: 20px; text-align: center; font-size: 24px; font-weight: bold; border-radius: 8px; }
+        .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
+        .btn { display: inline-block; padding: 12px 30px; background: #667eea; color: white; text-decoration: none; border-radius: 5px; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏠 HABITAT PRO</h1>
+            <p>{{ titulo }}</p>
+        </div>
+        
+        <div class="content">
+            <p>Olá <strong>{{ locatario_nome }}</strong>,</p>
+            <p>{{ mensagem_principal }}</p>
+            
+            <div class="valores">
+                <h3>📋 Detalhes da Cobrança</h3>
+                <p><strong>Imóvel:</strong> {{ imovel_endereco }}</p>
+                <p><strong>Comanda:</strong> {{ numero_comanda }}</p>
+                <p><strong>Vencimento:</strong> {{ data_vencimento }}</p>
+                
+                <div class="secao">
+                    <h4>💵 Valores Base</h4>
+                    <p>Aluguel: R$ {{ valor_aluguel }}</p>
+                    <p>Condomínio: R$ {{ valor_condominio }}</p>
+                    <p>IPTU: R$ {{ valor_iptu }}</p>
+                </div>
+                
+                {% if tem_multa_juros %}
+                <div class="secao" style="border-color: #e74c3c;">
+                    <h4>⚠️ Ajustes Financeiros</h4>
+                    <p>Multa (10%): R$ {{ valor_multa }}</p>
+                    <p>Juros (1% a.m.): R$ {{ valor_juros }}</p>
+                    <p style="color: #e74c3c;"><strong>Atraso: {{ dias_atraso }} dia(s)</strong></p>
+                </div>
+                {% endif %}
+                
+                <div class="total">
+                    TOTAL: R$ {{ valor_total }}
+                </div>
+            </div>
+            
+            <p style="text-align: center;">
+                <a href="{{ link_pagamento }}" class="btn">💳 Ver Detalhes</a>
+            </p>
+        </div>
+        
+        <div class="footer">
+            <p>HABITAT PRO - Sistema de Gestão Inteligente de Imóveis</p>
+            <p>Esta é uma mensagem automática. Não responda este email.</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,4 +1,9 @@
 #!/bin/bash
+# Carregar variáveis de ambiente do .env
+if [ -f .env ]; then
+    export $(cat .env | xargs)
+fi
+
 # Script de inicialização do SGLI
 
 # Cores

@@ -1,0 +1,128 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block extrahead %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'admin/css/custom_admin.css' %}">
+<script src="{% static 'admin/js/dashboard_premium.js' %}" defer></script>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-premium">
+    
+    <!-- HEADER PREMIUM -->
+    <div class="dashboard-header">
+        <h1>🚀 HABITAT PRO</h1>
+        <p>Sistema de Gestão Imobiliária Inteligente</p>
+        <div style="margin-top: 20px;">
+            <span class="glass" style="padding: 10px 20px; border-radius: 10px; display: inline-block; color: white; font-weight: 600;">
+                👋 Bem-vindo(a), {{ user.get_username }}
+            </span>
+        </div>
+    </div>
+
+    <!-- ESTATÍSTICAS -->
+    <div class="stats-grid">
+        <div class="stat-card blue">
+            <div class="stat-icon">🏢</div>
+            <div class="stat-value">{{ total_imoveis|default:"0" }}</div>
+            <div class="stat-label">Imóveis Cadastrados</div>
+            <a href="{% url 'admin:core_imovel_changelist' %}" style="text-decoration: none; color: #667eea; font-weight: 600; margin-top: 10px; display: inline-block;">Ver todos →</a>
+        </div>
+        
+        <div class="stat-card green">
+            <div class="stat-icon">📋</div>
+            <div class="stat-value">{{ contratos_ativos|default:"0" }}</div>
+            <div class="stat-label">Contratos Ativos</div>
+            <a href="{% url 'admin:core_locacao_changelist' %}?status__exact=ACTIVE" style="text-decoration: none; color: #4facfe; font-weight: 600; margin-top: 10px; display: inline-block;">Ver contratos →</a>
+        </div>
+        
+        <div class="stat-card orange">
+            <div class="stat-icon">👥</div>
+            <div class="stat-value">{{ total_locatarios|default:"0" }}</div>
+            <div class="stat-label">Locatários</div>
+            <a href="{% url 'admin:core_locatario_changelist' %}" style="text-decoration: none; color: #fa709a; font-weight: 600; margin-top: 10px; display: inline-block;">Ver todos →</a>
+        </div>
+        
+        <div class="stat-card red">
+            <div class="stat-icon">⚠️</div>
+            <div class="stat-value">{{ contratos_vencendo|default:"0" }}</div>
+            <div class="stat-label">Vencendo em 60 dias</div>
+            <a href="{% url 'admin:core_locacao_changelist' %}" style="text-decoration: none; color: #eb3349; font-weight: 600; margin-top: 10px; display: inline-block;">Ver detalhes →</a>
+        </div>
+    </div>
+
+    <!-- AÇÕES RÁPIDAS -->
+    <div class="actions-section">
+        <h2>⚡ Ações Rápidas</h2>
+        <div class="actions-grid">
+            <a href="{% url 'admin:core_locacao_add' %}" class="action-card">
+                <div class="action-icon">➕</div>
+                <span>Nova Locação</span>
+            </a>
+            <a href="{% url 'admin:core_imovel_add' %}" class="action-card">
+                <div class="action-icon">🏠</div>
+                <span>Cadastrar Imóvel</span>
+            </a>
+            <a href="{% url 'admin:core_locatario_add' %}" class="action-card">
+                <div class="action-icon">👤</div>
+                <span>Novo Locatário</span>
+            </a>
+            <a href="{% url 'admin:core_pagamento_changelist' %}" class="action-card">
+                <div class="action-icon">💰</div>
+                <span>Pagamentos</span>
+            </a>
+            <a href="{% url 'painel_whatsapp' %}" class="action-card">
+                <div class="action-icon">💬</div>
+                <span>Painel WhatsApp</span>
+            </a>
+            <a href="{% url 'admin:core_templatecontrato_changelist' %}" class="action-card">
+                <div class="action-icon">📄</div>
+                <span>Templates Contratos</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- COMANDAS VENCIDAS -->
+    {% if comandas_vencidas %}
+    <div class="module">
+        <h2>🚨 Comandas Vencidas</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Locatário</th>
+                    <th>Imóvel</th>
+                    <th>Vencimento</th>
+                    <th>Valor</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for comanda in comandas_vencidas %}
+                <tr>
+                    <td><a href="{% url 'admin:core_locatario_change' comanda.locacao.locatario.pk %}">{{ comanda.locacao.locatario.nome_razao_social }}</a></td>
+                    <td>{{ comanda.locacao.imovel.endereco_completo_curto }}</td>
+                    <td>{{ comanda.data_vencimento|date:"d/m/Y" }}</td>
+                    <td style="font-weight: 700;">R$ {{ comanda.valor_total|floatformat:2 }}</td>
+                    <td><span class="badge badge-danger">{{ comanda.dias_atraso }} dias atraso</span></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+
+    <!-- MODELOS DO SISTEMA -->
+    <div class="module">
+        <h2>📊 Gerenciar Sistema</h2>
+        {% if app_list %}
+            {% for app in app_list %}
+                {% include "admin/includes/app_list.html" with app=app %}
+            {% endfor %}
+        {% else %}
+            <p style="text-align: center; color: #7f8c8d; padding: 40px;">Nenhum modelo disponível</p>
+        {% endif %}
+    </div>
+
+</div>
+{% endblock %}

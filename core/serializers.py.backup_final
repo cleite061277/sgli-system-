@@ -1,0 +1,168 @@
+from rest_framework import serializers
+from .models import Usuario, Locador, Imovel, Locatario, Locacao, Comanda
+from .utils import formatar_moeda_brasileira
+
+class UsuarioSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Usuario
+        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'tipo_usuario', 'telefone', 'is_active']
+        read_only_fields = ['id']
+
+class LocadorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Locador
+        fields = '__all__'
+        read_only_fields = ['id', 'created_at', 'updated_at']
+
+class ImovelSerializer(serializers.ModelSerializer):
+    locador_nome = serializers.CharField(source='locador.nome_razao_social', read_only=True)
+    endereco_completo_formatado = serializers.CharField(source='endereco_completo', read_only=True)
+    valor_aluguel_formatado = serializers.SerializerMethodField()
+    valor_condominio_formatado = serializers.SerializerMethodField()
+    valor_total_mensal_formatado = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = Imovel
+        fields = '__all__'
+        read_only_fields = ['id', 'created_at', 'updated_at']
+    
+    def get_valor_aluguel_formatado(self, obj):
+        return formatar_moeda_brasileira(obj.valor_aluguel)
+    
+    def get_valor_condominio_formatado(self, obj):
+        return formatar_moeda_brasileira(obj.valor_condominio)
+    
+    def get_valor_total_mensal_formatado(self, obj):
+        return formatar_moeda_brasileira(obj.valor_total_mensal)
+
+class LocatarioSerializer(serializers.ModelSerializer):
+    renda_mensal_formatada = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = Locatario
+        fields = '__all__'
+        read_only_fields = ['id', 'created_at', 'updated_at']
+    
+    def get_renda_mensal_formatada(self, obj):
+        return formatar_moeda_brasileira(obj.renda_mensal) if obj.renda_mensal else None
+
+class LocacaoSerializer(serializers.ModelSerializer):
+    imovel_codigo = serializers.CharField(source='imovel.codigo_imovel', read_only=True)
+    locatario_nome = serializers.CharField(source='locatario.nome_razao_social', read_only=True)
+    valor_aluguel_formatado = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = Locacao
+        fields = '__all__'
+        read_only_fields = ['id', 'created_at', 'updated_at']
+    
+    def get_valor_aluguel_formatado(self, obj):
+        return formatar_moeda_brasileira(obj.valor_aluguel)
+
+class ComandaSerializer(serializers.ModelSerializer):
+    locacao_info = serializers.SerializerMethodField()
+    valor_total = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
+    valor_pendente = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
+    is_vencida = serializers.BooleanField(read_only=True)
+    dias_atraso = serializers.IntegerField(read_only=True)
+    
+    # Formatação brasileira
+    valor_total_formatado = serializers.SerializerMethodField()
+    valor_pendente_formatado = serializers.SerializerMethodField()
+    valor_aluguel_formatado = serializers.SerializerMethodField()
+    valor_pago_formatado = serializers.SerializerMethodField()
+    mes_ano_referencia = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = Comanda
+        fields = '__all__'
+        read_only_fields = ['id', 'numero_comanda', 'created_at', 'updated_at']
+    
+    def get_locacao_info(self, obj):
+        return {
+            'numero_contrato': obj.locacao.numero_contrato,
+            'imovel': obj.locacao.imovel.codigo_imovel,
+            'locatario': obj.locacao.locatario.nome_razao_social
+        }
+    
+    def get_valor_total_formatado(self, obj):
+        return formatar_moeda_brasileira(obj.valor_total)
+    
+    def get_valor_pendente_formatado(self, obj):
+        return formatar_moeda_brasileira(obj.valor_pendente)
+    
+    def get_valor_aluguel_formatado(self, obj):
+        return formatar_moeda_brasileira(obj.valor_aluguel)
+    
+    def get_valor_pago_formatado(self, obj):
+        return formatar_moeda_brasileira(obj.valor_pago)
+    
+    def get_mes_ano_referencia(self, obj):
+        meses = ['', 'Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun',
+                'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez']
+        return f"{meses[obj.mes_referencia]}/{obj.ano_referencia}"
+# ============================================================================
+# PAGAMENTO SERIALIZERS
+# ============================================================================
+
+class PagamentoSerializer(serializers.ModelSerializer):
+    """Pagamento serializer with nested relationships."""
+    
+    comanda_info = serializers.SerializerMethodField()
+    usuario_responsavel_nome = serializers.CharField(source='usuario_responsavel.get_full_name', read_only=True)
+    valor_pago_formatado = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = Pagamento
+        fields = [
+            'id', 'numero_pagamento', 'comanda', 'comanda_info',
+            'usuario_responsavel', 'usuario_responsavel_nome',
+            'valor_pago', 'valor_pago_formatado', 'data_pagamento',
+            'forma_pagamento', 'status', 'comprovante', 'hash_comprovante',
+            'observacoes', 'data_confirmacao', 'usuario_confirmacao',
+            'created_at', 'updated_at'
+        ]
+        read_only_fields = ['numero_pagamento', 'hash_comprovante', 'data_confirmacao']
+    
+    def get_comanda_info(self, obj) -> dict:
+        """Get invoice basic info."""
+        return {
+            'numero': obj.comanda.numero_comanda,
+            'valor_total': obj.comanda.valor_total,
+            'locatario': obj.comanda.locacao.locatario.nome_razao_social
+        }
+    
+    def get_valor_pago_formatado(self, obj) -> str:
+        """Format payment amount."""
+        return f"R$ {obj.valor_pago:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.')
+
+class PagamentoCreateSerializer(serializers.ModelSerializer):
+    """Serializer for creating payments."""
+    
+    class Meta:
+        model = Pagamento
+        fields = [
+            'comanda', 'valor_pago', 'data_pagamento',
+            'forma_pagamento', 'comprovante', 'observacoes'
+        ]
+    
+    def validate_valor_pago(self, value):
+        """Validate payment amount."""
+        if value <= 0:
+            raise serializers.ValidationError("Valor deve ser maior que zero.")
+        return value
+    
+    def validate(self, attrs):
+        """Cross-field validation."""
+        comanda = attrs.get('comanda')
+        valor_pago = attrs.get('valor_pago')
+        
+        if comanda and valor_pago:
+            valor_pendente = comanda.valor_total - (comanda.valor_pago or Decimal('0.00'))
+            if valor_pago > valor_pendente:
+                raise serializers.ValidationError({
+                    'valor_pago': f'Valor não pode exceder o pendente: R$ {valor_pendente:.2f}'
+                })
+        
+        return attrs
+

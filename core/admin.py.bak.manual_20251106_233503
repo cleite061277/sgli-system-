@@ -1,0 +1,517 @@
+from django.db.models import Sum, Value, Q
+from django.db.models.functions import Coalesce
+from decimal import Decimal
+from django.utils.html import format_html
+
+# Limpado e corrigido por Copilot — versão recomendada
+from django.contrib import admin
+import uuid
+from django.db import transaction, IntegrityError
+from django.utils import timezone
+from django.utils.html import format_html
+from django.urls import reverse
+from django.db.models import Sum, Q
+
+from .models import (
+    Usuario, Locador, Imovel, Locatario, Locacao,
+    Comanda, Pagamento, Fiador, TemplateContrato,
+    ConfiguracaoSistema, LogGeracaoComandas
+)
+
+from .forms import PagamentoAdminForm
+
+# FormSet customizado para preencher usuario_registro
+from django.forms import BaseInlineFormSet
+
+class UsuarioAdmin(admin.ModelAdmin):
+    """Admin organizado para Usuario"""
+    list_display = ['username', 'get_full_name', 'email', 'tipo_usuario', 'is_staff', 'is_active', 'date_joined']
+    list_filter = ['tipo_usuario', 'is_active', 'is_staff', 'date_joined']
+    search_fields = ['username', 'email', 'first_name', 'last_name', 'cpf']
+
+    fieldsets = (
+        ('🔐 Autenticação', {'fields': ('username', 'password')}),
+        ('👤 Dados Pessoais', {'fields': ('first_name', 'last_name', 'email', 'cpf', 'telefone', 'avatar')}),
+        ('🎭 Perfil do Sistema', {'fields': ('tipo_usuario',)}),
+        ('🔑 Permissões', {
+            'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions'),
+            'classes': ['collapse'],
+        }),
+        ('📅 Datas Importantes', {
+            'fields': ('date_joined', 'last_login'),
+            'classes': ['collapse'],
+        }),
+    )
+    readonly_fields = ['date_joined', 'last_login']
+
+
+# -----------------------
+# Locador
+# -----------------------
+@admin.register(Locador)
+class LocadorAdmin(admin.ModelAdmin):
+    list_display = [
+        'nome_razao_social',
+        'representante',
+        'tipo_locador',
+        'cpf_cnpj',
+        'telefone',
+        'email',
+        'is_active',
+    ]
+    list_filter = ['tipo_locador', 'is_active', 'created_at']
+    search_fields = ['nome_razao_social', 'representante', 'cpf_cnpj', 'email', 'telefone']
+
+    fieldsets = (
+        ('📋 Dados Básicos', {'fields': ('usuario', 'tipo_locador', 'nome_razao_social', 'representante', 'cpf_cnpj')}),
+        ('📞 Contatos', {'fields': ('telefone', 'email')}),
+        ('🏠 Endereço', {'fields': ('endereco_completo', 'cep')}),
+        ('📝 Observações', {'fields': ('observacoes',), 'classes': ['collapse']}),
+        ('🕐 Metadados', {'fields': ('created_at', 'updated_at', 'is_active'), 'classes': ['collapse']}),
+    )
+    readonly_fields = ['created_at', 'updated_at']
+
+
+# -----------------------
+# Imóvel
+# -----------------------
+@admin.register(Imovel)
+class ImovelAdmin(admin.ModelAdmin):
+    list_display = ['codigo_imovel', 'tipo_imovel', 'status', 'endereco', 'cidade', 'valor_aluguel', 'locador', 'is_active']
+    list_filter = ['tipo_imovel', 'status', 'cidade', 'estado', 'is_active', 'created_at']
+    search_fields = ['codigo_imovel', 'endereco', 'bairro', 'cidade', 'locador__nome_razao_social']
+
+    fieldsets = (
+        ('📋 Informações Básicas', {'fields': ('locador', 'codigo_imovel', 'tipo_imovel', 'status')}),
+        ('📍 Endereço', {'fields': ('endereco', 'numero', 'bairro', 'cidade', 'estado', 'cep')}),
+        ('📏 Características', {'fields': ('area_total', 'quartos', 'banheiros')}),
+        ('💰 Valores', {'fields': ('valor_aluguel', 'valor_condominio')}),
+        ('⚡ Utilidades / Contas', {
+            'fields': ('conta_agua_esgoto', 'numero_hidrometro', 'unidade_consumidora_energia'),
+            'description': 'Informações de contas de consumo do imóvel'
+        }),
+        ('📝 Descrição', {'fields': ('descricao',), 'classes': ['collapse']}),
+        ('🕐 Metadados', {'fields': ('created_at', 'updated_at', 'is_active'), 'classes': ['collapse']}),
+    )
+    readonly_fields = ['created_at', 'updated_at']
+
+
+# -----------------------
+# Locatário
+# -----------------------
+@admin.register(Locatario)
+class LocatarioAdmin(admin.ModelAdmin):
+    list_display = ['nome_razao_social', 'cpf_cnpj', 'telefone', 'email', 'empresa_trabalho', 'tem_fiador', 'is_active']
+    list_filter = ['created_at', 'is_active']
+    search_fields = ['nome_razao_social', 'cpf_cnpj', 'rg', 'email', 'telefone', 'empresa_trabalho']
+
+    fieldsets = (
+        ('📋 Dados Pessoais', {'fields': ('nome_razao_social', 'cpf_cnpj', 'rg', 'data_nascimento')}),
+        ('👨‍👩‍👦 Filiação', {'fields': ('nome_pai', 'nome_mae'), 'classes': ['collapse']}),
+        ('📞 Contatos', {'fields': ('telefone', 'email', 'outro_telefone', ('nome_contato_emergencia', 'telefone_contato_emergencia'))}),
+        ('🏠 Endereço', {'fields': ('endereco_completo',)}),
+        ('💼 Dados Profissionais', {'fields': ('empresa_trabalho', 'endereco_empresa', 'telefone_empresa', 'contato_empresa', 'tempo_empresa', 'renda_mensal')}),
+        ('🛡️ Garantia', {'fields': ('fiador',), 'description': 'Selecione um fiador cadastrado ou deixe em branco se não houver'}),
+        ('🕐 Metadados', {'fields': ('created_at', 'updated_at', 'is_active'), 'classes': ['collapse']}),
+    )
+    readonly_fields = ['created_at', 'updated_at']
+
+    @admin.display(description='Fiador', boolean=True)
+    def tem_fiador(self, obj):
+        return obj.fiador is not None
+
+
+# -----------------------
+# Locação (contratos)
+# -----------------------
+@admin.register(Locacao)
+class LocacaoAdmin(admin.ModelAdmin):
+    """Admin atualizado com geração de contratos"""
+    list_display = ('numero_contrato', 'imovel', 'locatario', 'status', 'data_inicio', 'data_fim')
+    list_filter = ('status', 'is_active', 'created_at')
+    search_fields = ('numero_contrato', 'imovel__codigo_imovel', 'locatario__nome_razao_social')
+    readonly_fields = ['created_at', 'updated_at']
+
+    actions = ['gerar_contrato_pdf_action', 'gerar_contrato_docx_action', 'gerar_contrato']
+
+    fieldsets = (
+        ('📋 Informações Básicas', {
+            'fields': ('numero_contrato', 'imovel', 'locatario', 'status'),
+            'description': '⚠️ Deixe o número do contrato VAZIO para gerar automaticamente'
+        }),
+        ('📅 Datas', {'fields': ('data_inicio', 'data_fim')}),
+        ('💰 Valores', {'fields': ('valor_aluguel', 'dia_vencimento')}),
+        ('🕐 Metadados', {'fields': ('created_at', 'updated_at', 'is_active'), 'classes': ['collapse']}),
+    )
+
+    def get_form(self, request, obj=None, **kwargs):
+        """Remove required do numero_contrato para permitir geração automática"""
+        form = super().get_form(request, obj, **kwargs)
+        if 'numero_contrato' in form.base_fields:
+            form.base_fields['numero_contrato'].required = False
+            form.base_fields['numero_contrato'].help_text = '✨ Deixe vazio para gerar automaticamente'
+        return form
+
+    def change_view(self, request, object_id, form_url='', extra_context=None):
+        """Adiciona botões de gerar contrato."""
+        extra_context = extra_context or {}
+        obj = self.get_object(request, object_id)
+        if obj:
+            extra_context['show_contrato_buttons'] = True
+            extra_context['contrato_docx_url'] = reverse('gerar_contrato_docx', args=[obj.pk])
+            extra_context['contrato_pdf_url'] = reverse('gerar_contrato_pdf', args=[obj.pk])
+        return super().change_view(request, object_id, form_url, extra_context)
+
+    @admin.action(description='📄 Gerar Contrato PDF')
+    def gerar_contrato_pdf_action(self, request, queryset):
+        if queryset.count() == 1:
+            from .contrato_generator import gerar_contrato_pdf
+            return gerar_contrato_pdf(queryset.first())
+        else:
+            self.message_user(request, '❌ Selecione apenas UMA locação', level='error')
+
+    @admin.action(description='📝 Gerar Contrato DOCX')
+    def gerar_contrato_docx_action(self, request, queryset):
+        if queryset.count() == 1:
+            from .contrato_generator import gerar_contrato_docx
+            return gerar_contrato_docx(queryset.first())
+        else:
+            self.message_user(request, '❌ Selecione apenas UMA locação', level='error')
+
+    def gerar_contrato(self, request, queryset):
+        """Gerar contratos em Word (bulk action)."""
+        from .document_generator import DocumentGenerator
+        generator = DocumentGenerator()
+
+        contratos_gerados = []
+        for locacao in queryset:
+            try:
+                filename = generator.gerar_contrato_locacao(locacao.id)
+                contratos_gerados.append(filename)
+            except Exception as e:
+                self.message_user(request, f'Erro ao gerar contrato {locacao.numero_contrato}: {e}', level='ERROR')
+
+        if contratos_gerados:
+            self.message_user(request, f'{len(contratos_gerados)} contrato(s) gerado(s) com sucesso!')
+
+
+# -----------------------
+# Comanda
+# -----------------------
+
+
+class PagamentoInline(admin.TabularInline):
+    model = Pagamento
+    extra = 0
+    fields = ['data_pagamento', 'valor_pago', 'forma_pagamento', 'status', 'comprovante', 'recibo_actions']
+    readonly_fields = ['numero_pagamento', 'created_at', 'recibo_actions']
+
+    def get_formset(self, request, obj=None, **kwargs):
+        formset = super().get_formset(request, obj, **kwargs)
+        formset.request = request
+        return formset
+
+    @admin.display(description='Recibo')
+    def recibo_actions(self, obj):
+        if not obj or not obj.pk:
+            return '-'
+
+        status = (getattr(obj, 'status', '') or '').lower()
+        is_confirmed = status == 'confirmado' or status == getattr(obj.StatusPagamento, 'CONFIRMADO', '').lower()
+
+        try:
+            view_url = reverse('pagina_recibo_pagamento', args=[obj.pk])
+            download_url = reverse('download_recibo_pagamento', args=[obj.pk])
+        except Exception:
+            view_url = f'/pagamento/{obj.pk}/recibo/'
+            download_url = f'/pagamento/{obj.pk}/recibo/download/'
+
+        if not is_confirmed:
+            return format_html('<span style="color: #999; font-style: italic;">Aguardando confirmação</span>')
+
+        return format_html(
+            '<a class="button" href="{}" target="_blank" style="background:#28a745;color:#fff;margin-right:6px;">🧾 Ver</a>'
+            '<a class="button" href="{}" target="_blank" style="background:#667eea;color:#fff;margin-right:6px;">📥 Word</a>'
+            '<a class="button" href="{}" style="background:#3b82f6;color:#fff;margin-right:6px;">📧 Email</a>',
+            view_url, download_url, view_url
+        )
+
+    def save_new(self, form, formset, commit=True):
+        obj = super().save_new(form, formset, commit=False)
+        if not obj.usuario_registro_id and hasattr(formset, 'request'):
+            obj.usuario_registro = formset.request.user
+        if commit:
+            obj.save()
+        return obj
+
+    def has_delete_permission(self, request, obj=None):
+        if obj and getattr(obj, 'status', None) == 'confirmado':
+            return False
+        return True
+
+@admin.register(Comanda)
+class ComandaAdmin(admin.ModelAdmin):
+    @admin.display(description='⏰ Dias de Atraso')
+    def dias_atraso_display(self, obj):
+        """
+        Exibe os dias de atraso no admin (indentação correta dentro da classe).
+        """
+        from django.utils.html import format_html
+        try:
+            dias = obj.dias_atraso() if hasattr(obj, 'dias_atraso') else 0
+        except Exception:
+            dias = 0
+
+        if dias == 0:
+            return format_html('<span style="color: #28a745; font-size: 16px;">✓ Em dia</span>')
+        elif dias > 0:
+            return format_html(
+                '<span style="color: #dc3545; font-size: 16px; font-weight: bold;">⚠️ {} dia(s) de atraso</span>',
+                dias
+            )
+        else:
+            return format_html(
+                '<span style="color: #17a2b8; font-size: 16px;">📅 Vence em {} dia(s)</span>',
+                abs(dias)
+            )
+    # Botão para enviar WhatsApp (implementação defensiva)
+    @admin.display(description='WhatsApp')
+    # Botão para enviar WhatsApp (implementação defensiva)
+    @admin.display(description='WhatsApp')
+    def painel_whatsapp_button(self, obj):
+        """
+        Gera botão/link para abrir o WhatsApp com mensagem itemizada e total da comanda.
+        Implementação defensiva — não quebra o admin em caso de erro.
+        """
+        from django.utils.html import format_html
+        from urllib.parse import quote_plus
+        from decimal import Decimal
+        from django.conf import settings
+
+        try:
+            # 1) localizar telefone de forma defensiva (várias possibilidades)
+            telefone = None
+            if getattr(obj, 'locacao', None):
+                loc = obj.locacao
+                telefone = getattr(getattr(loc, 'locatario', None), 'telefone', None) or telefone
+                telefone = getattr(getattr(loc, 'usuario_registro', None), 'telefone', None) or telefone
+            # fallback: telefone direto no objeto
+            telefone = telefone or getattr(obj, 'telefone', None) or getattr(obj, 'telefone_contato', None)
+
+            if not telefone:
+                return '-'
+
+            # extrair apenas dígitos
+            digits = ''.join(ch for ch in str(telefone) if ch.isdigit())
+            # prefixar DDI padrão se configurado e número curto
+            if getattr(settings, "WHATSAPP_DEFAULT_DDI", None) and len(digits) <= 11:
+                digits = f"{settings.WHATSAPP_DEFAULT_DDI}{digits}"
+
+            # validação simples: exige pelo menos 8 dígitos
+            if len(digits) < 8:
+                return '-'
+
+            # 2) tentar usar um formatter existente (se houver) - integração opcional
+            texto = None
+            try:
+                from core.notifications import message_formatter as mf
+                if hasattr(mf, "format_comanda_whatsapp"):
+                    texto = mf.format_comanda_whatsapp(obj)
+                elif hasattr(mf, "format_whatsapp_message"):
+                    texto = mf.format_whatsapp_message(obj)
+            except Exception:
+                texto = None
+
+            # 3) se não houver formatter, montar a mensagem itemizada localmente
+            if not texto:
+                def dec(field):
+                    try:
+                        raw = getattr(obj, field, None)
+                        return Decimal(raw or 0)
+                    except Exception:
+                        return Decimal(0)
+
+                mapping = [
+                    ("Aluguel", "valor_aluguel"),
+                    ("Condomínio", "valor_condominio"),
+                    ("IPTU", "valor_iptu"),
+                    ("Administração", "valor_administracao"),
+                    ("Outros (crédito)", "outros_creditos"),
+                    ("Outros (débito)", "outros_debitos"),
+                    ("Multa", "valor_multa"),
+                    ("Juros", "valor_juros"),
+                    ("Desconto", "desconto"),
+                ]
+
+                itens = []
+                for label, field in mapping:
+                    val = dec(field)
+                    if val and val != Decimal("0"):
+                        if field in ("outros_creditos", "desconto"):
+                            itens.append(f"{label}: -R$ {abs(val):,.2f}")
+                        else:
+                            itens.append(f"{label}: R$ {val:,.2f}")
+
+                # total preferindo o método do modelo se existir
+                total_oficial = None
+                try:
+                    if callable(getattr(obj, "valor_total", None)):
+                        total_oficial = obj.valor_total()
+                    else:
+                        total_oficial = dec("valor_total")
+                except Exception:
+                    total_oficial = None
+
+                if total_oficial in (None, 0):
+                    soma_positivos = sum(dec(f) for _, f in mapping if f not in ("desconto", "outros_creditos"))
+                    soma_creditos = dec("desconto") + dec("outros_creditos")
+                    total_used = soma_positivos - soma_creditos
+                else:
+                    total_used = Decimal(total_oficial or 0)
+
+                partes = []
+                partes.append(f"Olá! Recibo da comanda {getattr(obj, 'numero_comanda', '')}")
+                nome = ""
+                try:
+                    if getattr(obj, "locacao", None):
+                        nome = getattr(getattr(obj.locacao, "locatario", None), "nome_razao_social", None) \
+                            or getattr(getattr(obj.locacao, "usuario_registro", None), "get_full_name", None)
+                    if not nome:
+                        nome = getattr(obj, "locacao_info", None) or ""
+                except Exception:
+                    nome = ""
+                if nome:
+                    partes.append(f"Cliente: {nome}")
+
+                partes.append("")  # linha em branco antes dos itens
+                partes.append("Itens:")
+                for it in itens:
+                    partes.append(f"- {it}")
+
+                partes.append("")  # linha em branco antes do total
+                partes.append(f"Total: R$ {Decimal(total_used):,.2f}")
+
+                texto = "\n".join(partes)
+
+            # 4) codificar e construir URL
+            texto_enc = quote_plus(texto)
+            wa_url = f"https://wa.me/{digits}?text={texto_enc}"
+            return format_html('<a class="button" href="{}" target="_blank">💬 WhatsApp</a>', wa_url)
+
+        except Exception:
+            return '-'
+        """Botão para visualizar pagamento"""
+        url = reverse('admin:core_pagamento_change', args=[obj.pk])
+        return format_html(
+            '<a class="button" href="{}" target="_blank">🧾 Ver Detalhes</a>',
+            url
+        )
+
+    @admin.action(description='🧾 Gerar recibo (Word)')
+    def gerar_recibo(self, request, queryset):
+        from .document_generator import DocumentGenerator
+        generator = DocumentGenerator()
+        recibos_gerados = []
+        for pagamento in queryset:
+            try:
+                filename = generator.gerar_recibo_pagamento(pagamento.id)
+                recibos_gerados.append(filename)
+            except Exception as e:
+                self.message_user(request, f'Erro ao gerar recibo {pagamento.numero_pagamento}: {e}', level='ERROR')
+        if recibos_gerados:
+            self.message_user(request, f'{len(recibos_gerados)} recibo(s) gerado(s) com sucesso!')
+
+
+# -----------------------
+# TemplateContrato
+# -----------------------
+@admin.register(TemplateContrato)
+class TemplateContratoAdmin(admin.ModelAdmin):
+    list_display = ('nome', 'locador', 'tipo_imovel', 'is_default', 'created_at')
+    list_filter = ('is_default', 'tipo_imovel', 'locador')
+    search_fields = ('nome', 'descricao')
+    fieldsets = (
+        ('Informações Básicas', {'fields': ('nome', 'descricao', 'arquivo_template')}),
+        ('Associações', {'fields': ('locador', 'tipo_imovel', 'is_default'), 'description': 'Defina quando este template deve ser usado'})
+    )
+
+
+# -----------------------
+# ConfiguracaoSistema (singleton)
+# -----------------------
+@admin.register(ConfiguracaoSistema)
+class ConfiguracaoSistemaAdmin(admin.ModelAdmin):
+    fieldsets = (
+        ('Configurações de Comandas', {'fields': ('dia_vencimento_padrao', 'gerar_comandas_automaticamente')}),
+        ('Metadados', {'fields': ('atualizado_em', 'atualizado_por'), 'classes': ('collapse',)}),
+    )
+    readonly_fields = ('atualizado_em',)
+
+    def has_add_permission(self, request):
+        return not ConfiguracaoSistema.objects.exists()
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+
+# -----------------------
+# Fiador
+# -----------------------
+@admin.register(Fiador)
+class FiadorAdmin(admin.ModelAdmin):
+    """Admin para Fiador."""
+    list_display = [
+        'nome_completo', 'cpf', 'telefone', 'empresa_trabalho', 'created_at',
+        'painel_whatsapp_button', 'locatario_link', 'recibo_button'
+    ]
+    list_filter = ['created_at', 'is_active']
+    search_fields = ['nome_completo', 'cpf', 'rg', 'email', 'telefone']
+
+    fieldsets = (
+        ('📋 Dados Pessoais', {'fields': ('nome_completo', 'cpf', 'rg', 'data_nascimento')}),
+        ('👨‍👩‍👦 Filiação', {'fields': ('nome_pai', 'nome_mae'), 'classes': ['collapse']}),
+        ('📞 Contatos', {'fields': ('telefone', 'email', 'outro_telefone', ('nome_contato_emergencia', 'telefone_contato_emergencia'))}),
+        ('🏠 Endereço', {'fields': ('endereco_completo', 'cep')}),
+        ('💼 Dados Profissionais', {'fields': ('empresa_trabalho', 'endereco_empresa', 'telefone_empresa', 'contato_empresa', 'tempo_empresa', 'renda_mensal')}),
+        ('🕐 Metadados', {'fields': ('created_at', 'updated_at', 'is_active'), 'classes': ['collapse']}),
+    )
+    readonly_fields = ['created_at', 'updated_at']
+
+    @admin.display(description='WhatsApp')
+    def painel_whatsapp_button(self, obj):
+        telefone = getattr(obj, 'telefone', '') or ''
+        digits = ''.join(ch for ch in telefone if ch.isdigit())
+        if not digits:
+            return '-'
+        texto = f'Olá {obj.nome_completo}'
+        wa_url = f'https://wa.me/{digits}?text={texto.replace(" ", "%20")}'
+        return format_html('<a class="button" href="{}" target="_blank">💬 WhatsApp</a>', wa_url)
+
+    @admin.display(description='Locatário(s)')
+    def locatario_link(self, obj):
+        # Mostra links para locatários que têm este fiador (defensivo)
+        locatarios = Locatario.objects.filter(fiador=obj)
+        if not locatarios.exists():
+            return '-'
+        links = []
+        for loc in locatarios:
+            url = reverse('admin:core_locatario_change', args=[loc.id])
+            links.append(format_html('<a href="{}">{}</a>', url, loc.nome_razao_social))
+        return format_html('<br>'.join(links))
+
+    @admin.display(description='Recibo')
+    def recibo_button(self, obj):
+        # Implementação defensiva: leva ao change view do fiador (placeholder para ação real)
+        url = reverse('admin:core_fiador_change', args=[obj.pk])
+        return format_html('<a class="button" href="{}" target="_blank">🧾 Ver/Emitir</a>', url)
+
+
+# -----------------------
+# Dashboard override (mantido)
+# -----------------------
+try:
+    from .dashboard_views import admin_index
+    admin.site.index = admin_index
+except Exception:
+    # Se a view customizada não existir, mantemos o index padrão.
+    pass

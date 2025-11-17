@@ -1,0 +1,239 @@
+"""
+View para geração de contratos de locação
+HABITAT PRO - Sistema de Gestão Imobiliária
+"""
+from django.shortcuts import get_object_or_404, redirect
+from django.http import HttpResponse
+from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib import messages
+from datetime import datetime
+import io
+
+from docxtpl import DocxTemplate
+from docx import Document
+from docx.shared import Pt, RGBColor
+from docx.enum.text import WD_ALIGN_PARAGRAPH
+
+from .models import Locacao, TemplateContrato
+
+
+def formatar_cpf_cnpj(valor):
+    """Formata CPF ou CNPJ."""
+    if not valor:
+        return 'Não informado'
+    
+    numeros = ''.join(filter(str.isdigit, valor))
+    
+    if len(numeros) == 11:  # CPF
+        return f"{numeros[:3]}.{numeros[3:6]}.{numeros[6:9]}-{numeros[9:]}"
+    elif len(numeros) == 14:  # CNPJ
+        return f"{numeros[:2]}.{numeros[2:5]}.{numeros[5:8]}/{numeros[8:12]}-{numeros[12:]}"
+    
+    return valor
+
+
+def formatar_data(data):
+    """Formata data para o padrão brasileiro."""
+    if not data:
+        return 'Não informado'
+    
+    if isinstance(data, str):
+        return data
+    
+    return data.strftime('%d/%m/%Y')
+
+
+def formatar_moeda(valor):
+    """Formata valor monetário."""
+    if not valor:
+        return 'R$ 0,00'
+    
+    return f"R$ {float(valor):,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.')
+
+
+def buscar_template_contrato(locacao):
+    """Busca o template de contrato mais adequado."""
+    locador = locacao.imovel.locador
+    tipo_imovel = locacao.imovel.tipo_imovel
+    
+    # 1. Específico do locador + tipo
+    template = TemplateContrato.objects.filter(
+        locador=locador,
+        tipo_imovel=tipo_imovel,
+        is_active=True
+    ).first()
+    
+    if template:
+        return template
+    
+    # 2. Específico do locador
+    template = TemplateContrato.objects.filter(
+        locador=locador,
+        tipo_imovel='',
+        is_active=True
+    ).first()
+    
+    if template:
+        return template
+    
+    # 3. Específico do tipo de imóvel
+    template = TemplateContrato.objects.filter(
+        locador=None,
+        tipo_imovel=tipo_imovel,
+        is_active=True
+    ).first()
+    
+    if template:
+        return template
+    
+    # 4. Template padrão
+    template = TemplateContrato.objects.filter(
+        is_default=True,
+        is_active=True
+    ).first()
+    
+    return template
+
+
+def preparar_contexto_contrato(locacao):
+    """Prepara o contexto com todas as variáveis do contrato."""
+    locador = locacao.imovel.locador
+    locatario = locacao.locatario
+    imovel = locacao.imovel
+    fiador = locatario.fiador
+    
+    contexto = {
+        # LOCADOR
+        'locador_nome': locador.nome_razao_social or 'Não informado',
+        'locador_endereco_completo': locador.endereco_completo or 'Não informado',
+        'locador_cep': locador.cep or 'Não informado',
+        'locador_representante': locador.representante or locador.nome_razao_social or 'Não informado',
+        
+        # LOCATÁRIO
+        'locatario_nome': locatario.nome_razao_social or 'Não informado',
+        'locatario_rg': locatario.rg or 'Não informado',
+        'locatario_cpf_cnpj': formatar_cpf_cnpj(locatario.cpf_cnpj),
+        'locatario_data_nascimento': formatar_data(locatario.data_nascimento),
+        'locatario_telefone': locatario.telefone or 'Não informado',
+        'locatario_filiacao_pai': locatario.nome_pai or 'Não informado',
+        'locatario_filiacao_mae': locatario.nome_mae or 'Não informado',
+        'locatario_endereco_completo': locatario.endereco_completo or 'Não informado',
+        'locatario_fiador': fiador.nome_completo if fiador else 'Não possui fiador',
+        
+        # FIADOR - Dados Essenciais
+        'fiador_nome': fiador.nome_completo if fiador else 'Não possui fiador',
+        'fiador_cpf': formatar_cpf_cnpj(fiador.cpf) if fiador and fiador.cpf else 'Não informado',
+        'fiador_rg': fiador.rg if fiador and fiador.rg else 'Não informado',
+        'fiador_data_nascimento': formatar_data(fiador.data_nascimento) if fiador and fiador.data_nascimento else 'Não informado',
+        'fiador_telefone': fiador.telefone if fiador and fiador.telefone else 'Não informado',
+        'fiador_email': fiador.email if fiador and fiador.email else 'Não informado',
+        'fiador_endereco_completo': fiador.endereco_completo if fiador and fiador.endereco_completo else 'Não informado',
+        'fiador_cep': fiador.cep if fiador and fiador.cep else 'Não informado',
+        
+        # IMÓVEL - Endereço
+        'imovel_endereco': imovel.endereco or 'Não informado',
+        'imovel_numero': imovel.numero or 'S/N',
+        'imovel_bairro': imovel.bairro or 'Não informado',
+        'imovel_cidade': imovel.cidade or 'Não informado',
+        'imovel_estado': imovel.estado or 'PR',
+        'imovel_cep': imovel.cep or 'Não informado',
+        
+        # IMÓVEL - Utilidades
+        'imovel_conta_agua_esgoto': imovel.conta_agua_esgoto or 'Não informado',
+        'imovel_numero_hidrometro': imovel.numero_hidrometro or 'Não informado',
+        'imovel_unidade_consumidora_energia': imovel.unidade_consumidora_energia or 'Não informado',
+        'imovel_descricao': imovel.descricao or 'Conforme vistoria anexa',
+        
+        # LOCAÇÃO - Valores
+        'valor_aluguel': formatar_moeda(locacao.valor_aluguel),
+        'locacao_data_inicio': formatar_data(locacao.data_inicio),
+        'numero_contrato': locacao.numero_contrato or 'Não gerado',
+        
+        # Extras
+        'data_hoje': datetime.now().strftime('%d/%m/%Y'),
+        'cidade': 'PARANAGUÁ',
+    }
+    
+    return contexto
+
+
+def adicionar_numero_contrato_cabecalho(doc, numero_contrato):
+    """Adiciona o número do contrato no cabeçalho direito."""
+    for section in doc.sections:
+        header = section.header
+        
+        # Limpar cabeçalho existente
+        for paragraph in header.paragraphs:
+            paragraph.clear()
+        
+        # Adicionar número do contrato
+        paragraph = header.paragraphs[0] if header.paragraphs else header.add_paragraph()
+        paragraph.alignment = WD_ALIGN_PARAGRAPH.RIGHT
+        
+        run = paragraph.add_run(f'Contrato Nº {numero_contrato}')
+        run.font.size = Pt(10)
+        run.font.bold = True
+        run.font.color.rgb = RGBColor(30, 58, 138)
+
+
+@staff_member_required
+def gerar_contrato_docx(request, pk):
+    """Gera contrato em formato DOCX."""
+    locacao = get_object_or_404(Locacao, pk=pk)
+    
+    # Buscar template
+    template_obj = buscar_template_contrato(locacao)
+    
+    if not template_obj:
+        messages.error(request, 'Nenhum template de contrato encontrado. Configure um template padrão.')
+        return redirect('admin:core_locacao_change', pk)
+    
+    # Preparar contexto
+    contexto = preparar_contexto_contrato(locacao)
+    
+    try:
+        # Carregar template
+        doc_template = DocxTemplate(template_obj.arquivo_template.path)
+        
+        # Preencher template
+        doc_template.render(contexto)
+        
+        # Salvar em memória
+        docx_io = io.BytesIO()
+        doc_template.save(docx_io)
+        docx_io.seek(0)
+        
+        # Adicionar número do contrato no cabeçalho
+        doc = Document(docx_io)
+        adicionar_numero_contrato_cabecalho(doc, locacao.numero_contrato)
+        
+        # Salvar novamente
+        final_io = io.BytesIO()
+        doc.save(final_io)
+        final_io.seek(0)
+        
+        # Preparar resposta
+        nome_arquivo = f'Contrato_{locacao.numero_contrato}_{locacao.locatario.nome_razao_social}'
+        nome_arquivo = nome_arquivo.replace(' ', '_').replace('/', '-').replace('\\', '-')
+        nome_arquivo = f'{nome_arquivo}.docx'
+        
+        response = HttpResponse(
+            final_io.read(),
+            content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+        )
+        response['Content-Disposition'] = f'attachment; filename="{nome_arquivo}"'
+        
+        messages.success(request, f'✅ Contrato gerado com sucesso: {nome_arquivo}')
+        
+        return response
+        
+    except Exception as e:
+        messages.error(request, f'❌ Erro ao gerar contrato: {str(e)}')
+        return redirect('admin:core_locacao_change', pk)
+
+
+@staff_member_required
+def gerar_contrato_pdf(request, pk):
+    """Gera contrato em formato PDF (por enquanto redireciona para DOCX)."""
+    messages.info(request, '📑 Geração de PDF será implementada em breve. Baixando DOCX.')
+    return gerar_contrato_docx(request, pk)

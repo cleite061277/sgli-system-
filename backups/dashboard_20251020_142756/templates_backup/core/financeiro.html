@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SGLI - Dashboard Financeiro</title>
+    <meta charset="utf-8">
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+        .container { max-width: 1400px; margin: 0 auto; }
+        .card { background: white; padding: 20px; margin: 10px 0; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
+        .stat-card { text-align: center; padding: 20px; }
+        .stat-number { font-size: 36px; font-weight: bold; margin-bottom: 5px; }
+        .stat-label { font-size: 14px; color: #666; }
+        .pendente { color: #FF9800; }
+        .vencido { color: #F44336; }
+        .pago { color: #4CAF50; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .btn { background: #2196F3; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; display: inline-block; margin: 5px; }
+        .table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        .table th, .table td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+        .table th { background-color: #f8f9fa; font-weight: bold; }
+        .status-pendente { background: #fff3cd; color: #856404; padding: 4px 8px; border-radius: 4px; font-size: 12px; }
+        .status-vencida { background: #f8d7da; color: #721c24; padding: 4px 8px; border-radius: 4px; font-size: 12px; }
+        .valor { text-align: right; font-weight: bold; }
+        .progress { background: #e0e0e0; border-radius: 10px; height: 20px; margin: 10px 0; }
+        .progress-bar { background: #4CAF50; height: 100%; border-radius: 10px; transition: width 0.3s; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💰 SGLI - Dashboard Financeiro</h1>
+            <p>Controle completo de pagamentos e receitas</p>
+            <div>
+                <a href="/dashboard/" class="btn">🏠 Dashboard Geral</a>
+                <a href="/admin/" class="btn">🔐 Administração</a>
+                <a href="/api/comandas/" class="btn">📡 API Comandas</a>
+            </div>
+        </div>
+        
+        <div class="stats">
+            <div class="card stat-card">
+                <div class="stat-number pendente">R$ {{ total_pendente|floatformat:2 }}</div>
+                <div class="stat-label">Total Pendente</div>
+            </div>
+            <div class="card stat-card">
+                <div class="stat-number vencido">{{ total_vencidas }}</div>
+                <div class="stat-label">Comandas Vencidas</div>
+            </div>
+            <div class="card stat-card">
+                <div class="stat-number vencido">R$ {{ valor_vencido|floatformat:2 }}</div>
+                <div class="stat-label">Valor Vencido</div>
+            </div>
+            <div class="card stat-card">
+                <div class="stat-number">{{ comandas_mes }}</div>
+                <div class="stat-label">Comandas do Mês</div>
+            </div>
+            <div class="card stat-card">
+                <div class="stat-number">R$ {{ valor_mes|floatformat:2 }}</div>
+                <div class="stat-label">Receita Prevista</div>
+            </div>
+            <div class="card stat-card">
+                <div class="stat-number pago">R$ {{ valor_pago_mes|floatformat:2 }}</div>
+                <div class="stat-label">Recebido no Mês</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>📊 Taxa de Recebimento do Mês</h3>
+            <div class="progress">
+                <div class="progress-bar" style="width: {{ percentual_recebimento|floatformat:1 }}%"></div>
+            </div>
+            <p><strong>{{ percentual_recebimento|floatformat:1 }}%</strong> da receita prevista foi recebida</p>
+        </div>
+        
+        <div class="card">
+            <h3>⚠️ Comandas Vencidas (Top 10)</h3>
+            {% if comandas_vencidas_list %}
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Comanda</th>
+                        <th>Locatário</th>
+                        <th>Vencimento</th>
+                        <th>Status</th>
+                        <th>Valor</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for comanda in comandas_vencidas_list %}
+                    <tr>
+                        <td>{{ comanda.numero_comanda }}</td>
+                        <td>{{ comanda.locacao.locatario.nome_razao_social }}</td>
+                        <td>{{ comanda.data_vencimento|date:"d/m/Y" }}</td>
+                        <td><span class="status-vencida">VENCIDA</span></td>
+                        <td class="valor">R$ {{ comanda.valor_total|floatformat:2 }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p>🎉 Nenhuma comanda vencida!</p>
+            {% endif %}
+        </div>
+
+        <div class="card">
+            <h3>⏳ Comandas Pendentes (Top 10)</h3>
+            {% if comandas_pendentes_list %}
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Comanda</th>
+                        <th>Locatário</th>
+                        <th>Vencimento</th>
+                        <th>Status</th>
+                        <th>Valor</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for comanda in comandas_pendentes_list %}
+                    <tr>
+                        <td>{{ comanda.numero_comanda }}</td>
+                        <td>{{ comanda.locacao.locatario.nome_razao_social }}</td>
+                        <td>{{ comanda.data_vencimento|date:"d/m/Y" }}</td>
+                        <td><span class="status-pendente">PENDENTE</span></td>
+                        <td class="valor">R$ {{ comanda.valor_total|floatformat:2 }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p>✅ Nenhuma comanda pendente!</p>
+            {% endif %}
+        </div>
+
+        <div class="card">
+            <h3>🔗 Ações Rápidas</h3>
+            <a href="/admin/core/comanda/" class="btn">📋 Gerenciar Comandas</a>
+            <a href="/api/comandas/vencidas/" class="btn">⚠️ Ver Vencidas (API)</a>
+            <a href="/api/comandas/pendentes/" class="btn">⏳ Ver Pendentes (API)</a>
+            <a href="/api/comandas/dashboard/" class="btn">📊 Dashboard API</a>
+        </div>
+    </div>
+</body>
+</html>

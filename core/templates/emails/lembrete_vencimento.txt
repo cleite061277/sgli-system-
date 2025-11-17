@@ -1,0 +1,33 @@
+HABITAT PRO - {{ titulo }}
+
+Olá {{ locatario_nome }},
+
+{{ mensagem_principal }}
+
+DETALHES DA COBRANÇA
+═══════════════════════════════════════
+Imóvel: {{ imovel_endereco }}
+Comanda: {{ numero_comanda }}
+Vencimento: {{ data_vencimento }}
+
+VALORES BASE
+- Aluguel: R$ {{ valor_aluguel }}
+- Condomínio: R$ {{ valor_condominio }}
+- IPTU: R$ {{ valor_iptu }}
+
+{% if tem_multa_juros %}
+AJUSTES FINANCEIROS
+⚠️ Multa (10%): R$ {{ valor_multa }}
+⚠️ Juros (1% a.m.): R$ {{ valor_juros }}
+⚠️ Atraso: {{ dias_atraso }} dia(s)
+{% endif %}
+
+═══════════════════════════════════════
+TOTAL: R$ {{ valor_total }}
+═══════════════════════════════════════
+
+Para mais detalhes, acesse: {{ link_pagamento }}
+
+---
+HABITAT PRO - Sistema de Gestão Inteligente de Imóveis
+Esta é uma mensagem automática. Não responda este email.
