@@ -450,6 +450,7 @@ def enviar_comanda_email(request, comanda_id):
     from django.conf import settings
     from .models import Comanda
     from decimal import Decimal
+    import socket
     
     comanda = get_object_or_404(Comanda, id=comanda_id)
     loc = comanda.locacao.locatario
@@ -460,6 +461,9 @@ def enviar_comanda_email(request, comanda_id):
         return redirect('admin:core_comanda_changelist')
     
     try:
+        # ⚡ TIMEOUT DE 10 SEGUNDOS - Evitar worker timeout
+        socket.setdefaulttimeout(10)
+
         url = request.build_absolute_uri(f'/comanda/{comanda.id}/web/')
         
         # ✅ LÓGICA INTELIGENTE DE STATUS
@@ -532,7 +536,14 @@ Sistema de Gestão Imobiliária
         )
         email.send()
         messages.success(request, f'📧 Email enviado para {loc.email}!')
-    except Exception as e:
-        messages.error(request, f'❌ Erro: {e}')
+    except (Exception, socket.timeout) as e:
+        if isinstance(e, socket.timeout):
+            messages.error(request, '⏱️ Timeout: Servidor de email não respondeu em 10 segundos')
+        else:
+            messages.error(request, f'❌ Erro ao enviar email: {str(e)}')
     
+    finally:
+        # 🔄 Restaurar timeout padrão
+        socket.setdefaulttimeout(None)
+
     return redirect('admin:core_comanda_changelist')
