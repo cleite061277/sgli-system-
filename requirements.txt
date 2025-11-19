@@ -20,8 +20,8 @@ click-repl==0.3.0
 coverage==7.10.7
 cssselect2==0.8.0
 defusedxml==0.7.1
-dj-database-url==3.0.1
 Django==4.2.8
+django-anymail[sendgrid]==11.0
 django-cors-headers==4.3.1
 django-decouple==2.1
 django-extensions==4.1
@@ -29,6 +29,7 @@ django-filter==23.5
 django-picklefield==3.3
 django-q2==1.8.0
 djangorestframework==3.14.0
+dj-database-url==3.0.1
 docxcompose==1.4.0
 docxtpl==0.20.1
 fonttools==4.60.0
@@ -78,6 +79,3 @@ webencodings==0.5.1
 whitenoise==6.6.0
 yarl==1.20.1
 zopfli==0.2.3.post1
-django-anymail[sendgrid]==11.0
-django-anymail[sendgrid]==11.0
-django-anymail[sendgrid]==11.0
