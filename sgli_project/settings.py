@@ -266,3 +266,16 @@ CELERY_TASK_TIME_LIMIT = 30 * 60  # 30 minutos
 
 # URL do site (ajuste em produção)
 SITE_URL = config('SITE_URL', default='http://localhost:8000')
+
+# ════════════════════════════════════════════════════════════
+# SendGrid Email via AnyMail API
+# ════════════════════════════════════════════════════════════
+
+if 'anymail' not in INSTALLED_APPS:
+    INSTALLED_APPS += ['anymail']
+
+if os.environ.get('SENDGRID_API_KEY'):
+    EMAIL_BACKEND = 'anymail.backends.sendgrid.EmailBackend'
+    ANYMAIL = {
+        'SENDGRID_API_KEY': os.environ.get('SENDGRID_API_KEY'),
+    }
