@@ -432,7 +432,7 @@ class LocacaoAdmin(admin.ModelAdmin):
             self.message_user(request, f'{len(contratos_gerados)} contrato(s) gerado(s) com sucesso!')
     
     gerar_contrato.short_description = "Gerar contratos Word"
-    list_display = ('numero_contrato', 'imovel', 'locatario', 'status', 'data_inicio', 'data_fim')
+    list_display = ('numero_contrato', 'imovel', 'locatario', 'status', 'data_inicio', 'data_fim', 'alerta_vencimento')
     list_filter = ('status', 'is_active', 'created_at')
     search_fields = ('numero_contrato', 'imovel__codigo_imovel', 'locatario__nome_razao_social')
 

@@ -847,6 +847,33 @@ class Locacao(BaseModel):
             data_fim__gte=timezone.now().date()
         ).count()
     
+
+    def dias_para_vencer(self):
+        """Retorna dias restantes até o vencimento do contrato."""
+        from django.utils import timezone
+        hoje = timezone.now().date()
+        
+        if self.data_fim:
+            delta = (self.data_fim - hoje).days
+            return delta
+        return None
+    
+    def status_vencimento(self):
+        """Retorna status visual do vencimento."""
+        dias = self.dias_para_vencer()
+        
+        if dias is None:
+            return '⚪ Sem data'
+        elif dias < 0:
+            return '🔴 Vencido'
+        elif dias <= 30:
+            return '🔴 Crítico'
+        elif dias <= 60:
+            return '🟡 Atenção'
+        else:
+            return '🟢 Normal'
+
+
     class Meta:
         verbose_name = _('Locação')
         verbose_name_plural = _('Locações')
