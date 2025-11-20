@@ -1,0 +1,9 @@
+# HABITAT PRO - Configuração Railway
+# Instala LibreOffice para conversão DOCX → PDF
+
+[phases.setup]
+aptPkgs = [
+    "libreoffice-writer",
+    "libreoffice-common",
+    "libreoffice-core"
+]
