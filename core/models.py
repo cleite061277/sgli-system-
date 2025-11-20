@@ -1573,6 +1573,7 @@ class ConfiguracaoSistema(models.Model):
     def __str__(self):
         return f"Configurações (Vencimento: dia {self.dia_vencimento_padrao})"
     
+    @classmethod
     def get_config(cls):
         """Retorna a configuração única do sistema"""
         config, created = cls.objects.get_or_create(pk=1)
