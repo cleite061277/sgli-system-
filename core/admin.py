@@ -528,6 +528,31 @@ class SaldoFilter(admin.SimpleListFilter):
 class ComandaAdmin(admin.ModelAdmin):
     """Admin melhorado para Comanda com organização por seções"""
     
+
+    @admin.display(description='💰 Aluguel', ordering='_valor_aluguel_historico')
+    def valor_aluguel_display(self, obj):
+        """Exibe valor do aluguel com indicador se é dinâmico ou histórico."""
+        from django.utils.html import format_html
+        
+        valor = obj.valor_aluguel
+        
+        # Verificar se é valor dinâmico (pendente) ou histórico (pago)
+        if obj.status in ['PENDING', 'OVERDUE']:
+            # Valor dinâmico (sincronizado com contrato)
+            return format_html(
+                '<span style="color: #2563eb; font-weight: 600;">R$ {:,.2f}</span> '
+                '<span style="font-size: 10px; color: #6b7280;">🔄</span>',
+                valor
+            )
+        else:
+            # Valor histórico (congelado)
+            return format_html(
+                '<span style="font-weight: 600;">R$ {:,.2f}</span> '
+                '<span style="font-size: 10px; color: #6b7280;">📌</span>',
+                valor
+            )
+
+
     list_display = [
         'numero_comanda_link',
         'locacao_info',
@@ -562,6 +587,7 @@ class ComandaAdmin(admin.ModelAdmin):
         'created_at',
         'updated_at',
         'valor_total_display',
+        '_valor_aluguel_historico',
         'saldo_display',
         'dias_atraso_display',
     ]
@@ -616,7 +642,7 @@ class ComandaAdmin(admin.ModelAdmin):
         }),
         ('💰 Valores Base', {
             'fields': (
-                'valor_aluguel',
+                '_valor_aluguel_historico',  # Campo readonly (property calculada)
                 'valor_condominio',
                 'valor_iptu',
                 'valor_administracao',
@@ -833,6 +859,21 @@ class ComandaAdmin(admin.ModelAdmin):
         from django.utils.html import format_html
         import urllib.parse
         from decimal import Decimal
+        from django.conf import settings
+        
+        # 🔗 GERAR URL COMPLETA DA COMANDA
+        # Tentar obter domínio configurado
+        domain = getattr(settings, 'SITE_URL', None)
+        if not domain:
+            # Tentar pegar de ALLOWED_HOSTS
+            if settings.ALLOWED_HOSTS and settings.ALLOWED_HOSTS[0] != '*':
+                # Assumir HTTPS para production
+                domain = f"https://{settings.ALLOWED_HOSTS[0]}"
+            else:
+                # Fallback para desenvolvimento local
+                domain = "http://127.0.0.1:8000"
+        
+        comanda_url = f"{domain}/comanda/{obj.id}/web/"
         
         loc = obj.locacao.locatario
         imovel = obj.locacao.imovel
@@ -933,6 +974,11 @@ TOTAL: *R$ {obj.valor_total:,.2f}*
 
 ⚠️ *IMPORTANTE*
 Pague seus débitos em dia e evite multas, juros e outras correções conforme contrato de locação.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔗 *VER COMANDA COMPLETA*
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+{comanda_url}
 
 _Documento gerado via HABITAT PRO v1.0_'''
 
