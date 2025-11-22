@@ -859,17 +859,30 @@ class ComandaAdmin(admin.ModelAdmin):
         from decimal import Decimal
         from django.conf import settings
         
-        # 🔗 GERAR URL COMPLETA DA COMANDA
-        # Tentar obter domínio configurado
+        # 🔗 GERAR URL COMPLETA DA COMANDA - LÓGICA MELHORADA
+        domain = None
+        
+        # 1. Tentar SITE_URL (variável de ambiente recomendada)
         domain = getattr(settings, 'SITE_URL', None)
+        
+        # 2. Se não tiver, buscar domínio Railway nos ALLOWED_HOSTS
+        if not domain and hasattr(settings, 'ALLOWED_HOSTS'):
+            for host in settings.ALLOWED_HOSTS:
+                if 'railway.app' in host and host != '*':
+                    domain = f"https://{host}"
+                    break
+        
+        # 3. Fallback: primeiro host válido (não * ou localhost)
+        if not domain and hasattr(settings, 'ALLOWED_HOSTS'):
+            for host in settings.ALLOWED_HOSTS:
+                if host not in ['*', 'localhost', '127.0.0.1', '.localhost']:
+                    # Assumir HTTPS para hosts públicos
+                    domain = f"https://{host}" if not host.startswith('http') else host
+                    break
+        
+        # 4. Último recurso: desenvolvimento local
         if not domain:
-            # Tentar pegar de ALLOWED_HOSTS
-            if settings.ALLOWED_HOSTS and settings.ALLOWED_HOSTS[0] != '*':
-                # Assumir HTTPS para production
-                domain = f"https://{settings.ALLOWED_HOSTS[0]}"
-            else:
-                # Fallback para desenvolvimento local
-                domain = "http://127.0.0.1:8000"
+            domain = "http://127.0.0.1:8000"
         
         comanda_url = f"{domain}/comanda/{obj.id}/web/"
         
