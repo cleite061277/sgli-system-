@@ -529,7 +529,7 @@ class ComandaAdmin(admin.ModelAdmin):
     """Admin melhorado para Comanda com organização por seções"""
     
 
-    @admin.display(description='💰 Aluguel', ordering='_valor_aluguel_historico')
+    @admin.display(description='💰 Aluguel')
     def valor_aluguel_display(self, obj):
         """Exibe valor do aluguel com indicador se é dinâmico ou histórico."""
         from django.utils.html import format_html
@@ -587,7 +587,6 @@ class ComandaAdmin(admin.ModelAdmin):
         'created_at',
         'updated_at',
         'valor_total_display',
-        '_valor_aluguel_historico',
         'saldo_display',
         'dias_atraso_display',
     ]
@@ -642,7 +641,6 @@ class ComandaAdmin(admin.ModelAdmin):
         }),
         ('💰 Valores Base', {
             'fields': (
-                '_valor_aluguel_historico',  # Campo readonly (property calculada)
                 'valor_condominio',
                 'valor_iptu',
                 'valor_administracao',
