@@ -16,6 +16,7 @@ DEBUG = config('DEBUG', default=False, cast=bool)
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost').split(',')
 
 INSTALLED_APPS = [
+    'django_apscheduler',
     'core.apps.CoreConfig',  # ← DEVE VIR PRIMEIRO para templates customizados
     'django.contrib.admin',
     'django.contrib.auth',
@@ -279,3 +280,9 @@ if os.environ.get('SENDGRID_API_KEY'):
     ANYMAIL = {
         'SENDGRID_API_KEY': os.environ.get('SENDGRID_API_KEY'),
     }
+
+# ================================================================
+# APSCHEDULER - NOTIFICAÇÕES AUTOMÁTICAS
+# ================================================================
+APSCHEDULER_DATETIME_FORMAT = "N j, Y, f:s a"
+APSCHEDULER_RUN_NOW_TIMEOUT = 25

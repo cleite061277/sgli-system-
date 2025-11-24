@@ -61,3 +61,19 @@ txt/
 admin .py
 *ok_*.py
 models.py
+
+# Backups
+*.backup
+*.backup.*
+*_backup_*
+*.bak
+*.old
+
+# Scripts temporários
+implementar_*.sh
+verificar_*.sh
+fix_*.sh
+
+# Arquivos temporários
+~
+*~
