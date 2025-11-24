@@ -956,14 +956,34 @@ class Comanda(BaseModel):
     )
     
     # Valores da cobrança
-    valor_aluguel = models.DecimalField(
-    	max_digits=10,
-    	decimal_places=2,
-    	default=Decimal('0.00'),  # ← ADICIONAR
-    	validators=[MinValueValidator(Decimal('0.00'))],
-    	verbose_name=_('Valor do Aluguel'),
-        help_text=_('Valor do aluguel no mês de referência')
+    # ✅ CAMPO HISTÓRICO (será renomeado via migration)
+    _valor_aluguel_historico = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        verbose_name=_('Valor Aluguel (Histórico)'),
+        help_text=_('Valor do aluguel no momento da geração (histórico)')
     )
+    
+    # ✅ PROPERTY INTELIGENTE
+    @property
+    def valor_aluguel(self):
+        """
+        Retorna valor aluguel de forma inteligente:
+        - PENDENTE/VENCIDA: Valor atual do contrato (sempre atualizado)
+        - PAGA/CANCELADA: Valor histórico (preserva auditoria)
+        """
+        if self.status in ['PENDING', 'OVERDUE']:
+            # Comandas pendentes/vencidas: sincroniza com contrato
+            return self.locacao.valor_aluguel if self.locacao else self._valor_aluguel_historico
+        else:
+            # Comandas pagas/canceladas: mantém histórico
+            return self._valor_aluguel_historico
+    
+    @valor_aluguel.setter
+    def valor_aluguel(self, value):
+        """Permite setar valor_aluguel (para criação/admin)"""
+        from decimal import Decimal
+        self._valor_aluguel_historico = Decimal(str(value)) if value else Decimal('0.00')
     
     valor_condominio = models.DecimalField(
         max_digits=10,
@@ -1239,9 +1259,11 @@ class Comanda(BaseModel):
         """Validate model data."""
         super().clean()
         
-        if self.valor_pago > self.valor_total:
-            if abs(self.valor_pago - self.valor_total) > Decimal('0.01'):  # Allow small rounding differences
-                raise ValidationError(_('Valor pago não pode ser maior que o valor total.'))
+        # ✅ CORREÇÃO DEV_13.2: Validação removida - sistema permite pagamentos a maior/menor
+        # Crédito/débito são calculados automaticamente pelo método get_saldo()
+        # if self.valor_pago > self.valor_total:
+        # if abs(self.valor_pago - self.valor_total) > Decimal('0.01'):  # Allow small rounding differences
+        # raise ValidationError(_('Valor pago não pode ser maior que o valor total.'))
     
     def save(self, *args, **kwargs):
         """
@@ -1256,6 +1278,13 @@ class Comanda(BaseModel):
         
         # Se já existe numero_comanda (edição), salva normalmente
         if self.numero_comanda:
+            # ✅ GARANTIR: Campo preenchido mesmo em edições antigas
+            if self._valor_aluguel_historico is None:
+                if self.locacao:
+                    self._valor_aluguel_historico = self.locacao.valor_aluguel
+                else:
+                    self._valor_aluguel_historico = Decimal('0.00')
+            
             return super().save(*args, **kwargs)
         
         # mes_referencia é DateField -> extrair ano e mês
@@ -1290,6 +1319,14 @@ class Comanda(BaseModel):
                         new_seq = 1
                     
                     self.numero_comanda = f"{prefix}-{new_seq:04d}"
+                    
+                    # ✅ CORREÇÃO: Preencher _valor_aluguel_historico em novas comandas
+                    if not self.pk and self._valor_aluguel_historico is None:
+                        if self.locacao:
+                            self._valor_aluguel_historico = self.locacao.valor_aluguel
+                        else:
+                            self._valor_aluguel_historico = Decimal('0.00')
+                    
                     super().save(*args, **kwargs)
                 
                 return
@@ -1305,7 +1342,7 @@ class Comanda(BaseModel):
     
     def __str__(self) -> str:
         return f"Comanda {self.numero_comanda} - {self.mes_referencia:02d}/{self.ano_referencia}"
-    	
+        
 class Meta:
         verbose_name = _('Comanda')
         verbose_name_plural = _('Comandas')

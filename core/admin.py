@@ -1,5 +1,6 @@
 
 from django.contrib import admin
+from django import forms
 from core.models import ConfiguracaoSistema, LogGeracaoComandas
 from django.contrib.auth.admin import UserAdmin
 from django.utils import timezone
@@ -22,6 +23,8 @@ from django.urls import reverse
 from django.db.models import Sum, Q, F, Count
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
+from django.urls import reverse
+from django.utils.html import format_html
 
 class UsuarioCreationForm(UserCreationForm):
     """Form para criação de usuário com senha criptografada"""
@@ -528,36 +531,89 @@ class SaldoFilter(admin.SimpleListFilter):
 class ComandaAdmin(admin.ModelAdmin):
     """Admin melhorado para Comanda com organização por seções"""
     
+    # ✅ Form customizado para excluir property valor_aluguel
+    class ComandaAdminForm(forms.ModelForm):
+        class Meta:
+            model = Comanda
+            fields = '__all__'
+            # Excluir property valor_aluguel do formulário
+            exclude = []
+        
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+            # Se for nova comanda, preencher _valor_aluguel_historico com valor do contrato
+            if not self.instance.pk and 'locacao' in self.initial:
+                try:
+                    locacao = Locacao.objects.get(pk=self.initial['locacao'])
+                    self.initial['_valor_aluguel_historico'] = locacao.valor_aluguel
+                except Locacao.DoesNotExist:
+                    pass
+        
+        def save(self, commit=True):
+            """
+            Garante que _valor_aluguel_historico seja preenchido antes de salvar.
+            """
+            from decimal import Decimal
+            
+            instance = super().save(commit=False)
+            
+            # Se for nova comanda e campo estiver vazio, preencher com valor do contrato
+            if not instance.pk or instance._valor_aluguel_historico is None:
+                if instance.locacao:
+                    instance._valor_aluguel_historico = instance.locacao.valor_aluguel
+                else:
+                    instance._valor_aluguel_historico = Decimal('0.00')
+            
+            if commit:
+                instance.save()
+            
+            return instance
+    
+    form = ComandaAdminForm
+
 
     @admin.display(description='💰 Aluguel')
     def valor_aluguel_display(self, obj):
         """Exibe valor do aluguel com indicador se é dinâmico ou histórico."""
         from django.utils.html import format_html
-        
-        valor = obj.valor_aluguel
-        
-        # Verificar se é valor dinâmico (pendente) ou histórico (pago)
-        if obj.status in ['PENDING', 'OVERDUE']:
-            # Valor dinâmico (sincronizado com contrato)
-            return format_html(
-                '<span style="color: #2563eb; font-weight: 600;">R$ {:,.2f}</span> '
-                '<span style="font-size: 10px; color: #6b7280;">🔄</span>',
-                valor
-            )
-        else:
-            # Valor histórico (congelado)
-            return format_html(
-                '<span style="font-weight: 600;">R$ {:,.2f}</span> '
-                '<span style="font-size: 10px; color: #6b7280;">📌</span>',
-                valor
-            )
+        from decimal import Decimal
 
+        # 1. Usa a property inteligente do modelo Comanda
+        valor_numerico = obj.valor_aluguel
+
+        # 2. Garante que o valor é um tipo numérico
+        try:
+            valor_para_formatar = Decimal(str(valor_numerico))
+        except (ValueError, TypeError):
+            valor_para_formatar = Decimal('0.00')
+
+        # 3. Determina o ícone e a cor baseado no status
+        if obj.status in ['PENDING', 'OVERDUE']:
+            icone = '🔄'
+            cor = '#2563eb'
+            estilo = 'font-weight: 600;'
+        else:
+            icone = '📌'
+            cor = '#374151'
+            estilo = 'font-weight: 500;'
+
+        # 4. Formata a string de forma segura (formato brasileiro)
+        valor_br = f"R$ {valor_para_formatar:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+        
+        return format_html(
+            '<span style="color: {}; {}">{}</span> <span style="font-size: 10px; color: #6b7280;">{}</span>',
+            cor,
+            estilo,
+            valor_br,
+            icone
+        )
 
     list_display = [
         'numero_comanda_link',
         'locacao_info',
         'mes_ano_referencia',
         'vencimento_colorido',
+        'valor_aluguel_display',  # ← Mostra aluguel com indicador 🔄/📌
         'valor_total_formatado',
         'saldo_display',
         'acoes_envio',
@@ -584,6 +640,8 @@ class ComandaAdmin(admin.ModelAdmin):
     
     readonly_fields = [
         'numero_comanda',
+        '_valor_aluguel_historico',
+        'valor_aluguel_display',  # ← Campo histórico (readonly)
         'created_at',
         'updated_at',
         'valor_total_display',
@@ -641,11 +699,12 @@ class ComandaAdmin(admin.ModelAdmin):
         }),
         ('💰 Valores Base', {
             'fields': (
+                'valor_aluguel_display',  # ← Sincroniza: atual (PENDING) ou histórico (PAID)
                 'valor_condominio',
                 'valor_iptu',
                 'valor_administracao',
             ),
-            'description': 'Valores base calculados automaticamente na geração'
+            'description': '🔄 Aluguel sincroniza com contrato se PENDENTE | 📌 Congela se PAGO'
         }),
         ('➕ Valores Adicionais', {
             'fields': (
