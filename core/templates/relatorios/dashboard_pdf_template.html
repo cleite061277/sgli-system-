@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>HABITAT PRO - Relatório Financeiro {{ ano }}</title>
+    <style>
+        @page {
+            size: A4 landscape;
+            margin: 2cm;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            font-size: 10pt;
+            line-height: 1.5;
+            color: #333;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 30px;
+            border-radius: 10px;
+        }
+        
+        .header h1 {
+            margin: 0;
+            font-size: 24pt;
+        }
+        
+        .header p {
+            margin: 5px 0 0 0;
+            font-size: 12pt;
+            opacity: 0.9;
+        }
+        
+        .kpis {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            page-break-inside: avoid;
+        }
+        
+        .kpi-card {
+            width: 23%;
+            background: #f9fafb;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            border-radius: 8px;
+        }
+        
+        .kpi-card h3 {
+            margin: 0 0 10px 0;
+            font-size: 10pt;
+            color: #6b7280;
+            font-weight: normal;
+        }
+        
+        .kpi-card .value {
+            font-size: 20pt;
+            font-weight: bold;
+            color: #111827;
+            margin: 0;
+        }
+        
+        .kpi-card .subtitle {
+            font-size: 8pt;
+            color: #9ca3af;
+            margin: 5px 0 0 0;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+            page-break-inside: avoid;
+        }
+        
+        table thead {
+            background: #667eea;
+            color: white;
+        }
+        
+        table th {
+            padding: 12px 8px;
+            text-align: left;
+            font-weight: bold;
+            font-size: 9pt;
+        }
+        
+        table td {
+            padding: 10px 8px;
+            border-bottom: 1px solid #e5e7eb;
+            font-size: 9pt;
+        }
+        
+        table tbody tr:nth-child(even) {
+            background: #f9fafb;
+        }
+        
+        .section-title {
+            font-size: 14pt;
+            font-weight: bold;
+            color: #667eea;
+            margin: 30px 0 15px 0;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #667eea;
+        }
+        
+        .footer {
+            margin-top: 50px;
+            text-align: center;
+            font-size: 8pt;
+            color: #9ca3af;
+            page-break-inside: avoid;
+        }
+        
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 8pt;
+            font-weight: bold;
+        }
+        
+        .status-excelente {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .status-atencao {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .status-critico {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <h1>🏠 HABITAT PRO</h1>
+        <p>Relatório Financeiro {{ ano }}</p>
+        <p style="font-size: 9pt; margin-top: 10px;">Gerado em {{ data_geracao }}</p>
+    </div>
+
+    <!-- KPIs -->
+    <div class="kpis">
+        <div class="kpi-card">
+            <h3>💰 Receita Prevista</h3>
+            <p class="value">R$ {{ kpis.receita_prevista|floatformat:2 }}</p>
+            <p class="subtitle">Total esperado</p>
+        </div>
+        
+        <div class="kpi-card" style="border-left-color: #11998e;">
+            <h3>✅ Receita Realizada</h3>
+            <p class="value">R$ {{ kpis.receita_realizada|floatformat:2 }}</p>
+            <p class="subtitle">{{ kpis.taxa_realizacao }}% do previsto</p>
+        </div>
+        
+        <div class="kpi-card" style="border-left-color: #ee0979;">
+            <h3>⚠️ Inadimplência</h3>
+            <p class="value">R$ {{ kpis.inadimplencia_valor|floatformat:2 }}</p>
+            <p class="subtitle">{{ kpis.inadimplencia_percentual }}% ({{ kpis.inadimplencia_qtd }} comandas)</p>
+        </div>
+        
+        <div class="kpi-card" style="border-left-color: #f093fb;">
+            <h3>🏠 Taxa de Ocupação</h3>
+            <p class="value">{{ kpis.taxa_ocupacao }}%</p>
+            <p class="subtitle">{{ kpis.imoveis_ocupados }}/{{ kpis.total_imoveis }} imóveis</p>
+        </div>
+    </div>
+
+    <!-- Dados Mensais -->
+    <h2 class="section-title">📊 Detalhamento Mensal</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Mês</th>
+                <th>Previsto</th>
+                <th>Realizado</th>
+                <th>Diferença</th>
+                <th>Inadimpl. %</th>
+                <th>Taxa Real. %</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for mes in dados_mensais %}
+            <tr>
+                <td><strong>{{ mes.nome_mes }}/{{ ano }}</strong></td>
+                <td>R$ {{ mes.previsto|floatformat:2 }}</td>
+                <td style="{% if mes.realizado >= mes.previsto %}color: #065f46; font-weight: bold;{% endif %}">
+                    R$ {{ mes.realizado|floatformat:2 }}
+                </td>
+                <td style="{% if mes.diferenca >= 0 %}color: #065f46;{% else %}color: #991b1b;{% endif %} font-weight: bold;">
+                    {% if mes.diferenca >= 0 %}+{% endif %}R$ {{ mes.diferenca|floatformat:2 }}
+                </td>
+                <td style="{% if mes.inadimplencia > 3 %}color: #991b1b; font-weight: bold;{% endif %}">
+                    {{ mes.inadimplencia }}%
+                </td>
+                <td style="{% if mes.taxa_realizacao >= 98 %}color: #065f46;{% elif mes.taxa_realizacao >= 90 %}color: #92400e;{% else %}color: #991b1b;{% endif %} font-weight: bold;">
+                    {{ mes.taxa_realizacao }}%
+                </td>
+                <td>
+                    <span class="status-badge {% if mes.taxa_realizacao >= 98 %}status-excelente{% elif mes.taxa_realizacao >= 90 %}status-atencao{% else %}status-critico{% endif %}">
+                        {% if mes.taxa_realizacao >= 98 %}Excelente{% elif mes.taxa_realizacao >= 90 %}Atenção{% else %}Crítico{% endif %}
+                    </span>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Performance por Imóvel -->
+    <h2 class="section-title">🏠 Performance por Imóvel</h2>
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 50%;">Imóvel</th>
+                <th>Previsto</th>
+                <th>Realizado</th>
+                <th>Taxa %</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for imovel in performance_imoveis %}
+            <tr>
+                <td>{{ imovel.nome }}</td>
+                <td>R$ {{ imovel.previsto|floatformat:2 }}</td>
+                <td style="{% if imovel.taxa >= 98 %}color: #065f46; font-weight: bold;{% elif imovel.taxa == 0 %}color: #991b1b; font-weight: bold;{% endif %}">
+                    R$ {{ imovel.realizado|floatformat:2 }}
+                </td>
+                <td style="{% if imovel.taxa >= 98 %}color: #065f46;{% elif imovel.taxa >= 90 %}color: #92400e;{% else %}color: #991b1b;{% endif %} font-weight: bold;">
+                    {{ imovel.taxa }}%
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Footer -->
+    <div class="footer">
+        <p>Relatório gerado automaticamente pelo sistema HABITAT PRO</p>
+        <p>Este documento contém informações confidenciais • {{ data_geracao }}</p>
+        <p>HABITAT PRO v1.0 • Sistema de Gestão Imobiliária</p>
+    </div>
+</body>
+</html>

@@ -1,0 +1,64 @@
+"""
+URLs do core - VERSÃO LIMPA
+"""
+from django.urls import path
+from django.contrib import admin
+from .views import (
+    comanda_web_view,
+    enviar_comanda_email,
+    download_recibo_pagamento,
+    pagina_recibo_pagamento,
+)
+
+# ========== DASHBOARD FINANCEIRO ==========
+from .views_relatorios import (
+    dashboard_financeiro,
+    exportar_dashboard_excel,
+    exportar_dashboard_pdf,
+    enviar_relatorio_email,
+)
+
+###from .views_whatsapp import (
+#    painel_whatsapp,
+#    gerar_mensagem_whatsapp,
+#)
+
+urlpatterns = [    
+    path('comanda/<uuid:comanda_id>/web/', comanda_web_view, name='comanda_web_view'),
+    path('comanda/<uuid:comanda_id>/enviar-email/', enviar_comanda_email, name='enviar_comanda_email'),
+    
+    # ========== DASHBOARD FINANCEIRO ==========
+    path('relatorios/dashboard/', 
+         dashboard_financeiro, 
+         name='dashboard_financeiro'),
+    
+    path('relatorios/dashboard/excel/', 
+         exportar_dashboard_excel, 
+         name='exportar_dashboard_excel'),
+    
+    path('relatorios/dashboard/pdf/', 
+         exportar_dashboard_pdf, 
+         name='exportar_dashboard_pdf'),
+    
+    path('relatorios/dashboard/email/', 
+         enviar_relatorio_email, 
+         name='enviar_relatorio_email'),
+    
+    # Painel WhatsApp
+#    path('admin/whatsapp/', 
+#         admin.site.admin_view(painel_whatsapp), 
+#         name='painel_whatsapp'),
+#    
+#    path('admin/whatsapp/gerar-mensagem/<uuid:comanda_id>/', 
+#         admin.site.admin_view(gerar_mensagem_whatsapp), 
+#         name='gerar_mensagem_whatsapp'),
+    
+    # Recibos
+    path('pagamento/<uuid:pagamento_id>/recibo/', 
+         pagina_recibo_pagamento, 
+         name='pagina_recibo_pagamento'),
+    
+    path('pagamento/<uuid:pagamento_id>/recibo/download/', 
+         download_recibo_pagamento, 
+         name='download_recibo_pagamento'),
+]

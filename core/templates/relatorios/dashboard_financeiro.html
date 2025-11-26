@@ -1,0 +1,495 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HABITAT PRO - Dashboard Financeiro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .gradient-blue { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .gradient-green { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); }
+        .gradient-red { background: linear-gradient(135deg, #ee0979 0%, #ff6a00 100%); }
+        .gradient-orange { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+        .card-hover { transition: all 0.3s ease; cursor: pointer; }
+        .card-hover:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(0,0,0,0.15); }
+        .pulse-animation { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .7; }
+        }
+        .alerta-badge { 
+            position: absolute; 
+            top: -8px; 
+            right: -8px; 
+            background: #ef4444; 
+            color: white; 
+            border-radius: 50%; 
+            width: 24px; 
+            height: 24px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 12px; 
+            font-weight: bold;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <div class="gradient-blue text-white px-8 py-6 shadow-lg">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center gap-4">
+                    <!-- Logo SVG -->
+                    <svg width="60" height="60" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="50" y="90" width="100" height="80" fill="#fff" opacity="0.2" rx="5"/>
+                        <path d="M 40 90 L 100 40 L 160 90 Z" fill="#fff" opacity="0.9"/>
+                        <rect x="85" y="130" width="30" height="40" fill="#667eea" rx="3"/>
+                        <rect x="65" y="105" width="20" height="20" fill="#f5576c" opacity="0.8" rx="2"/>
+                        <rect x="115" y="105" width="20" height="20" fill="#f5576c" opacity="0.8" rx="2"/>
+                        <rect x="130" y="60" width="15" height="30" fill="#fff" opacity="0.7" rx="2"/>
+                        <circle cx="100" cy="145" r="8" fill="#fff" opacity="0.9"/>
+                        <text x="100" y="151" text-anchor="middle" font-family="Arial" font-size="12" font-weight="bold" fill="#667eea">H</text>
+                    </svg>
+                    <div>
+                        <h1 class="text-3xl font-bold tracking-tight">HABITAT PRO</h1>
+                        <p class="text-blue-100 mt-1 text-sm">Dashboard Financeiro & Analytics</p>
+                    </div>
+                </div>
+                <div class="flex gap-3">
+                    <form action="{% url 'enviar_relatorio_email' %}" method="post" onsubmit="return confirmarEnvioEmail(event)">
+                        {% csrf_token %}
+                        <button type="submit" class="bg-white text-blue-600 px-4 py-2 rounded-lg font-semibold hover:bg-blue-50 transition flex items-center gap-2">
+                            <span>📧</span> Enviar Email
+                        </button>
+                    </form>
+                    <a href="{% url 'exportar_dashboard_excel' %}" class="bg-white text-blue-600 px-4 py-2 rounded-lg font-semibold hover:bg-blue-50 transition flex items-center gap-2">
+                        <span>📊</span> Excel
+                    </a>
+                    <a href="{% url 'exportar_dashboard_pdf' %}" class="bg-white text-blue-600 px-4 py-2 rounded-lg font-semibold hover:bg-blue-50 transition flex items-center gap-2">
+                        <span>📄</span> PDF
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alertas -->
+    {% if alertas %}
+    <div class="max-w-7xl mx-auto px-8 py-4">
+        {% for alerta in alertas %}
+        <div class="bg-{% if alerta.tipo == 'warning' %}red{% else %}blue{% endif %}-50 border-l-4 border-{% if alerta.tipo == 'warning' %}red{% else %}blue{% endif %}-500 p-4 mb-2 rounded-lg">
+            <div class="flex justify-between items-center">
+                <div>
+                    <p class="font-semibold text-{% if alerta.tipo == 'warning' %}red{% else %}blue{% endif %}-800">{{ alerta.titulo }}</p>
+                    <p class="text-sm text-{% if alerta.tipo == 'warning' %}red{% else %}blue{% endif %}-700">{{ alerta.mensagem }}</p>
+                </div>
+                <a href="{{ alerta.link }}" class="text-{% if alerta.tipo == 'warning' %}red{% else %}blue{% endif %}-600 hover:text-{% if alerta.tipo == 'warning' %}red{% else %}blue{% endif %}-800 font-semibold text-sm">
+                    {{ alerta.acao }} →
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Filtros -->
+    <div class="max-w-7xl mx-auto px-8 py-6">
+        <div class="bg-white rounded-xl shadow-md p-6 mb-6">
+            <form method="get" class="grid grid-cols-1 md:grid-cols-5 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Período</label>
+                    <select name="periodo" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+                        <option value="mes" {% if filtros.periodo == 'mes' %}selected{% endif %}>Mês Atual</option>
+                        <option value="trimestre" {% if filtros.periodo == 'trimestre' %}selected{% endif %}>Último Trimestre</option>
+                        <option value="semestre" {% if filtros.periodo == 'semestre' %}selected{% endif %}>Último Semestre</option>
+                        <option value="ano" {% if filtros.periodo == 'ano' %}selected{% endif %}>Ano {{ ano_atual }}</option>
+                        <option value="comparativo" {% if filtros.periodo == 'comparativo' %}selected{% endif %}>Comparativo 2024 vs 2025</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Imóvel</label>
+                    <select name="imovel" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+                        <option value="todos">Todos os Imóveis</option>
+                        {% for imovel in imoveis %}
+                        <option value="{{ imovel.id }}" {% if filtros.imovel == imovel.id|stringformat:'s' %}selected{% endif %}>
+                            {{ imovel.endereco }}, {{ imovel.numero }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
+                    <select name="status" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+                        <option value="todos" {% if filtros.status == 'todos' %}selected{% endif %}>Todos</option>
+                        <option value="pago" {% if filtros.status == 'pago' %}selected{% endif %}>Pagas</option>
+                        <option value="pendente" {% if filtros.status == 'pendente' %}selected{% endif %}>Pendentes</option>
+                        <option value="atrasado" {% if filtros.status == 'atrasado' %}selected{% endif %}>Atrasadas</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Visualização</label>
+                    <select name="visualizacao" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+                        <option value="real" {% if filtros.visualizacao == 'real' %}selected{% endif %}>Dados Reais</option>
+                        <option value="projecao" {% if filtros.visualizacao == 'projecao' %}selected{% endif %}>Com Projeção (3 meses)</option>
+                    </select>
+                </div>
+                <div class="flex items-end">
+                    <button type="submit" class="w-full gradient-blue text-white px-4 py-2 rounded-lg font-semibold hover:opacity-90 transition">
+                        🔄 Atualizar
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- KPI Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+            <!-- Receita Prevista -->
+            <div class="bg-white rounded-xl shadow-md p-6 card-hover relative">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="gradient-blue text-white p-3 rounded-lg">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    {% if kpis.receita_prevista_alerta %}
+                    <span class="alerta-badge pulse-animation">!</span>
+                    {% endif %}
+                </div>
+                <p class="text-gray-500 text-sm font-medium mb-1">Receita Prevista</p>
+                <p class="text-3xl font-bold text-gray-800">R$ {{ kpis.receita_prevista|floatformat:2 }}</p>
+                <p class="text-sm mt-2 {% if kpis.delta_receita >= 0 %}text-green-600{% else %}text-red-600{% endif %}">
+                    {% if kpis.delta_receita >= 0 %}▲{% else %}▼{% endif %} {{ kpis.delta_receita|floatformat:1 }}% vs mês anterior
+                </p>
+            </div>
+
+            <!-- Receita Realizada -->
+            <div class="bg-white rounded-xl shadow-md p-6 card-hover relative">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="gradient-green text-white p-3 rounded-lg">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                </div>
+                <p class="text-gray-500 text-sm font-medium mb-1">Receita Realizada</p>
+                <p class="text-3xl font-bold text-gray-800">R$ {{ kpis.receita_realizada|floatformat:2 }}</p>
+                <p class="text-sm mt-2 text-gray-600">
+                    {{ kpis.taxa_realizacao|floatformat:1 }}% da receita prevista
+                </p>
+            </div>
+
+            <!-- Taxa de Inadimplência -->
+            <div class="bg-white rounded-xl shadow-md p-6 card-hover relative">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="gradient-red text-white p-3 rounded-lg">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                    </div>
+                    {% if kpis.inadimplencia_critica %}
+                    <span class="alerta-badge pulse-animation">{{ kpis.total_atrasadas }}</span>
+                    {% endif %}
+                </div>
+                <p class="text-gray-500 text-sm font-medium mb-1">Taxa de Inadimplência</p>
+                <p class="text-3xl font-bold text-gray-800">{{ kpis.taxa_inadimplencia|floatformat:1 }}%</p>
+                <p class="text-sm mt-2 {% if kpis.taxa_inadimplencia <= 3 %}text-green-600{% else %}text-red-600{% endif %}">
+                    Meta: 3% | Atual: {{ kpis.total_atrasadas }} comandas
+                </p>
+            </div>
+
+            <!-- Taxa de Ocupação -->
+            <div class="bg-white rounded-xl shadow-md p-6 card-hover">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="gradient-orange text-white p-3 rounded-lg">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                        </svg>
+                    </div>
+                </div>
+                <p class="text-gray-500 text-sm font-medium mb-1">Taxa de Ocupação</p>
+                <p class="text-3xl font-bold text-gray-800">{{ kpis.taxa_ocupacao|floatformat:1 }}%</p>
+                <p class="text-sm mt-2 text-gray-600">
+                    {{ kpis.imoveis_ocupados }} de {{ kpis.total_imoveis }} imóveis
+                </p>
+            </div>
+        </div>
+
+        <!-- Gráficos -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+            <!-- Gráfico Receita Mensal -->
+            <div class="bg-white rounded-xl shadow-md p-6">
+                <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                    <span>📈</span> Receita Prevista vs Realizada
+                </h3>
+                <canvas id="receitaChart" height="300"></canvas>
+            </div>
+
+            <!-- Gráfico Inadimplência -->
+            <div class="bg-white rounded-xl shadow-md p-6">
+                <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                    <span>⚠️</span> Evolução da Inadimplência
+                </h3>
+                <canvas id="inadimplenciaChart" height="300"></canvas>
+            </div>
+        </div>
+
+        <!-- Gráfico Performance por Imóvel -->
+        <div class="bg-white rounded-xl shadow-md p-6 mb-6">
+            <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                <span>🏘️</span> Performance por Imóvel
+            </h3>
+            <canvas id="imovelChart" height="400"></canvas>
+        </div>
+
+        <!-- Tabelas de Detalhamento -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Tabela de Pendências -->
+            <div class="bg-white rounded-xl shadow-md p-6">
+                <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                    <span>⏳</span> Comandas Pendentes
+                </h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="border-b-2 border-gray-200">
+                                <th class="text-left py-2 px-2 font-semibold text-gray-700">Locatário</th>
+                                <th class="text-left py-2 px-2 font-semibold text-gray-700">Vencimento</th>
+                                <th class="text-right py-2 px-2 font-semibold text-gray-700">Valor</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for comanda in comandas_pendentes %}
+                            <tr class="border-b border-gray-100 hover:bg-gray-50">
+                                <td class="py-2 px-2">{{ comanda.locacao.locatario.nome_razao_social|truncatewords:3 }}</td>
+                                <td class="py-2 px-2">{{ comanda.data_vencimento|date:"d/m/Y" }}</td>
+                                <td class="py-2 px-2 text-right font-semibold">R$ {{ comanda.valor_total|floatformat:2 }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="3" class="text-center py-4 text-gray-500">Nenhuma comanda pendente</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Tabela de Atrasadas -->
+            <div class="bg-white rounded-xl shadow-md p-6">
+                <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                    <span>🚨</span> Comandas Atrasadas
+                </h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="border-b-2 border-gray-200">
+                                <th class="text-left py-2 px-2 font-semibold text-gray-700">Locatário</th>
+                                <th class="text-left py-2 px-2 font-semibold text-gray-700">Atraso</th>
+                                <th class="text-right py-2 px-2 font-semibold text-gray-700">Valor</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for comanda in comandas_atrasadas %}
+                            <tr class="border-b border-gray-100 hover:bg-red-50">
+                                <td class="py-2 px-2">{{ comanda.locacao.locatario.nome_razao_social|truncatewords:3 }}</td>
+                                <td class="py-2 px-2">
+                                    <span class="px-2 py-1 bg-red-100 text-red-700 rounded-full text-xs font-semibold">
+                                        {{ comanda.dias_atraso }} dias
+                                    </span>
+                                </td>
+                                <td class="py-2 px-2 text-right font-semibold text-red-600">R$ {{ comanda.valor_total|floatformat:2 }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="3" class="text-center py-4 text-gray-500">Nenhuma comanda atrasada</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="max-w-7xl mx-auto px-8 py-6 text-center text-gray-500 text-sm">
+        <p>© 2025 HABITAT PRO - Sistema de Gestão de Locações | Gerado em {{ data_geracao|date:"d/m/Y H:i:s" }}</p>
+    </div>
+
+    <script>
+        // Dados para os gráficos
+        const dadosMensais = {{ dados_mensais|safe }};
+        const performanceImoveis = {{ performance_imoveis|safe }};
+
+        // Gráfico Receita
+        const ctxReceita = document.getElementById('receitaChart').getContext('2d');
+        new Chart(ctxReceita, {
+            type: 'line',
+            data: {
+                labels: dadosMensais.map(d => d.mes),
+                datasets: [{
+                    label: 'Previsto',
+                    data: dadosMensais.map(d => d.previsto),
+                    borderColor: 'rgba(102, 126, 234, 1)',
+                    backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4
+                }, {
+                    label: 'Realizado',
+                    data: dadosMensais.map(d => d.realizado),
+                    borderColor: 'rgba(17, 153, 142, 1)',
+                    backgroundColor: 'rgba(17, 153, 142, 0.1)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'top' },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                label += 'R$ ' + context.parsed.y.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+                                return label;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return 'R$ ' + (value/1000).toFixed(0) + 'k';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Gráfico Inadimplência
+        const ctxInadimplencia = document.getElementById('inadimplenciaChart').getContext('2d');
+        new Chart(ctxInadimplencia, {
+            type: 'line',
+            data: {
+                labels: dadosMensais.map(d => d.mes),
+                datasets: [{
+                    label: 'Taxa de Inadimplência (%)',
+                    data: dadosMensais.map(d => d.inadimplencia),
+                    backgroundColor: 'rgba(238, 9, 121, 0.1)',
+                    borderColor: 'rgba(238, 9, 121, 1)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4
+                }, {
+                    label: 'Meta (3%)',
+                    data: Array(dadosMensais.length).fill(3),
+                    borderColor: 'rgba(34, 197, 94, 0.5)',
+                    borderWidth: 2,
+                    borderDash: [5, 5],
+                    pointRadius: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'top' } },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 10,
+                        ticks: {
+                            callback: function(value) {
+                                return value + '%';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Gráfico Imóveis
+        const ctxImovel = document.getElementById('imovelChart').getContext('2d');
+        new Chart(ctxImovel, {
+            type: 'bar',
+            data: {
+                labels: performanceImoveis.map(i => i.nome),
+                datasets: [{
+                    label: 'Previsto',
+                    data: performanceImoveis.map(i => i.previsto),
+                    backgroundColor: 'rgba(102, 126, 234, 0.5)',
+                    borderColor: 'rgba(102, 126, 234, 1)',
+                    borderWidth: 1
+                }, {
+                    label: 'Realizado',
+                    data: performanceImoveis.map(i => i.realizado),
+                    backgroundColor: 'rgba(17, 153, 142, 0.5)',
+                    borderColor: 'rgba(17, 153, 142, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { 
+                    legend: { position: 'top' },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                label += 'R$ ' + context.parsed.x.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+                                return label;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return 'R$ ' + (value/1000).toFixed(0) + 'k';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Função de confirmação de email
+        function confirmarEnvioEmail(event) {
+            event.preventDefault();
+            const email = prompt('Digite o email de destino:', '');
+            if (email) {
+                const form = event.target;
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'email';
+                input.value = email;
+                form.appendChild(input);
+                form.submit();
+            }
+            return false;
+        }
+    </script>
+</body>
+</html>

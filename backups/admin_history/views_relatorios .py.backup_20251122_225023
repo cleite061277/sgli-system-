@@ -1,0 +1,601 @@
+"""
+Views para Dashboard Financeiro - HABITAT PRO
+Sistema SGLI v16 - VERSÃO CORRIGIDA E OTIMIZADA
+"""
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse, JsonResponse
+from django.db.models import Sum, Count, Q, F, DecimalField
+from django.db.models.functions import Coalesce
+from django.views.decorators.http import require_http_methods
+from datetime import date, timedelta
+from decimal import Decimal
+import json
+
+from core.models import Comanda, Locacao, Imovel, Pagamento
+
+
+@login_required
+def dashboard_financeiro(request):
+    """
+    View principal do dashboard financeiro
+    Exibe KPIs, gráficos e análises financeiras
+    """
+    # Filtros do usuário
+    periodo = request.GET.get('periodo', 'ano')
+    imovel_id = request.GET.get('imovel', 'todos')
+    status_filtro = request.GET.get('status', 'todos')
+    visualizacao = request.GET.get('visualizacao', 'real')
+    
+    # Calcular range de datas baseado no período
+    hoje = date.today()
+    ano_atual = hoje.year
+    
+    if periodo == 'mes':
+        data_inicio = hoje.replace(day=1)
+        data_fim = hoje
+    elif periodo == 'trimestre':
+        data_inicio = hoje - timedelta(days=90)
+        data_fim = hoje
+    elif periodo == 'semestre':
+        data_inicio = hoje - timedelta(days=180)
+        data_fim = hoje
+    elif periodo == 'comparativo':
+        # Ano atual vs ano anterior
+        data_inicio = date(ano_atual - 1, 1, 1)
+        data_fim = hoje
+    else:  # 'ano' - padrão
+        data_inicio = date(ano_atual, 1, 1)
+        data_fim = date(ano_atual, 12, 31)
+    
+    # Montar queryset base de comandas
+    # CORREÇÃO: Usar mes_referencia (campo date) em vez de campos separados
+    queryset = Comanda.objects.filter(
+        mes_referencia__gte=data_inicio,
+        mes_referencia__lte=data_fim,
+        is_active=True
+    )
+    
+    # Aplicar filtros adicionais
+    if imovel_id != 'todos':
+        queryset = queryset.filter(locacao__imovel_id=imovel_id)
+    
+    if status_filtro == 'pago':
+        queryset = queryset.filter(status__in=['PAGO', 'PAID', 'PAGA'])
+    elif status_filtro == 'pendente':
+        queryset = queryset.filter(status__in=['PENDENTE', 'PENDING'])
+    elif status_filtro == 'atrasado':
+        queryset = queryset.filter(status__in=['ATRASADO', 'EM_ATRASO', 'OVERDUE'])
+    
+    # Calcular KPIs principais
+    kpis = calcular_kpis(queryset, hoje)
+    
+    # Dados mensais para gráficos
+    if periodo == 'comparativo':
+        dados_mensais = calcular_comparativo_anual(ano_atual)
+    else:
+        dados_mensais = calcular_dados_mensais(ano_atual)
+    
+    # Performance por imóvel (top 5 + outros)
+    performance_imoveis = calcular_performance_imoveis(ano_atual)
+    
+    # Gerar alertas baseados nos KPIs
+    alertas = gerar_alertas(kpis, dados_mensais)
+    
+    # Projeção (se solicitado)
+    projecao = None
+    if visualizacao == 'projecao':
+        projecao = calcular_projecao(dados_mensais)
+    
+    # Lista de imóveis para filtro
+    imoveis = Imovel.objects.filter(is_active=True).order_by('endereco')
+    
+    # Listas para tabelas
+    comandas_pendentes = queryset.filter(
+        status__in=['PENDENTE', 'PENDING']
+    ).select_related('locacao__locatario', 'locacao__imovel')[:10]
+    
+    comandas_atrasadas = queryset.filter(
+        status__in=['ATRASADO', 'EM_ATRASO', 'OVERDUE']
+    ).select_related('locacao__locatario', 'locacao__imovel')[:10]
+    
+    # Calcular dias de atraso
+    for comanda in comandas_atrasadas:
+        if hasattr(comanda, 'data_vencimento') and comanda.data_vencimento:
+            comanda.dias_atraso = (hoje - comanda.data_vencimento).days
+        else:
+            comanda.dias_atraso = 0
+    
+    context = {
+        'kpis': kpis,
+        'dados_mensais': json.dumps(dados_mensais),
+        'performance_imoveis': json.dumps(performance_imoveis),
+        'alertas': alertas,
+        'projecao': json.dumps(projecao) if projecao else None,
+        'comandas_pendentes': comandas_pendentes,
+        'comandas_atrasadas': comandas_atrasadas,
+        'imoveis': imoveis,
+        'ano_atual': ano_atual,
+        'data_geracao': hoje,
+        'filtros': {
+            'periodo': periodo,
+            'imovel': imovel_id,
+            'status': status_filtro,
+            'visualizacao': visualizacao,
+        }
+    }
+    
+    return render(request, 'relatorios/dashboard_financeiro.html', context)
+
+
+def calcular_kpis(queryset, data_referencia):
+    """
+    Calcula os 4 KPIs principais do dashboard
+    
+    CORREÇÃO: Usa valor_aluguel_historico em vez de valor_total
+    
+    Returns:
+        dict com receita_prevista, receita_realizada, inadimplencia_*, taxa_ocupacao
+    """
+    # 1. RECEITA PREVISTA (soma de todas as comandas do período)
+    receita_prevista = queryset.aggregate(
+        total=Coalesce(Sum('valor_aluguel_historico'), Decimal('0'))
+    )['total']
+    
+    # 2. RECEITA REALIZADA (comandas pagas ou pagamentos confirmados)
+    # Primeiro tentar via status
+    receita_realizada_status = queryset.filter(
+        status__in=['PAGO', 'PAID', 'PAGA']
+    ).aggregate(
+        total=Coalesce(Sum('valor_aluguel_historico'), Decimal('0'))
+    )['total']
+    
+    # Depois via pagamentos confirmados
+    receita_realizada_pagamentos = Pagamento.objects.filter(
+        comanda__in=queryset,
+        status='confirmado',
+        is_active=True
+    ).aggregate(
+        total=Coalesce(Sum('valor_pago'), Decimal('0'))
+    )['total']
+    
+    # Usar o maior valor (mais preciso)
+    receita_realizada = max(receita_realizada_status, receita_realizada_pagamentos)
+    
+    # 3. INADIMPLÊNCIA (comandas vencidas não pagas)
+    comandas_atrasadas = queryset.filter(
+        data_vencimento__lt=data_referencia,
+        status__in=['PENDENTE', 'PENDING', 'ATRASADO', 'EM_ATRASO', 'OVERDUE']
+    )
+    
+    inadimplencia_valor = comandas_atrasadas.aggregate(
+        total=Coalesce(Sum('valor_aluguel_historico'), Decimal('0'))
+    )['total']
+    
+    inadimplencia_qtd = comandas_atrasadas.count()
+    
+    # Percentual de inadimplência
+    inadimplencia_percentual = (
+        float(inadimplencia_valor / receita_prevista * 100) 
+        if receita_prevista > 0 else 0
+    )
+    
+    # 4. TAXA DE OCUPAÇÃO (imóveis com locação ativa)
+    total_imoveis = Imovel.objects.filter(is_active=True).count()
+    
+    imoveis_ocupados = Locacao.objects.filter(
+        status__in=['ATIVO', 'ATIVA'],
+        is_active=True
+    ).values('imovel').distinct().count()
+    
+    taxa_ocupacao = (
+        (imoveis_ocupados / total_imoveis * 100)
+        if total_imoveis > 0 else 0
+    )
+    
+    # Taxa de realização (quanto % foi realizado do previsto)
+    taxa_realizacao = (
+        float(receita_realizada / receita_prevista * 100)
+        if receita_prevista > 0 else 0
+    )
+    
+    # Variação vs mês anterior
+    mes_anterior = data_referencia.replace(day=1) - timedelta(days=1)
+    receita_mes_anterior = Comanda.objects.filter(
+        mes_referencia__year=mes_anterior.year,
+        mes_referencia__month=mes_anterior.month,
+        is_active=True
+    ).aggregate(
+        total=Coalesce(Sum('valor_aluguel_historico'), Decimal('0'))
+    )['total']
+    
+    delta_receita = 0
+    if receita_mes_anterior > 0:
+        delta_receita = ((receita_prevista - receita_mes_anterior) / receita_mes_anterior * 100)
+    
+    return {
+        'receita_prevista': float(receita_prevista),
+        'receita_realizada': float(receita_realizada),
+        'inadimplencia_valor': float(inadimplencia_valor),
+        'inadimplencia_qtd': inadimplencia_qtd,
+        'taxa_inadimplencia': round(inadimplencia_percentual, 1),
+        'inadimplencia_percentual': round(inadimplencia_percentual, 1),
+        'taxa_ocupacao': round(taxa_ocupacao, 1),
+        'taxa_realizacao': round(taxa_realizacao, 1),
+        'total_imoveis': total_imoveis,
+        'imoveis_ocupados': imoveis_ocupados,
+        'delta_receita': round(float(delta_receita), 1),
+        'receita_prevista_alerta': receita_prevista < receita_mes_anterior * 0.9,
+        'inadimplencia_critica': inadimplencia_percentual > 3,
+        'total_atrasadas': inadimplencia_qtd,
+    }
+
+
+def calcular_dados_mensais(ano):
+    """
+    Calcula dados agregados por mês para gráficos
+    
+    CORREÇÃO: Filtra por mes_referencia (campo date) em vez de campos separados
+    
+    Returns:
+        list de dicts com dados de cada mês
+    """
+    meses_data = []
+    mes_atual = date.today().month
+    
+    for mes in range(1, 13):
+        # Só calcular até o mês atual
+        if mes > mes_atual and ano == date.today().year:
+            break
+            
+        # Filtrar comandas do mês usando range de datas
+        data_inicio = date(ano, mes, 1)
+        if mes == 12:
+            data_fim = date(ano, 12, 31)
+        else:
+            data_fim = date(ano, mes + 1, 1) - timedelta(days=1)
+        
+        comandas_mes = Comanda.objects.filter(
+            mes_referencia__gte=data_inicio,
+            mes_referencia__lte=data_fim,
+            is_active=True
+        )
+        
+        # Receita prevista
+        previsto = comandas_mes.aggregate(
+            total=Coalesce(Sum('valor_aluguel_historico'), Decimal('0'))
+        )['total']
+        
+        # Receita realizada (pagas)
+        realizado = comandas_mes.filter(
+            status__in=['PAGO', 'PAID', 'PAGA']
+        ).aggregate(
+            total=Coalesce(Sum('valor_aluguel_historico'), Decimal('0'))
+        )['total']
+        
+        # Inadimplência (atrasadas)
+        atrasadas = comandas_mes.filter(
+            data_vencimento__lt=date.today(),
+            status__in=['PENDENTE', 'PENDING', 'ATRASADO', 'EM_ATRASO', 'OVERDUE']
+        )
+        
+        inadimplencia_valor = atrasadas.aggregate(
+            total=Coalesce(Sum('valor_aluguel_historico'), Decimal('0'))
+        )['total']
+        
+        # Percentual de inadimplência
+        inadimplencia_percentual = (
+            float(inadimplencia_valor / previsto * 100)
+            if previsto > 0 else 0
+        )
+        
+        # Taxa de realização
+        taxa_realizacao = (
+            float(realizado / previsto * 100)
+            if previsto > 0 else 0
+        )
+        
+        # Nome do mês
+        nome_mes = data_inicio.strftime('%b')
+        
+        meses_data.append({
+            'mes': f'{nome_mes}/{str(ano)[2:]}',
+            'previsto': float(previsto),
+            'realizado': float(realizado),
+            'inadimplencia': round(inadimplencia_percentual, 1),
+            'taxa_realizacao': round(taxa_realizacao, 1),
+        })
+    
+    return meses_data
+
+
+def calcular_comparativo_anual(ano_atual):
+    """
+    Calcula comparativo ano atual vs ano anterior
+    """
+    dados = []
+    ano_anterior = ano_atual - 1
+    
+    for mes in range(1, 13):
+        # Ano anterior
+        data_inicio_ant = date(ano_anterior, mes, 1)
+        if mes == 12:
+            data_fim_ant = date(ano_anterior, 12, 31)
+        else:
+            data_fim_ant = date(ano_anterior, mes + 1, 1) - timedelta(days=1)
+        
+        anterior = Comanda.objects.filter(
+            mes_referencia__gte=data_inicio_ant,
+            mes_referencia__lte=data_fim_ant,
+            is_active=True
+        ).aggregate(total=Coalesce(Sum('valor_aluguel_historico'), Decimal('0')))['total']
+        
+        # Ano atual
+        data_inicio_atu = date(ano_atual, mes, 1)
+        if mes == 12:
+            data_fim_atu = date(ano_atual, 12, 31)
+        else:
+            data_fim_atu = date(ano_atual, mes + 1, 1) - timedelta(days=1)
+        
+        atual = Comanda.objects.filter(
+            mes_referencia__gte=data_inicio_atu,
+            mes_referencia__lte=data_fim_atu,
+            is_active=True
+        ).aggregate(total=Coalesce(Sum('valor_aluguel_historico'), Decimal('0')))['total']
+        
+        nome_mes = data_inicio_atu.strftime('%b')
+        
+        dados.append({
+            'mes': nome_mes,
+            'ano_anterior': float(anterior),
+            'ano_atual': float(atual),
+        })
+    
+    return dados
+
+
+def calcular_performance_imoveis(ano):
+    """
+    Calcula performance de cada imóvel (top 5 + outros agregados)
+    
+    CORREÇÃO: Usa valor_aluguel_historico
+    """
+    # Agregar por imóvel
+    imoveis = Imovel.objects.filter(
+        is_active=True,
+        locacao__is_active=True
+    ).annotate(
+        total_previsto=Coalesce(
+            Sum('locacao__comanda__valor_aluguel_historico',
+                filter=Q(locacao__comanda__mes_referencia__year=ano)),
+            Decimal('0')
+        ),
+        total_realizado=Coalesce(
+            Sum('locacao__comanda__valor_aluguel_historico',
+                filter=Q(locacao__comanda__mes_referencia__year=ano,
+                        locacao__comanda__status__in=['PAGO', 'PAID', 'PAGA'])),
+            Decimal('0')
+        )
+    ).order_by('-total_previsto')[:10]
+    
+    imoveis_performance = []
+    
+    for imovel in imoveis:
+        previsto = float(imovel.total_previsto)
+        realizado = float(imovel.total_realizado)
+        taxa = (realizado / previsto * 100) if previsto > 0 else 0
+        
+        imoveis_performance.append({
+            'nome': f"{imovel.endereco}, {imovel.numero}",
+            'previsto': previsto,
+            'realizado': realizado,
+            'taxa': round(taxa, 1)
+        })
+    
+    return imoveis_performance
+
+
+def calcular_projecao(dados_mensais):
+    """
+    Calcula projeção linear para próximos 3 meses
+    Usa os últimos 6 meses como base
+    """
+    if len(dados_mensais) < 6:
+        return None
+    
+    # Pegar últimos 6 meses
+    ultimos_6 = dados_mensais[-6:]
+    valores = [m['realizado'] for m in ultimos_6]
+    
+    # Calcular tendência (média simples de crescimento)
+    if len(valores) >= 2:
+        crescimento_medio = (valores[-1] - valores[0]) / len(valores)
+    else:
+        crescimento_medio = 0
+    
+    # Projetar próximos 3 meses
+    projecao = []
+    ultimo_valor = valores[-1]
+    
+    for i in range(1, 4):
+        valor_projetado = ultimo_valor + (crescimento_medio * i)
+        projecao.append({
+            'mes': f'Projeção +{i}',
+            'previsto': round(valor_projetado * 1.02, 2),
+            'estimado': round(max(0, valor_projetado), 2)
+        })
+    
+    return projecao
+
+
+def gerar_alertas(kpis, dados_mensais):
+    """
+    Gera alertas baseados em KPIs e tendências
+    
+    Returns:
+        list de dicts com alertas
+    """
+    alertas = []
+    
+    # Alerta 1: Inadimplência acima da meta (3%)
+    if kpis['inadimplencia_percentual'] > 3:
+        alertas.append({
+            'tipo': 'warning',
+            'titulo': '⚠️ Inadimplência acima da meta',
+            'mensagem': f"Inadimplência atual: {kpis['inadimplencia_percentual']}% (Meta: 3%). "
+                       f"Total de {kpis['inadimplencia_qtd']} comandas atrasadas.",
+            'acao': 'Ver comandas atrasadas',
+            'link': '/admin/core/comanda/?status__in=ATRASADO,EM_ATRASO,OVERDUE'
+        })
+    
+    # Alerta 2: Taxa de realização baixa (<90%)
+    if kpis['taxa_realizacao'] < 90:
+        alertas.append({
+            'tipo': 'warning',
+            'titulo': '📉 Taxa de realização abaixo do esperado',
+            'mensagem': f"Apenas {kpis['taxa_realizacao']}% da receita prevista foi realizada.",
+            'acao': 'Ver pendências',
+            'link': '/admin/core/comanda/?status__in=PENDENTE,PENDING'
+        })
+    
+    # Alerta 3: Taxa de ocupação baixa (<85%)
+    if kpis['taxa_ocupacao'] < 85:
+        alertas.append({
+            'tipo': 'warning',
+            'titulo': '🏠 Taxa de ocupação baixa',
+            'mensagem': f"Apenas {kpis['imoveis_ocupados']} de {kpis['total_imoveis']} imóveis estão ocupados ({kpis['taxa_ocupacao']}%).",
+            'acao': 'Ver imóveis disponíveis',
+            'link': '/admin/core/imovel/'
+        })
+    
+    return alertas
+
+
+@login_required
+@require_http_methods(["GET"])
+def exportar_dashboard_excel(request):
+    """
+    Exporta dashboard completo para Excel
+    """
+    from openpyxl import Workbook
+    from openpyxl.styles import Font, PatternFill, Alignment
+    from io import BytesIO
+    
+    # Calcular dados
+    ano_atual = date.today().year
+    queryset = Comanda.objects.filter(
+        mes_referencia__year=ano_atual,
+        is_active=True
+    )
+    
+    kpis = calcular_kpis(queryset, date.today())
+    dados_mensais = calcular_dados_mensais(ano_atual)
+    
+    # Criar workbook
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Dashboard Financeiro"
+    
+    # Header
+    ws['A1'] = 'HABITAT PRO - Dashboard Financeiro'
+    ws['A1'].font = Font(size=16, bold=True)
+    ws.merge_cells('A1:D1')
+    
+    # KPIs
+    ws['A3'] = 'KPIs Principais'
+    ws['A3'].font = Font(bold=True, size=14)
+    
+    row = 4
+    for label, valor in [
+        ('Receita Prevista', f"R$ {kpis['receita_prevista']:,.2f}"),
+        ('Receita Realizada', f"R$ {kpis['receita_realizada']:,.2f}"),
+        ('Taxa de Realização', f"{kpis['taxa_realizacao']}%"),
+        ('Taxa de Inadimplência', f"{kpis['inadimplencia_percentual']}%"),
+        ('Taxa de Ocupação', f"{kpis['taxa_ocupacao']}%"),
+    ]:
+        ws[f'A{row}'] = label
+        ws[f'B{row}'] = valor
+        row += 1
+    
+    # Salvar
+    output = BytesIO()
+    wb.save(output)
+    output.seek(0)
+    
+    response = HttpResponse(
+        output.read(),
+        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+    response['Content-Disposition'] = f'attachment; filename=dashboard_financeiro_{ano_atual}.xlsx'
+    
+    return response
+
+
+@login_required
+@require_http_methods(["GET"])
+def exportar_dashboard_pdf(request):
+    """
+    Exporta dashboard completo para PDF
+    """
+    return HttpResponse("Funcionalidade de PDF em desenvolvimento", content_type="text/plain")
+
+
+@login_required
+@require_http_methods(["POST"])
+def enviar_relatorio_email(request):
+    """
+    Envia relatório completo por email
+    """
+    from django.core.mail import EmailMessage
+    
+    # Validar email
+    destinatario = request.POST.get('email', '').strip()
+    if not destinatario:
+        return JsonResponse({
+            'success': False,
+            'mensagem': 'Email não informado'
+        }, status=400)
+    
+    # Calcular dados
+    ano_atual = date.today().year
+    queryset = Comanda.objects.filter(
+        mes_referencia__year=ano_atual,
+        is_active=True
+    )
+    
+    kpis = calcular_kpis(queryset, date.today())
+    
+    try:
+        # Criar email
+        email = EmailMessage(
+            subject=f'HABITAT PRO - Relatório Financeiro {ano_atual}',
+            body=f'''Olá,
+
+Segue resumo do relatório financeiro do HABITAT PRO referente ao ano de {ano_atual}.
+
+Principais indicadores:
+- Receita Prevista: R$ {kpis['receita_prevista']:,.2f}
+- Receita Realizada: R$ {kpis['receita_realizada']:,.2f}
+- Taxa de Realização: {kpis['taxa_realizacao']}%
+- Inadimplência: {kpis['inadimplencia_percentual']}%
+- Taxa de Ocupação: {kpis['taxa_ocupacao']}%
+
+Atenciosamente,
+Sistema HABITAT PRO
+''',
+            to=[destinatario]
+        )
+        
+        # Enviar
+        email.send()
+        
+        return JsonResponse({
+            'success': True,
+            'mensagem': f'Email enviado com sucesso para {destinatario}!'
+        })
+        
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'mensagem': f'Erro ao enviar email: {str(e)}'
+        }, status=500)
