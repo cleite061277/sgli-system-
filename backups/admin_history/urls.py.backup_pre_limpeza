@@ -1,7 +1,0 @@
-"""
-URLs do core - APENAS rotas específicas (admin vai em sgli_project/urls.py)
-"""
-from django.urls import path
-
-# Por enquanto vazio - todas URLs estão em sgli_project/urls.py
-urlpatterns = []

@@ -1570,4 +1570,4 @@ class FiadorAdmin(admin.ModelAdmin):
 
 # Override Dashboard
 from .dashboard_views import admin_index
-admin.site.index = admin_index
+# admin.site.index = admin_index  # COMENTADO - Dashboard isolado

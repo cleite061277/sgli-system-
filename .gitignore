@@ -81,3 +81,25 @@ fix_*.sh
 # Reorganização profissional
 backup_*/
 reorganizacao_*.log
+
+# Backups do dashboard
+backups/
+*.backup
+*.backup_*
+*_backup_*
+*.bak
+
+# Arquivos temporários Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Logs
+*.log
+
+# SQLite (se houver)
+*.sqlite3
+db.sqlite3
+
