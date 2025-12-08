@@ -286,7 +286,7 @@ class LocacaoAdmin(admin.ModelAdmin):
         'locatario__nome_razao_social',
     ]
     
-    readonly_fields = ['created_at', 'updated_at']
+    readonly_fields = ['created_at', 'updated_at', 'numero_contrato', 'caucao_valor_total']
     
     actions = ['gerar_contrato_pdf_action', 'gerar_contrato_docx_action']
     
@@ -312,6 +312,26 @@ class LocacaoAdmin(admin.ModelAdmin):
                 'dia_vencimento',
             )
         }),
+        # ✅ NOVO DEV_20: Seção de Garantias
+        ('🛡️ Garantias de Contrato', {
+            'fields': (
+                'tipo_garantia',
+                'fiador_garantia',
+                'caucao_quantidade_meses',
+                'caucao_valor_total',
+                'seguro_apolice',
+                'seguro_seguradora',
+            ),
+            'description': '''
+                <div style="background: #e3f2fd; padding: 10px; border-left: 4px solid #2196f3; margin-bottom: 10px;">
+                    <strong>📌 Instruções:</strong><br>
+                    1. Selecione o <strong>Tipo de Garantia</strong><br>
+                    2. Preencha APENAS os campos correspondentes ao tipo selecionado<br>
+                    3. Campos não preenchidos serão "NÃO INFORMADO" no contrato
+                </div>
+            ''',
+            'classes': ['collapse'],
+        }),
         ('🕐 Metadados', {
             'fields': (
                 'created_at',
@@ -323,12 +343,43 @@ class LocacaoAdmin(admin.ModelAdmin):
     )
     
     def get_form(self, request, obj=None, **kwargs):
-        """Remove required do numero_contrato"""
+        """
+        Remove required do numero_contrato e configura campos de garantia.
+        ✅ NOVO DEV_20: Configurações dos campos de garantia
+        """
         form = super().get_form(request, obj, **kwargs)
+        
+        # Configuração do numero_contrato (já existente)
         if 'numero_contrato' in form.base_fields:
             form.base_fields['numero_contrato'].required = False
             form.base_fields['numero_contrato'].help_text = '✨ Deixe vazio para gerar automaticamente'
+        
+        # ✅ NOVO DEV_20: Configurações dos campos de garantia
+        if 'fiador_garantia' in form.base_fields:
+            form.base_fields['fiador_garantia'].required = False
+            form.base_fields['fiador_garantia'].help_text = '✅ Necessário apenas se Tipo = Fiador'
+        
+        if 'caucao_quantidade_meses' in form.base_fields:
+            form.base_fields['caucao_quantidade_meses'].required = False
+            form.base_fields['caucao_quantidade_meses'].help_text = '✅ Necessário apenas se Tipo = Caução'
+        
+        if 'caucao_valor_total' in form.base_fields:
+            form.base_fields['caucao_valor_total'].required = False
+            form.base_fields['caucao_valor_total'].help_text = '🔄 Calculado automaticamente'
+        
+        if 'seguro_apolice' in form.base_fields:
+            form.base_fields['seguro_apolice'].required = False
+            form.base_fields['seguro_apolice'].help_text = '✅ Necessário apenas se Tipo = Seguro'
+        
+        if 'seguro_seguradora' in form.base_fields:
+            form.base_fields['seguro_seguradora'].required = False
+            form.base_fields['seguro_seguradora'].help_text = '✅ Nome da seguradora'
+        
         return form
+    
+    # ✅ NOVO DEV_20: Incluir JavaScript customizado
+    class Media:
+        js = ('admin/js/garantias_dinamicas.js',)
 
     def change_view(self, request, object_id, form_url='', extra_context=None):
         """Adiciona botões de gerar contrato."""
@@ -438,13 +489,6 @@ class LocacaoAdmin(admin.ModelAdmin):
     list_display = ('numero_contrato', 'imovel', 'locatario', 'status', 'data_inicio', 'data_fim', 'alerta_vencimento')
     list_filter = ('status', 'is_active', 'created_at')
     search_fields = ('numero_contrato', 'imovel__codigo_imovel', 'locatario__nome_razao_social')
-
-    def get_form(self, request, obj=None, **kwargs):
-        """Remove required do numero_contrato para permitir geração automática"""
-        form = super().get_form(request, obj, **kwargs)
-        if 'numero_contrato' in form.base_fields:
-            form.base_fields['numero_contrato'].required = False
-        return form
 
 """
 Admin melhorado para o modelo Comanda

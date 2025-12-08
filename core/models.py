@@ -736,6 +736,11 @@ class Locacao(BaseModel):
     
     def save(self, *args, **kwargs):
         """Gera numero_contrato sequencial único se não existir."""
+        
+        # ✅ NOVO DEV_20: Calcular valor da caução automaticamente
+        if self.tipo_garantia == 'caucao' and self.caucao_quantidade_meses:
+            self.caucao_valor_total = self.calcular_valor_caucao()
+        
         if not self.numero_contrato:
             from django.utils import timezone
             import re
@@ -826,6 +831,67 @@ class Locacao(BaseModel):
         help_text=_('Dia do mês para vencimento da comanda (1-31)')
     )
     
+    # ========================================
+    # GARANTIAS DE CONTRATO - ✅ NOVO DEV_20
+    # ========================================
+    
+    TIPO_GARANTIA_CHOICES = [
+        ('fiador', 'Fiador'),
+        ('caucao', 'Caução'),
+        ('seguro', 'Seguro Garantia'),
+        ('nenhuma', 'Sem Garantia'),
+    ]
+    
+    tipo_garantia = models.CharField(
+        max_length=20,
+        choices=TIPO_GARANTIA_CHOICES,
+        default='nenhuma',
+        verbose_name=_('Tipo de Garantia'),
+        help_text=_('Tipo de garantia exigida para este contrato')
+    )
+    
+    fiador_garantia = models.ForeignKey(
+        'Fiador',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='locacoes_garantidas',
+        verbose_name=_('Fiador (Garantia)'),
+        help_text=_('Fiador responsável pela garantia deste contrato')
+    )
+    
+    caucao_quantidade_meses = models.IntegerField(
+        null=True,
+        blank=True,
+        validators=[MinValueValidator(1), MaxValueValidator(12)],
+        verbose_name=_('Caução (Quantidade de Meses)'),
+        help_text=_('Quantidade de aluguéis como caução (1-12)')
+    )
+    
+    caucao_valor_total = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        validators=[MinValueValidator(Decimal('0.01'))],
+        verbose_name=_('Caução (Valor Total)'),
+        help_text=_('Valor total da caução (calculado automaticamente)')
+    )
+    
+    seguro_apolice = models.CharField(
+        max_length=100,
+        blank=True,
+        verbose_name=_('Seguro Garantia (Nº Apólice)'),
+        help_text=_('Número da apólice do seguro garantia (máx. 100 caracteres)')
+    )
+    
+    seguro_seguradora = models.CharField(
+        max_length=200,
+        blank=True,
+        verbose_name=_('Seguro Garantia (Seguradora)'),
+        help_text=_('Nome da seguradora')
+    )
+    
     def __str__(self) -> str:
         return f"Contrato {self.numero_contrato} - {self.locatario.nome_razao_social}"
     
@@ -872,6 +938,61 @@ class Locacao(BaseModel):
             return '🟡 Atenção'
         else:
             return '🟢 Normal'
+    
+    # ========================================
+    # MÉTODOS DE GARANTIA - ✅ NOVO DEV_20
+    # ========================================
+    
+    def calcular_valor_caucao(self):
+        """Calcula valor total da caução baseado na quantidade de meses."""
+        if self.tipo_garantia == 'caucao' and self.caucao_quantidade_meses:
+            return self.valor_aluguel * self.caucao_quantidade_meses
+        return Decimal('0.00')
+    
+    def get_garantia_para_template(self):
+        """Retorna dicionário com variáveis de garantia para substituição em templates."""
+        garantia_vars = {
+            'tipo_garantia': self.get_tipo_garantia_display(),
+            'fiador_nome': 'NÃO INFORMADO',
+            'fiador_cpf': 'NÃO INFORMADO',
+            'fiador_endereco': 'NÃO INFORMADO',
+            'fiador_telefone': 'NÃO INFORMADO',
+            'fiador_email': 'NÃO INFORMADO',
+            'fiador_profissao': 'NÃO INFORMADO',
+            'fiador_renda': 'NÃO INFORMADO',
+            'caucao_meses': 'NÃO INFORMADO',
+            'caucao_valor': 'NÃO INFORMADO',
+            'seguro_apolice': 'NÃO INFORMADO',
+            'seguro_seguradora': 'NÃO INFORMADO',
+        }
+        
+        if self.tipo_garantia == 'fiador' and self.fiador_garantia:
+            fiador = self.fiador_garantia
+            garantia_vars.update({
+                'fiador_nome': fiador.nome,
+                'fiador_cpf': fiador.cpf_cnpj,
+                'fiador_endereco': fiador.endereco,
+                'fiador_telefone': fiador.telefone,
+                'fiador_email': fiador.email,
+                'fiador_profissao': getattr(fiador, 'profissao', 'NÃO INFORMADO'),
+                'fiador_renda': f"R$ {fiador.renda_mensal:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.') if hasattr(fiador, 'renda_mensal') and fiador.renda_mensal else 'NÃO INFORMADO',
+            })
+        
+        elif self.tipo_garantia == 'caucao':
+            if self.caucao_quantidade_meses:
+                garantia_vars['caucao_meses'] = str(self.caucao_quantidade_meses)
+            
+            valor_caucao = self.caucao_valor_total or self.calcular_valor_caucao()
+            if valor_caucao > 0:
+                garantia_vars['caucao_valor'] = f"R$ {valor_caucao:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.')
+        
+        elif self.tipo_garantia == 'seguro':
+            if self.seguro_apolice:
+                garantia_vars['seguro_apolice'] = self.seguro_apolice
+            if self.seguro_seguradora:
+                garantia_vars['seguro_seguradora'] = self.seguro_seguradora
+        
+        return garantia_vars
 
 
     class Meta:

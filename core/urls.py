@@ -1,5 +1,6 @@
 """
-URLs do core - VERSÃO LIMPA
+URLs do core - VERSÃO DEV_20
+Adicionado: Rotas do Dashboard Financeiro
 """
 from django.urls import path
 from django.contrib import admin
@@ -9,6 +10,14 @@ from .views import (
     enviar_comanda_email,
     download_recibo_pagamento,
     pagina_recibo_pagamento,
+)
+
+# ✅ NOVO DEV_20: Import das views do dashboard
+from .dashboard_views import (
+    dashboard_financeiro,
+    exportar_dashboard_excel,
+    exportar_dashboard_pdf,
+    enviar_relatorio_email
 )
 
 ###from .views_whatsapp import (
@@ -37,4 +46,21 @@ urlpatterns = [
     path('pagamento/<uuid:pagamento_id>/recibo/download/', 
          download_recibo_pagamento, 
          name='download_recibo_pagamento'),
+    
+    # ✅ NOVO DEV_20: Dashboard Financeiro
+    path('dashboard/financeiro/', 
+         admin.site.admin_view(dashboard_financeiro), 
+         name='dashboard_financeiro'),
+    
+    path('dashboard/financeiro/excel/', 
+         admin.site.admin_view(exportar_dashboard_excel), 
+         name='exportar_dashboard_excel'),
+    
+    path('dashboard/financeiro/pdf/', 
+         admin.site.admin_view(exportar_dashboard_pdf), 
+         name='exportar_dashboard_pdf'),
+    
+    path('dashboard/financeiro/email/', 
+         admin.site.admin_view(enviar_relatorio_email), 
+         name='enviar_relatorio_email'),
 ]

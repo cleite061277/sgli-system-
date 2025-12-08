@@ -515,7 +515,18 @@ VALORES:
 TOTAL: R$ {comanda.valor_total:,.2f}
 {obs_status}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+'''
+        
+        # ✅ NOVO DEV_20: Campo Comentários (Observações)
+        if comanda.observacoes and comanda.observacoes.strip():
+            corpo += f'''
+📝 COMENTÁRIOS:
+{comanda.observacoes.strip()}
 
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+'''
+        
+        corpo += f'''
 🔗 Ver comanda completa:
 {url}
 

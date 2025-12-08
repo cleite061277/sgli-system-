@@ -103,3 +103,12 @@ __pycache__/
 *.sqlite3
 db.sqlite3
 
+
+# Arquivos de backup
+*.BAK
+*.backup_*
+
+# Arquivos temporários de análise
+analise_codigo.txt
+relatorio_auditoria.txt
+core/static/admin/js/

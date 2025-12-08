@@ -66,9 +66,7 @@ urlpatterns = [
     path('', home_view, name='home'),
     
     # === WHATSAPP ===
-    path('dashboard/', include('core.dashboard.urls')),
 #    path('admin/whatsapp/', painel_whatsapp, name='painel_whatsapp'),
-    path('dashboard/', include('core.dashboard.urls')),
 #    path('admin/whatsapp/api/mensagem/<uuid:comanda_id>/', 
          #         gerar_mensagem_whatsapp, 
 #         name='api_mensagem_comanda'),
@@ -121,7 +119,7 @@ urlpatterns = [
          name='password_reset_complete'),
     
     # === ADMIN (UMA VEZ, NO FINAL) ===
-    path('dashboard/', include('core.dashboard.urls')),
+    # LEGADO - Desativado DEV_20:     path('dashboard/', include('core.dashboard.urls')),
     path('admin/', admin.site.urls),
     path('', include('core.urls')),
 ]
