@@ -286,3 +286,31 @@ if os.environ.get('SENDGRID_API_KEY'):
 # ================================================================
 APSCHEDULER_DATETIME_FORMAT = "N j, Y, f:s a"
 APSCHEDULER_RUN_NOW_TIMEOUT = 25
+
+# ==========================================
+# CONFIGURAÇÃO DE MEDIA FILES
+# ==========================================
+
+import os
+
+# Detectar ambiente
+IS_RAILWAY = os.environ.get('RAILWAY_ENVIRONMENT') is not None
+
+if IS_RAILWAY:
+    # PRODUÇÃO (Railway): Usar volume persistente
+    MEDIA_ROOT = '/data/media'
+    MEDIA_URL = '/media/'
+    
+    # Criar diretórios se não existirem
+    import pathlib
+    pathlib.Path(MEDIA_ROOT).mkdir(parents=True, exist_ok=True)
+    pathlib.Path(os.path.join(MEDIA_ROOT, 'templates_contratos')).mkdir(parents=True, exist_ok=True)
+    pathlib.Path(os.path.join(MEDIA_ROOT, 'contratos_gerados')).mkdir(parents=True, exist_ok=True)
+else:
+    # DESENVOLVIMENTO (Local): Usar pasta local
+    MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+    MEDIA_URL = '/media/'
+
+# Configurar uploads
+FILE_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10MB
+DATA_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10MB
