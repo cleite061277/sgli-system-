@@ -99,11 +99,15 @@ def buscar_template_contrato(locacao):
 
 
 def preparar_contexto_contrato(locacao):
-    """Prepara o contexto com todas as variáveis do contrato."""
+    """
+    Prepara o contexto com todas as variáveis do contrato.
+    ✅ CORRIGIDO DEV_20: Adiciona variáveis de garantia (tipo_garantia, caução, seguro, fiador_garantia)
+    """
     locador = locacao.imovel.locador
     locatario = locacao.locatario
     imovel = locacao.imovel
-    fiador = locatario.fiador
+    # ✅ CORREÇÃO: Pegar fiador da LOCAÇÃO (garantia), não do locatário
+    fiador = locacao.fiador_garantia
     
     contexto = {
         # LOCADOR
@@ -111,6 +115,7 @@ def preparar_contexto_contrato(locacao):
         'locador_endereco_completo': locador.endereco_completo or 'Não informado',
         'locador_cep': locador.cep or 'Não informado',
         'locador_representante': locador.representante or locador.nome_razao_social or 'Não informado',
+        'Locador_Representante': locador.representante or locador.nome_razao_social or 'Não informado',  # Case alternativo
         
         # LOCATÁRIO
         'locatario_nome': locatario.nome_razao_social or 'Não informado',
@@ -124,14 +129,17 @@ def preparar_contexto_contrato(locacao):
         'locatario_fiador': fiador.nome_completo if fiador else 'Não possui fiador',
         
         # FIADOR - Dados Essenciais
-        'fiador_nome': fiador.nome_completo if fiador else 'Não possui fiador',
-        'fiador_cpf': formatar_cpf_cnpj(fiador.cpf) if fiador and fiador.cpf else 'Não informado',
-        'fiador_rg': fiador.rg if fiador and fiador.rg else 'Não informado',
-        'fiador_data_nascimento': formatar_data(fiador.data_nascimento) if fiador and fiador.data_nascimento else 'Não informado',
-        'fiador_telefone': fiador.telefone if fiador and fiador.telefone else 'Não informado',
-        'fiador_email': fiador.email if fiador and fiador.email else 'Não informado',
-        'fiador_endereco_completo': fiador.endereco_completo if fiador and fiador.endereco_completo else 'Não informado',
-        'fiador_cep': fiador.cep if fiador and fiador.cep else 'Não informado',
+        'fiador_nome': fiador.nome_completo if fiador else '',
+        'fiador_cpf': formatar_cpf_cnpj(fiador.cpf) if fiador and fiador.cpf else '',
+        'fiador_rg': fiador.rg if fiador and fiador.rg else '',
+        'fiador_data_nascimento': formatar_data(fiador.data_nascimento) if fiador and fiador.data_nascimento else '',
+        'fiador_telefone': fiador.telefone if fiador and fiador.telefone else '',
+        'fiador_email': fiador.email if fiador and fiador.email else '',
+        'fiador_endereco_completo': fiador.endereco_completo if fiador and fiador.endereco_completo else '',
+        'fiador_cep': fiador.cep if fiador and fiador.cep else '',
+        # ✅ NOVO DEV_20: Campos adicionais do fiador
+        'fiador_profissao': '',  # Campo não existe no modelo
+        'fiador_endereco': fiador.endereco_completo if fiador and fiador.endereco_completo else '',
         
         # IMÓVEL - Endereço
         'imovel_endereco': imovel.endereco or 'Não informado',
@@ -151,6 +159,19 @@ def preparar_contexto_contrato(locacao):
         'valor_aluguel': formatar_moeda(locacao.valor_aluguel),
         'locacao_data_inicio': formatar_data(locacao.data_inicio),
         'numero_contrato': locacao.numero_contrato or 'Não gerado',
+        
+        # ========================================
+        # ✅ NOVO DEV_20: GARANTIAS
+        # ========================================
+        'tipo_garantia': dict(locacao.TIPO_GARANTIA_CHOICES).get(locacao.tipo_garantia, 'Não informado'),
+        
+        # Caução
+        'caucao_meses': str(locacao.caucao_quantidade_meses) if locacao.caucao_quantidade_meses else '',
+        'caucao_valor': formatar_moeda(locacao.caucao_valor_total) if locacao.caucao_valor_total else '',
+        
+        # Seguro
+        'seguro_apolice': locacao.seguro_apolice or '',
+        'seguro_seguradora': locacao.seguro_seguradora or '',
         
         # Extras
         'data_hoje': datetime.now().strftime('%d/%m/%Y'),
