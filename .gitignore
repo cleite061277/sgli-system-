@@ -112,3 +112,8 @@ db.sqlite3
 analise_codigo.txt
 relatorio_auditoria.txt
 core/static/admin/js/
+
+# Backups locais
+backups/
+*.backup
+*_backup_*
