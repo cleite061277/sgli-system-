@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resposta Registrada - HABITAT PRO</title>
+    {% include 'renovacao/base_style.html' %}
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏠 HABITAT PRO</h1>
+            <p>Renovação de Contrato</p>
+        </div>
+        
+        <div class="content">
+            <div class="success-icon">✅</div>
+            
+            <div class="message-box">
+                <h2 style="margin-bottom: 20px; color: #28a745;">
+                    {% if tipo == 'proprietario' %}
+                        Aprovação Registrada com Sucesso!
+                    {% else %}
+                        Aceitação Registrada com Sucesso!
+                    {% endif %}
+                </h2>
+                
+                <p style="color: #666; line-height: 1.6;">
+                    {% if tipo == 'proprietario' %}
+                        Sua aprovação foi registrada no sistema.<br>
+                        O locatário será notificado em breve sobre a proposta de renovação.
+                    {% else %}
+                        Sua aceitação foi registrada no sistema.<br>
+                        Em breve você receberá o novo contrato para assinatura.
+                    {% endif %}
+                </p>
+                
+                <div style="background: #d4edda; border-left: 4px solid #28a745; 
+                            padding: 15px; margin: 30px 0; border-radius: 4px;">
+                    <strong>📋 Próximos Passos:</strong><br>
+                    {% if tipo == 'proprietario' %}
+                        • Aguardar resposta do locatário<br>
+                        • Você receberá um email assim que o locatário responder<br>
+                        • Se aprovado por ambas as partes, o contrato será gerado
+                    {% else %}
+                        • Aguardar geração do novo contrato<br>
+                        • Você receberá o contrato por email<br>
+                        • Realize a assinatura conforme orientações
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            Obrigado por usar o HABITAT PRO!<br>
+            Em caso de dúvidas, entre em contato através do sistema.</div>
+    </div>
+</body>
+</html>

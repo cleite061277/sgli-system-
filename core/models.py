@@ -901,7 +901,7 @@ class Locacao(BaseModel):
         return cls.objects.filter(status=cls.StatusLocacao.ATIVA).count()
     
     @classmethod
-    def get_contratos_vencendo(cls, dias=60):
+    def get_contratos_vencendo(cls, dias=90):
         """Retorna contratos que vencem em X dias."""
         from django.utils import timezone
         from datetime import timedelta
@@ -1951,4 +1951,384 @@ def atualizar_status_comanda(sender, instance, **kwargs):
     
     # Salvar alterações
     comanda.save(update_fields=['status', 'data_pagamento', 'updated_at'])
+
+# ════════════════════════════════════════════════════════════════════════════
+# MODELO DE RENOVAÇÃO DE CONTRATOS - DEV_21
+# ════════════════════════════════════════════════════════════════════════════
+
+class RenovacaoContrato(BaseModel):
+    """
+    Modelo para gerenciar renovações de contratos de locação.
+    Mantém histórico completo do processo de renovação com rastreabilidade.
+    """
+    
+    # ========================================
+    # VÍNCULO COM LOCAÇÃO ORIGINAL
+    # ========================================
+    
+    locacao_original = models.ForeignKey(
+        'Locacao',
+        on_delete=models.CASCADE,
+        related_name='propostas_renovacao',
+        verbose_name=_('Locação Original'),
+        help_text=_('Contrato que está sendo renovado')
+    )
+    
+    # ========================================
+    # PROPOSTA DE RENOVAÇÃO
+    # ========================================
+    
+    nova_data_inicio = models.DateField(
+        verbose_name=_('Nova Data de Início'),
+        help_text=_('Início da nova vigência')
+    )
+    
+    nova_data_fim = models.DateField(
+        verbose_name=_('Nova Data de Fim'),
+        help_text=_('Fim da nova vigência')
+    )
+    
+    novo_valor_aluguel = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        validators=[MinValueValidator(Decimal('0.01'))],
+        verbose_name=_('Novo Valor do Aluguel'),
+        help_text=_('Valor mensal proposto para o novo contrato')
+    )
+    
+    nova_duracao_meses = models.IntegerField(
+        default=12,
+        validators=[MinValueValidator(1), MaxValueValidator(60)],
+        verbose_name=_('Duração (meses)'),
+        help_text=_('Duração da nova vigência em meses')
+    )
+    
+    # ========================================
+    # GARANTIAS DA RENOVAÇÃO
+    # ========================================
+    
+    TIPO_GARANTIA_CHOICES = [
+        ('fiador', 'Fiador'),
+        ('caucao', 'Caução'),
+        ('seguro', 'Seguro Garantia'),
+        ('nenhuma', 'Sem Garantia'),
+    ]
+    
+    novo_tipo_garantia = models.CharField(
+        max_length=20,
+        choices=TIPO_GARANTIA_CHOICES,
+        default='nenhuma',
+        verbose_name=_('Tipo de Garantia (Novo Contrato)'),
+        help_text=_('Tipo de garantia para o contrato renovado')
+    )
+    
+    novo_fiador = models.ForeignKey(
+        'Fiador',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='renovacoes_como_fiador',
+        verbose_name=_('Novo Fiador'),
+        help_text=_('Fiador para o contrato renovado (se aplicável)')
+    )
+    
+    nova_caucao_meses = models.IntegerField(
+        null=True,
+        blank=True,
+        validators=[MinValueValidator(1), MaxValueValidator(12)],
+        verbose_name=_('Nova Caução (quantidade de meses)'),
+        help_text=_('Quantidade de meses de aluguel como caução')
+    )
+    
+    nova_caucao_valor = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        validators=[MinValueValidator(Decimal('0.01'))],
+        verbose_name=_('Nova Caução (valor total)'),
+        help_text=_('Valor total da caução (calculado automaticamente)')
+    )
+    
+    nova_seguro_apolice = models.CharField(
+        max_length=100,
+        blank=True,
+        verbose_name=_('Nova Apólice de Seguro'),
+        help_text=_('Número da apólice do seguro garantia')
+    )
+    
+    # ========================================
+    # CONTROLE DE STATUS E WORKFLOW
+    # ========================================
+    
+    STATUS_CHOICES = [
+        ('rascunho', 'Rascunho'),
+        ('pendente_proprietario', 'Aguardando Proprietário'),
+        ('pendente_locatario', 'Aguardando Locatário'),
+        ('aprovada', 'Aprovada - Aguardando Vigência'),
+        ('ativa', 'Ativa (Novo Contrato Gerado)'),
+        ('recusada', 'Recusada'),
+        ('cancelada', 'Cancelada'),
+    ]
+    
+    status = models.CharField(
+        max_length=30,
+        choices=STATUS_CHOICES,
+        default='rascunho',
+        verbose_name=_('Status'),
+        help_text=_('Status atual do processo de renovação')
+    )
+    
+    data_proposta = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name=_('Data da Proposta'),
+        help_text=_('Quando a proposta foi criada')
+    )
+    
+    # ========================================
+    # APROVAÇÕES - PROPRIETÁRIO
+    # ========================================
+    
+    proprietario_aprovou = models.BooleanField(
+        null=True,
+        blank=True,
+        verbose_name=_('Proprietário Aprovou?'),
+        help_text=_('True=Aprovado, False=Rejeitado, None=Pendente')
+    )
+    
+    data_aprovacao_proprietario = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name=_('Data Aprovação Proprietário')
+    )
+    
+    ip_aprovacao_proprietario = models.GenericIPAddressField(
+        null=True,
+        blank=True,
+        verbose_name=_('IP Aprovação Proprietário'),
+        help_text=_('Endereço IP de onde a aprovação foi feita')
+    )
+    
+    token_proprietario = models.UUIDField(
+        default=uuid.uuid4,
+        editable=False,
+        unique=True,
+        verbose_name=_('Token Proprietário'),
+        help_text=_('Token único para link de aprovação do proprietário')
+    )
+    
+    # ========================================
+    # APROVAÇÕES - LOCATÁRIO
+    # ========================================
+    
+    locatario_aprovou = models.BooleanField(
+        null=True,
+        blank=True,
+        verbose_name=_('Locatário Aprovou?'),
+        help_text=_('True=Aprovado, False=Rejeitado, None=Pendente')
+    )
+    
+    data_aprovacao_locatario = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name=_('Data Aprovação Locatário')
+    )
+    
+    ip_aprovacao_locatario = models.GenericIPAddressField(
+        null=True,
+        blank=True,
+        verbose_name=_('IP Aprovação Locatário'),
+        help_text=_('Endereço IP de onde a aprovação foi feita')
+    )
+    
+    token_locatario = models.UUIDField(
+        default=uuid.uuid4,
+        editable=False,
+        unique=True,
+        verbose_name=_('Token Locatário'),
+        help_text=_('Token único para link de aprovação do locatário')
+    )
+    
+    # ========================================
+    # APROVAÇÃO MANUAL (PLANO B - SEM INTERNET)
+    # ========================================
+    
+    aprovacao_manual_proprietario = models.BooleanField(
+        default=False,
+        verbose_name=_('✋ Aprovação Manual Proprietário'),
+        help_text=_('Marcado quando aprovação feita por telefone/presencial')
+    )
+    
+    aprovacao_manual_locatario = models.BooleanField(
+        default=False,
+        verbose_name=_('✋ Aprovação Manual Locatário'),
+        help_text=_('Marcado quando aprovação feita por telefone/presencial')
+    )
+    
+    motivo_aprovacao_manual = models.TextField(
+        blank=True,
+        verbose_name=_('Motivo Aprovação Manual'),
+        help_text=_('Justificativa para aprovação manual (ex: sem internet)')
+    )
+    
+    # ========================================
+    # NOVO CONTRATO GERADO
+    # ========================================
+    
+    nova_locacao = models.OneToOneField(
+        'Locacao',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='origem_renovacao',
+        verbose_name=_('Nova Locação Gerada'),
+        help_text=_('Locação criada após aprovação da renovação')
+    )
+    
+    contrato_gerado = models.FileField(
+        upload_to='contratos/renovacoes/',
+        null=True,
+        blank=True,
+        verbose_name=_('Contrato Gerado (DOCX/PDF)'),
+        help_text=_('Arquivo do novo contrato gerado')
+    )
+    
+    data_geracao_contrato = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name=_('Data Geração Contrato')
+    )
+    
+    # ========================================
+    # OBSERVAÇÕES E AUDITORIA
+    # ========================================
+    
+    observacoes = models.TextField(
+        blank=True,
+        verbose_name=_('Observações'),
+        help_text=_('Notas sobre o processo de renovação')
+    )
+    
+    motivo_recusa = models.TextField(
+        blank=True,
+        verbose_name=_('Motivo da Recusa'),
+        help_text=_('Se recusada, explicar o motivo')
+    )
+    
+    historico_comunicacoes = models.JSONField(
+        default=dict,
+        blank=True,
+        verbose_name=_('Histórico de Comunicações'),
+        help_text=_('Log de emails/WhatsApp enviados')
+    )
+    
+    class Meta:
+        verbose_name = _('Renovação de Contrato')
+        verbose_name_plural = _('Renovações de Contratos')
+        ordering = ['-data_proposta']
+        indexes = [
+            models.Index(fields=['status']),
+            models.Index(fields=['locacao_original', 'status']),
+            models.Index(fields=['data_proposta']),
+        ]
+    
+    def __str__(self):
+        return f"Renovação: {self.locacao_original.numero_contrato} ({self.get_status_display()})"
+    
+    # ========================================
+    # MÉTODOS
+    # ========================================
+    
+    def gerar_nova_locacao(self):
+        """
+        Cria nova Locacao quando renovação é aprovada.
+        Retorna a nova locação criada.
+        """
+        if self.nova_locacao:
+            return self.nova_locacao
+        
+        # Criar nova locação baseada na proposta
+        nova_locacao = Locacao.objects.create(
+            imovel=self.locacao_original.imovel,
+            locatario=self.locacao_original.locatario,
+            data_inicio=self.nova_data_inicio,
+            data_fim=self.nova_data_fim,
+            valor_aluguel=self.novo_valor_aluguel,
+            dia_vencimento=self.locacao_original.dia_vencimento,
+            tipo_garantia=self.novo_tipo_garantia,
+            fiador_garantia=self.novo_fiador,
+            caucao_quantidade_meses=self.nova_caucao_meses,
+            seguro_apolice=self.nova_seguro_apolice,
+            status='PENDING',  # Ficará PENDING até data_inicio
+        )
+        
+        # Calcular caução automaticamente se necessário
+        if self.novo_tipo_garantia == 'caucao' and self.nova_caucao_meses:
+            nova_locacao.save()  # Trigger do save() calcula caução
+        
+        # Vincular renovação à nova locação
+        self.nova_locacao = nova_locacao
+        self.status = 'ativa'
+        self.save()
+        
+        # Inativar contrato original
+        self.locacao_original.status = 'INACTIVE'
+        self.locacao_original.save()
+        
+        return nova_locacao
+    
+    @property
+    def dias_para_vencimento(self):
+        """Retorna dias até vencimento do contrato original."""
+        from django.utils import timezone
+        delta = self.locacao_original.data_fim - timezone.now().date()
+        return delta.days
+    
+    @property
+    def aumento_percentual(self):
+        """Retorna percentual de aumento do aluguel."""
+        valor_original = self.locacao_original.valor_aluguel
+        if valor_original > 0:
+            return ((self.novo_valor_aluguel / valor_original) - 1) * 100
+        return 0
+    
+    @property
+    def diferenca_aluguel(self):
+        """Retorna diferença em reais entre aluguel novo e antigo."""
+        return self.novo_valor_aluguel - self.locacao_original.valor_aluguel
+    
+    def calcular_nova_caucao(self):
+        """Calcula o valor da nova caução baseado nos meses."""
+        if self.novo_tipo_garantia == 'caucao' and self.nova_caucao_meses:
+            return self.novo_valor_aluguel * self.nova_caucao_meses
+        return Decimal('0.00')
+    
+    def registrar_comunicacao(self, tipo, destinatario, sucesso=True, detalhes=''):
+        """
+        Registra uma comunicação enviada no histórico.
+        
+        Args:
+            tipo: 'email' ou 'whatsapp'
+            destinatario: 'proprietario' ou 'locatario'
+            sucesso: bool
+            detalhes: string com detalhes adicionais
+        """
+        from django.utils import timezone
+        
+        if not self.historico_comunicacoes:
+            self.historico_comunicacoes = {}
+        
+        if 'envios' not in self.historico_comunicacoes:
+            self.historico_comunicacoes['envios'] = []
+        
+        self.historico_comunicacoes['envios'].append({
+            'data': timezone.now().isoformat(),
+            'tipo': tipo,
+            'destinatario': destinatario,
+            'sucesso': sucesso,
+            'detalhes': detalhes
+        })
+        
+        self.save(update_fields=['historico_comunicacoes', 'updated_at'])
+
     

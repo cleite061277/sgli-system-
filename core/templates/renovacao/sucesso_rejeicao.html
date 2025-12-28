@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resposta Registrada - HABITAT PRO</title>
+    {% include 'renovacao/base_style.html' %}
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏠 HABITAT PRO</h1>
+            <p>Renovação de Contrato</p>
+        </div>
+        
+        <div class="content">
+            <div class="success-icon">✅</div>
+            
+            <div class="message-box">
+                <h2 style="margin-bottom: 20px;">Resposta Registrada</h2>
+                
+                <p style="color: #666; line-height: 1.6;">
+                    {% if tipo == 'proprietario' %}
+                        Você optou por não renovar o contrato.<br>
+                        Sua decisão foi registrada no sistema.
+                    {% else %}
+                        Você optou por não aceitar a renovação.<br>
+                        Sua decisão foi registrada no sistema.
+                    {% endif %}
+                </p>
+                
+                <div style="background: #fff3cd; border-left: 4px solid #ffc107; 
+                            padding: 15px; margin: 30px 0; border-radius: 4px;">
+                    <strong>📋 Próximos Passos:</strong><br>
+                    • A imobiliária entrará em contato em breve<br>
+                    • Caso tenha mudado de ideia, entre em contato conosco
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            Em caso de dúvidas, entre em contato através do sistema.<br>
+            <strong>HABITAT PRO - A&C Imóveis e Sistemas Imobiliários</strong>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,6 +1,6 @@
 """
-URLs do core - VERSÃO DEV_20
-Adicionado: Rotas do Dashboard Financeiro
+URLs do core - VERSÃO DEV_21
+Adicionado: Rotas de Renovação de Contratos
 """
 from django.urls import path
 from django.contrib import admin
@@ -12,7 +12,7 @@ from .views import (
     pagina_recibo_pagamento,
 )
 
-# ✅ NOVO DEV_20: Import das views do dashboard
+# ✅ DEV_20: Import das views do dashboard
 from .dashboard_views import (
     dashboard_financeiro,
     exportar_dashboard_excel,
@@ -20,23 +20,12 @@ from .dashboard_views import (
     enviar_relatorio_email
 )
 
-###from .views_whatsapp import (
-#    painel_whatsapp,
-#    gerar_mensagem_whatsapp,
-#)
+# ✅ DEV_21: Import das views de renovação
+from . import views_renovacao
 
 urlpatterns = [    
     path('comanda/<uuid:comanda_id>/web/', comanda_web_view, name='comanda_web_view'),
     path('comanda/<uuid:comanda_id>/enviar-email/', enviar_comanda_email, name='enviar_comanda_email'),
-
-    # Painel WhatsApp
-#    path('admin/whatsapp/', 
-#         admin.site.admin_view(painel_whatsapp), 
-#         name='painel_whatsapp'),
-#    
-#    path('admin/whatsapp/gerar-mensagem/<uuid:comanda_id>/', 
-#         admin.site.admin_view(gerar_mensagem_whatsapp), 
-#         name='gerar_mensagem_whatsapp'),
     
     # Recibos
     path('pagamento/<uuid:pagamento_id>/recibo/', 
@@ -47,7 +36,7 @@ urlpatterns = [
          download_recibo_pagamento, 
          name='download_recibo_pagamento'),
     
-    # ✅ NOVO DEV_20: Dashboard Financeiro
+    # ✅ DEV_20: Dashboard Financeiro
     path('dashboard/financeiro/', 
          admin.site.admin_view(dashboard_financeiro), 
          name='dashboard_financeiro'),
@@ -63,4 +52,13 @@ urlpatterns = [
     path('dashboard/financeiro/email/', 
          admin.site.admin_view(enviar_relatorio_email), 
          name='enviar_relatorio_email'),
+    
+    # ✅ DEV_21: Rotas Públicas de Renovação (sem autenticação)
+    path('renovacao/proprietario/<uuid:token>/', 
+         views_renovacao.responder_renovacao_proprietario, 
+         name='responder_renovacao_proprietario'),
+    
+    path('renovacao/locatario/<uuid:token>/', 
+         views_renovacao.responder_renovacao_locatario, 
+         name='responder_renovacao_locatario'),
 ]

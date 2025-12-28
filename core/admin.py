@@ -407,7 +407,7 @@ class LocacaoAdmin(admin.ModelAdmin):
     
     @admin.display(description='⚠️ Alerta', ordering='data_fim')
     def alerta_vencimento(self, obj):
-        """Exibe alerta para contratos vencendo em até 60 dias"""
+        """Exibe alerta para contratos vencendo em até 90 dias"""
         from django.utils import timezone
         from django.utils.html import format_html
         
@@ -417,7 +417,7 @@ class LocacaoAdmin(admin.ModelAdmin):
         hoje = timezone.now().date()
         dias_restantes = (obj.data_fim - hoje).days
         
-        if 0 <= dias_restantes <= 60:
+        if 0 <= dias_restantes <= settings.PRAZO_ALERTA_VENCIMENTO_DIAS:
             if dias_restantes <= 7:
                 cor, icon = '#dc3545', '🚨'
             elif dias_restantes <= 30:
@@ -1615,3 +1615,863 @@ class FiadorAdmin(admin.ModelAdmin):
 # Override Dashboard
 from .dashboard_views import admin_index
 # admin.site.index = admin_index  # COMENTADO - Dashboard isolado
+
+
+# ════════════════════════════════════════════════════════════════════════════
+# ADMIN DE RENOVAÇÃO DE CONTRATOS - DEV_21
+# ════════════════════════════════════════════════════════════════════════════
+
+from django.utils.html import format_html
+from django.urls import reverse
+from core.models import RenovacaoContrato
+from core.services.whatsapp_service import WhatsAppService
+from django.conf import settings
+
+
+@admin.register(RenovacaoContrato)
+class RenovacaoContratoAdmin(admin.ModelAdmin):
+    """
+    Admin para gerenciar renovações de contratos.
+    Permite 3 canais de comunicação: Email, WhatsApp e Manual.
+    """
+    
+    list_display = [
+        'numero_contrato_original',
+        'imovel_info',
+        'locatario_info',
+        'vencimento_info',
+        'status_badge',
+        'acoes_rapidas',
+    ]
+    
+    list_filter = [
+        'status',
+        'data_proposta',
+        'proprietario_aprovou',
+        'locatario_aprovou',
+    ]
+    
+    search_fields = [
+        'locacao_original__numero_contrato',
+        'locacao_original__imovel__endereco',
+        'locacao_original__locatario__nome_razao_social',
+    ]
+    
+    readonly_fields = [
+        'data_proposta',
+        'token_proprietario',
+        'token_locatario',
+        'data_aprovacao_proprietario',
+        'ip_aprovacao_proprietario',
+        'data_aprovacao_locatario',
+        'ip_aprovacao_locatario',
+        'exibir_ferramentas_comunicacao',
+        'exibir_resumo_proposta',
+    ]
+    
+    fieldsets = (
+        ('Contrato Original', {
+            'fields': ('locacao_original',)
+        }),
+        
+        ('Proposta de Renovação', {
+            'fields': (
+                'exibir_resumo_proposta',
+                'nova_data_inicio',
+                'nova_data_fim',
+                'nova_duracao_meses',
+                'novo_valor_aluguel',
+            ),
+        }),
+        
+        ('Garantias', {
+            'fields': (
+                'novo_tipo_garantia',
+                'novo_fiador',
+                'nova_caucao_meses',
+                'nova_caucao_valor',
+                'nova_seguro_apolice',
+            ),
+            'classes': ('collapse',)
+        }),
+        
+        ('Status e Controle', {
+            'fields': (
+                'status',
+                'data_proposta',
+                'observacoes',
+            ),
+        }),
+        
+        ('Aprovação Proprietário', {
+            'fields': (
+                'proprietario_aprovou',
+                'data_aprovacao_proprietario',
+                'ip_aprovacao_proprietario',
+                'token_proprietario',
+            ),
+            'classes': ('collapse',)
+        }),
+        
+        ('Aprovação Locatário', {
+            'fields': (
+                'locatario_aprovou',
+                'data_aprovacao_locatario',
+                'ip_aprovacao_locatario',
+                'token_locatario',
+            ),
+            'classes': ('collapse',)
+        }),
+        
+        ('✋ Aprovação Manual (Plano B)', {
+            'fields': (
+                'aprovacao_manual_proprietario',
+                'aprovacao_manual_locatario',
+                'motivo_aprovacao_manual',
+            ),
+            'classes': ('collapse',),
+            'description': 'Use para registrar aprovações feitas por telefone/presencial'
+        }),
+        
+        ('📧 Ferramentas de Comunicação', {
+            'fields': ('exibir_ferramentas_comunicacao',),
+        }),
+        
+        ('Contrato Gerado', {
+            'fields': (
+                'nova_locacao',
+                'contrato_gerado',
+                'data_geracao_contrato',
+            ),
+            'classes': ('collapse',)
+        }),
+        
+        ('Recusa', {
+            'fields': ('motivo_recusa',),
+            'classes': ('collapse',)
+        }),
+    )
+    
+    # ========================================
+    # MÉTODOS DE EXIBIÇÃO
+    # ========================================
+    
+    def numero_contrato_original(self, obj):
+        """Exibe número do contrato original"""
+        return obj.locacao_original.numero_contrato
+    numero_contrato_original.short_description = 'Nº Contrato'
+    
+    def imovel_info(self, obj):
+        """Exibe informações do imóvel"""
+        imovel = obj.locacao_original.imovel
+        return f"{imovel.endereco}, {imovel.numero}"
+    imovel_info.short_description = 'Imóvel'
+    
+    def locatario_info(self, obj):
+        """Exibe nome do locatário"""
+        return obj.locacao_original.locatario.nome_razao_social
+    locatario_info.short_description = 'Locatário'
+    
+    def vencimento_info(self, obj):
+        """Exibe data de vencimento e dias restantes"""
+        dias = obj.dias_para_vencimento
+        cor = '#28a745' if dias > settings.ALERTA_MEDIO_DIAS else '#ffc107' if dias > settings.ALERTA_CRITICO_DIAS else '#dc3545'
+        return format_html(
+            '<span style="color: {}; font-weight: bold;">{} ({} dias)</span>',
+            cor,
+            obj.locacao_original.data_fim.strftime('%d/%m/%Y'),
+            dias
+        )
+    vencimento_info.short_description = 'Vencimento'
+    
+    def status_badge(self, obj):
+        """Badge colorido para status"""
+        colors = {
+            'rascunho': '#6c757d',
+            'pendente_proprietario': '#ff9800',
+            'pendente_locatario': '#2196f3',
+            'aprovada': '#4caf50',
+            'ativa': '#28a745',
+            'recusada': '#dc3545',
+            'cancelada': '#6c757d',
+        }
+        color = colors.get(obj.status, '#6c757d')
+        
+        return format_html(
+            '<span style="background: {}; color: white; padding: 5px 12px; '
+            'border-radius: 12px; font-size: 11px; font-weight: bold;">{}</span>',
+            color,
+            obj.get_status_display()
+        )
+    status_badge.short_description = 'Status'
+    
+    def acoes_rapidas(self, obj):
+        """Botões de ação rápida"""
+        url = reverse('admin:core_renovacaocontrato_change', args=[obj.pk])
+        return format_html(
+            '<a class="button" href="{}">Abrir</a>',
+            url
+        )
+    acoes_rapidas.short_description = 'Ações'
+    
+    
+    def exibir_resumo_proposta(self, obj):
+        """Exibe resumo visual da proposta"""
+        locacao_atual = obj.locacao_original
+        aumento = obj.aumento_percentual
+        diferenca = obj.diferenca_aluguel
+        
+        cor_aumento = '#28a745' if aumento >= 0 else '#dc3545'
+        
+        html = f"""
+        <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; border-left: 4px solid #667eea;">
+            <h3 style="margin-top: 0; color: #333;">💰 Comparação de Valores</h3>
+            
+            <table style="width: 100%; margin-top: 15px;">
+                <tr>
+                    <td style="padding: 8px; background: white; border-radius: 4px;">
+                        <strong>Valor Atual:</strong><br>
+                        <span style="font-size: 24px; color: #666;">
+                            R$ {locacao_atual.valor_aluguel:,.2f}
+                        </span>
+                    </td>
+                    <td style="text-align: center; padding: 0 20px;">
+                        <span style="font-size: 20px;">→</span><br>
+                        <span style="background: {cor_aumento}; color: white; padding: 4px 12px; 
+                                     border-radius: 12px; font-size: 12px;">
+                            {'+' if aumento >= 0 else ''}{aumento:.1f}%
+                        </span>
+                    </td>
+                    <td style="padding: 8px; background: white; border-radius: 4px;">
+                        <strong>Valor Novo:</strong><br>
+                        <span style="font-size: 24px; color: #28a745;">
+                            R$ {obj.novo_valor_aluguel:,.2f}
+                        </span>
+                    </td>
+                </tr>
+            </table>
+            
+            <p style="margin-top: 15px; color: #666;">
+                <strong>Diferença mensal:</strong> 
+                <span style="color: {cor_aumento};">
+                    R$ {diferenca:,.2f}
+                </span>
+            </p>
+            
+            <p style="margin: 10px 0 0 0; color: #666; font-size: 13px;">
+                <strong>Dias para vencimento:</strong> {obj.dias_para_vencimento} dias
+            </p>
+        </div>
+        """
+        return format_html(html)
+    exibir_resumo_proposta.short_description = 'Resumo da Proposta'
+    
+    def exibir_ferramentas_comunicacao(self, obj):
+        """
+        Exibe ferramentas de comunicação: Email, WhatsApp e Links públicos.
+        Esta é a funcionalidade PRINCIPAL dos 3 canais de comunicação.
+        """
+        locacao_atual = obj.locacao_original
+        proprietario = locacao_atual.imovel.locador
+        locatario = locacao_atual.locatario
+        
+        # URLs dos links públicos
+        base_url = settings.SITE_URL
+        url_proprietario = f"{base_url}/renovacao/proprietario/{obj.token_proprietario}/"
+        url_locatario = f"{base_url}/renovacao/locatario/{obj.token_locatario}/"
+        
+        # Gerar mensagens WhatsApp
+        try:
+            msg_proprietario = WhatsAppService.gerar_mensagem_renovacao_proprietario(obj)
+            tel_proprietario = proprietario.telefone
+            link_whatsapp_prop = WhatsAppService.gerar_link_whatsapp(tel_proprietario, msg_proprietario)
+        except:
+            link_whatsapp_prop = "#"
+        
+        try:
+            msg_locatario = WhatsAppService.gerar_mensagem_renovacao_locatario(obj)
+            tel_locatario = locatario.telefone
+            link_whatsapp_loc = WhatsAppService.gerar_link_whatsapp(tel_locatario, msg_locatario)
+        except:
+            link_whatsapp_loc = "#"
+        
+        html = f"""
+        <div style="background: #f8f9fa; padding: 20px; border-radius: 8px;">
+            
+            <!-- PROPRIETÁRIO -->
+            <div style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; 
+                        border-left: 4px solid #ff9800;">
+                <h3 style="margin-top: 0; color: #ff9800;">📧 Comunicação com Proprietário</h3>
+                
+                <p><strong>Nome:</strong> {proprietario.nome_razao_social}</p>
+                <p><strong>Email:</strong> {proprietario.email or 'Não cadastrado'}</p>
+                <p><strong>Telefone:</strong> {proprietario.telefone or 'Não cadastrado'}</p>
+                
+                <div style="margin-top: 20px;">
+                    <h4 style="color: #333;">Canal 1: Email Automático</h4>
+                    <button onclick="alert('Funcionalidade de reenvio será implementada via action')" 
+                            style="background: #007bff; color: white; border: none; padding: 10px 20px; 
+                                   border-radius: 4px; cursor: pointer; margin-right: 10px;">
+                        📤 Reenviar Email
+                    </button>
+                    <small style="color: #666;">
+                        Envia email com link de aprovação
+                    </small>
+                </div>
+                
+                <div style="margin-top: 20px;">
+                    <h4 style="color: #333;">Canal 2: WhatsApp Manual</h4>
+                    <a href="{link_whatsapp_prop}" target="_blank"
+                       style="display: inline-block; background: #25d366; color: white; 
+                              padding: 10px 20px; border-radius: 4px; text-decoration: none; 
+                              margin-right: 10px;">
+                        💬 Abrir WhatsApp Web
+                    </a>
+                    <button onclick="navigator.clipboard.writeText('{msg_proprietario}'.replace(/%20/g, ' ').replace(/%0A/g, String.fromCharCode(10))); alert('Mensagem copiada!');" 
+                            style="background: #28a745; color: white; border: none; padding: 10px 20px; 
+                                   border-radius: 4px; cursor: pointer;">
+                        📋 Copiar Mensagem
+                    </button>
+                </div>
+                
+                <div style="margin-top: 20px;">
+                    <h4 style="color: #333;">Link Público (Compartilhar):</h4>
+                    <input type="text" value="{url_proprietario}" readonly 
+                           onclick="this.select(); navigator.clipboard.writeText(this.value); alert('Link copiado!');" 
+                           style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; 
+                                  font-family: monospace; cursor: pointer;">
+                    <small style="color: #666;">Clique para copiar</small>
+                </div>
+                
+                <div style="margin-top: 15px; padding: 10px; background: #fff3cd; border-radius: 4px;">
+                    <strong>Status:</strong> 
+                    {
+                        '✅ Aprovado' if obj.proprietario_aprovou == True else 
+                        '❌ Rejeitado' if obj.proprietario_aprovou == False else 
+                        '⏳ Aguardando resposta'
+                    }
+                    {f'<br><small>Data: {obj.data_aprovacao_proprietario.strftime("%d/%m/%Y %H:%M")}</small>' 
+                     if obj.data_aprovacao_proprietario else ''}
+                </div>
+            </div>
+            
+            <!-- LOCATÁRIO (só mostra se proprietário já aprovou) -->
+            {'<div style="background: white; padding: 20px; border-radius: 8px; border-left: 4px solid #2196f3;">' 
+             if obj.status == 'pendente_locatario' or obj.locatario_aprovou is not None else 
+             '<div style="background: #e9ecef; padding: 20px; border-radius: 8px; opacity: 0.6;">'}
+                <h3 style="margin-top: 0; color: #2196f3;">📧 Comunicação com Locatário</h3>
+                
+                {'<p style="color: #666; font-style: italic;">Aguardando aprovação do proprietário...</p>' 
+                 if obj.status != 'pendente_locatario' and obj.locatario_aprovou is None else f'''
+                <p><strong>Nome:</strong> {locatario.nome_razao_social}</p>
+                <p><strong>Email:</strong> {locatario.email or 'Não cadastrado'}</p>
+                <p><strong>Telefone:</strong> {locatario.telefone or 'Não cadastrado'}</p>
+                
+                <div style="margin-top: 20px;">
+                    <h4 style="color: #333;">Canal 1: Email Automático</h4>
+                    <button onclick="alert('Email será enviado automaticamente após aprovação do proprietário')" 
+                            style="background: #007bff; color: white; border: none; padding: 10px 20px; 
+                                   border-radius: 4px; cursor: pointer;">
+                        📤 Reenviar Email
+                    </button>
+                </div>
+                
+                <div style="margin-top: 20px;">
+                    <h4 style="color: #333;">Canal 2: WhatsApp Manual</h4>
+                    <a href="{link_whatsapp_loc}" target="_blank"
+                       style="display: inline-block; background: #25d366; color: white; 
+                              padding: 10px 20px; border-radius: 4px; text-decoration: none; 
+                              margin-right: 10px;">
+                        💬 Abrir WhatsApp Web
+                    </a>
+                    <button onclick="navigator.clipboard.writeText('{msg_locatario}'.replace(/%20/g, ' ').replace(/%0A/g, String.fromCharCode(10))); alert('Mensagem copiada!');" 
+                            style="background: #28a745; color: white; border: none; padding: 10px 20px; 
+                                   border-radius: 4px; cursor: pointer;">
+                        📋 Copiar Mensagem
+                    </button>
+                </div>
+                
+                <div style="margin-top: 20px;">
+                    <h4 style="color: #333;">Link Público (Compartilhar):</h4>
+                    <input type="text" value="{url_locatario}" readonly 
+                           onclick="this.select(); navigator.clipboard.writeText(this.value); alert('Link copiado!');" 
+                           style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; 
+                                  font-family: monospace; cursor: pointer;">
+                    <small style="color: #666;">Clique para copiar</small>
+                </div>
+                
+                <div style="margin-top: 15px; padding: 10px; background: #d1ecf1; border-radius: 4px;">
+                    <strong>Status:</strong> 
+                    {
+                        '✅ Aceitou' if obj.locatario_aprovou == True else 
+                        '❌ Recusou' if obj.locatario_aprovou == False else 
+                        '⏳ Aguardando resposta'
+                    }
+                    {f'<br><small>Data: {obj.data_aprovacao_locatario.strftime("%d/%m/%Y %H:%M")}</small>' 
+                     if obj.data_aprovacao_locatario else ''}
+                </div>
+                '''}
+            </div>
+            
+            <div style="margin-top: 20px; padding: 15px; background: #fff3cd; border-left: 4px solid #ffc107; 
+                        border-radius: 4px;">
+                <strong>💡 Dica:</strong> Use o Canal 3 (Aprovação Manual abaixo) para pessoas sem internet/email.
+            </div>
+        </div>
+        """
+        return format_html(html)
+    exibir_ferramentas_comunicacao.short_description = 'Ferramentas de Comunicação (3 Canais)'
+    
+    # ========================================
+    # SAVE MODEL (APROVAÇÃO MANUAL)
+    # ========================================
+    
+    def save_model(self, request, obj, form, change):
+        """
+        Processa aprovações manuais (Plano B).
+        Quando admin marca checkbox de aprovação manual, registra como aprovação online.
+        """
+        
+        # Se marcou aprovação manual do proprietário
+        if obj.aprovacao_manual_proprietario and obj.proprietario_aprovou is None:
+            obj.proprietario_aprovou = True
+            obj.data_aprovacao_proprietario = timezone.now()
+            obj.ip_aprovacao_proprietario = request.META.get('REMOTE_ADDR', '127.0.0.1')
+            obj.status = 'pendente_locatario'
+            
+            self.message_user(
+                request,
+                '✅ Aprovação manual do proprietário registrada! '
+                'Locatário será notificado.',
+                level='success'
+            )
+            
+            # Enviar email ao locatário
+            from core.services.email_service import EmailService
+            EmailService.notificar_locatario_renovacao(obj)
+        
+        # Se marcou aprovação manual do locatário
+        if obj.aprovacao_manual_locatario and obj.locatario_aprovou is None:
+            obj.locatario_aprovou = True
+            obj.data_aprovacao_locatario = timezone.now()
+            obj.ip_aprovacao_locatario = request.META.get('REMOTE_ADDR', '127.0.0.1')
+            obj.status = 'aprovada'
+            
+            self.message_user(
+                request,
+                '✅ Aprovação manual do locatário registrada! '
+                'Renovação aprovada por ambas as partes.',
+                level='success'
+            )
+        
+        super().save_model(request, obj, form, change)
+# ════════════════════════════════════════════════════════════════════
+# ACTIONS PARA RENOVACAOCONTRATOADMIN
+# Adicionar ao final do RenovacaoContratoAdmin em core/admin.py
+# ════════════════════════════════════════════════════════════════════
+
+    actions = ['gerar_contrato_renovacao', 'gerar_contrato_pdf_renovacao', 'enviar_contrato_email', 'enviar_contrato_whatsapp', 'ativar_renovacao']
+    
+    @admin.action(description='📝 Gerar Contrato de Renovação (DOCX)')
+    def gerar_contrato_renovacao(self, request, queryset):
+        """
+        Gera contrato DOCX para renovação.
+        Usa sistema de templates + variáveis de renovação.
+        """
+        if queryset.count() != 1:
+            self.message_user(
+                request,
+                '❌ Selecione apenas UMA renovação por vez',
+                level='error'
+            )
+            return
+        
+        renovacao = queryset.first()
+        
+        if renovacao.status != 'aprovada':
+            self.message_user(
+                request,
+                f'❌ Renovação deve estar APROVADA (status atual: {renovacao.get_status_display()})',
+                level='error'
+            )
+            return
+        
+        # Criar nova locação se não existe
+        if not renovacao.nova_locacao:
+            try:
+                nova_locacao = Locacao.objects.create(
+                    imovel=renovacao.locacao_original.imovel,
+                    locatario=renovacao.locacao_original.locatario,
+                    data_inicio=renovacao.nova_data_inicio,
+                    data_fim=renovacao.nova_data_fim,
+                    valor_aluguel=renovacao.novo_valor_aluguel,
+                    dia_vencimento=renovacao.locacao_original.dia_vencimento,
+                    tipo_garantia=renovacao.novo_tipo_garantia,
+                    fiador_garantia=renovacao.novo_fiador,
+                    caucao_quantidade_meses=renovacao.nova_caucao_meses,
+                    seguro_apolice=renovacao.nova_seguro_apolice,
+                    status='PENDING',
+                )
+                
+                renovacao.nova_locacao = nova_locacao
+                renovacao.data_geracao_contrato = timezone.now()
+                renovacao.save()
+                
+            except Exception as e:
+                self.message_user(
+                    request,
+                    f'❌ Erro ao criar nova locação: {e}',
+                    level='error'
+                )
+                return
+        
+        # Gerar contrato de renovação
+        from core.views_gerar_contrato import gerar_docx_contrato_renovacao
+        from django.http import HttpResponse
+        
+        try:
+            # Gerar DOCX
+            docx_io = gerar_docx_contrato_renovacao(renovacao)
+            
+            # Preparar resposta
+            filename = f'Contrato_Renovacao_{renovacao.locacao_original.numero_contrato}.docx'
+            
+            response = HttpResponse(
+                docx_io.read(),
+                content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+            )
+            response['Content-Disposition'] = f'attachment; filename="{filename}"'
+            
+            self.message_user(
+                request,
+                f'✅ Contrato de renovação gerado: {filename}',
+                level='success'
+            )
+            
+            return response
+            
+        except Exception as e:
+            import traceback
+            self.message_user(
+                request,
+                f'❌ Erro ao gerar contrato: {e}',
+                level='error'
+            )
+    
+    
+    @admin.action(description='📄 Gerar Contrato de Renovação (PDF)')
+    def gerar_contrato_pdf_renovacao(self, request, queryset):
+        """
+        Gera contrato PDF para renovação.
+        Usa DOCX → PDF via LibreOffice.
+        """
+        if queryset.count() != 1:
+            self.message_user(
+                request,
+                '❌ Selecione apenas UMA renovação por vez',
+                level='error'
+            )
+            return
+        
+        renovacao = queryset.first()
+        
+        if renovacao.status != 'aprovada':
+            self.message_user(
+                request,
+                f'❌ Renovação deve estar APROVADA (status atual: {renovacao.get_status_display()})',
+                level='error'
+            )
+            return
+        
+        # Criar nova locação se não existe
+        if not renovacao.nova_locacao:
+            try:
+                nova_locacao = Locacao.objects.create(
+                    imovel=renovacao.locacao_original.imovel,
+                    locatario=renovacao.locacao_original.locatario,
+                    data_inicio=renovacao.nova_data_inicio,
+                    data_fim=renovacao.nova_data_fim,
+                    valor_aluguel=renovacao.novo_valor_aluguel,
+                    dia_vencimento=renovacao.locacao_original.dia_vencimento,
+                    tipo_garantia=renovacao.novo_tipo_garantia,
+                    fiador_garantia=renovacao.novo_fiador,
+                    caucao_quantidade_meses=renovacao.nova_caucao_meses,
+                    seguro_apolice=renovacao.nova_seguro_apolice,
+                    status='PENDING',
+                )
+                
+                renovacao.nova_locacao = nova_locacao
+                renovacao.data_geracao_contrato = timezone.now()
+                renovacao.save()
+                
+            except Exception as e:
+                self.message_user(
+                    request,
+                    f'❌ Erro ao criar nova locação: {e}',
+                    level='error'
+                )
+                return
+        
+        # Gerar DOCX primeiro, depois converter para PDF
+        from core.views_gerar_contrato import gerar_docx_contrato_renovacao, converter_docx_para_pdf
+        from django.http import HttpResponse
+        
+        try:
+            # 1. Gerar DOCX
+            docx_io = gerar_docx_contrato_renovacao(renovacao)
+            
+            # 2. Converter para PDF
+            pdf_io = converter_docx_para_pdf(docx_io)
+            
+            if not pdf_io:
+                raise Exception('Falha ao gerar PDF. Verifique se LibreOffice está instalado.')
+            
+            # 3. Preparar resposta
+            filename = f'Contrato_Renovacao_{renovacao.locacao_original.numero_contrato}.pdf'
+            
+            response = HttpResponse(
+                pdf_io.read(),
+                content_type='application/pdf'
+            )
+            response['Content-Disposition'] = f'attachment; filename="{filename}"'
+            
+            self.message_user(
+                request,
+                f'✅ Contrato PDF gerado: {filename}',
+                level='success'
+            )
+            
+            return response
+            
+        except Exception as e:
+            import traceback
+            self.message_user(
+                request,
+                f'❌ Erro ao gerar PDF: {e}',
+                level='error'
+            )
+
+    @admin.action(description='📧 Enviar Contrato por Email')
+    def enviar_contrato_email(self, request, queryset):
+        """
+        Envia contrato por email para proprietário e locatário.
+        """
+        if queryset.count() != 1:
+            self.message_user(
+                request,
+                '❌ Selecione apenas UMA renovação por vez',
+                level='error'
+            )
+            return
+        
+        renovacao = queryset.first()
+        
+        if not renovacao.nova_locacao:
+            self.message_user(
+                request,
+                '❌ Contrato ainda não foi gerado. Execute "Gerar Contrato" primeiro.',
+                level='error'
+            )
+            return
+        
+        from django.core.mail import EmailMessage
+        from core.views_gerar_contrato import gerar_contrato_docx
+        import io
+        
+        try:
+            # Gerar DOCX em memória
+            response = gerar_contrato_docx(renovacao.nova_locacao)
+            docx_content = response.content
+            
+            locacao = renovacao.locacao_original
+            proprietario = locacao.imovel.locador
+            locatario = locacao.locatario
+            
+            # Criar email
+            email = EmailMessage(
+                subject=f'Contrato de Renovação - {locacao.imovel.endereco_completo}',
+                body=f"""
+Prezados,
+
+Segue em anexo o contrato de renovação já aprovado por ambas as partes.
+
+Dados da Renovação:
+- Imóvel: {locacao.imovel.endereco_completo}
+- Locatário: {locatario.nome_razao_social}
+- Vigência: {renovacao.nova_data_inicio.strftime('%d/%m/%Y')} a {renovacao.nova_data_fim.strftime('%d/%m/%Y')}
+- Valor: R$ {renovacao.novo_valor_aluguel:,.2f}
+
+Por favor, imprimam, assinem e devolvam 2 vias.
+
+Atenciosamente,
+HABITAT PRO - A&C Imóveis e Sistemas Imobiliários
+
+                """,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                to=[proprietario.email, locatario.email],
+            )
+            
+            # Anexar DOCX
+            email.attach(
+                f'Contrato_Renovacao_{renovacao.nova_locacao.numero_contrato}.docx',
+                docx_content,
+                'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+            )
+            
+            email.send()
+            
+            self.message_user(
+                request,
+                f'✅ Email enviado com sucesso para:\n'
+                f'   • {proprietario.email}\n'
+                f'   • {locatario.email}',
+                level='success'
+            )
+            
+        except Exception as e:
+            self.message_user(
+                request,
+                f'❌ Erro ao enviar email: {e}',
+                level='error'
+            )
+    
+    @admin.action(description='💬 Enviar Contrato por WhatsApp')
+    def enviar_contrato_whatsapp(self, request, queryset):
+        """
+        Gera link wa.me para enviar contrato via WhatsApp.
+        Segue o mesmo padrão usado em comandas.
+        """
+        if queryset.count() != 1:
+            self.message_user(
+                request,
+                '❌ Selecione apenas UMA renovação por vez',
+                level='error'
+            )
+            return
+        
+        renovacao = queryset.first()
+        
+        if not renovacao.nova_locacao:
+            self.message_user(
+                request,
+                '❌ Contrato ainda não foi gerado. Execute "Gerar Contrato" primeiro.',
+                level='error'
+            )
+            return
+        
+        from urllib.parse import quote
+        
+        locacao = renovacao.locacao_original
+        locatario = locacao.locatario
+        
+        # Limpar telefone
+        telefone = ''.join(filter(str.isdigit, locatario.telefone))
+        
+        # Adicionar código do Brasil se necessário
+        if not telefone.startswith('55'):
+            telefone = f'55{telefone}'
+        
+        # Mensagem
+        base_url = settings.SITE_URL
+        mensagem = f"""🏠 *HABITAT PRO - Contrato de Renovação*
+
+Olá *{locatario.nome_razao_social}*,
+
+Seu contrato de renovação foi aprovado! ✅
+
+📋 *Dados do Contrato:*
+- Imóvel: {locacao.imovel.endereco_completo}
+- Vigência: {renovacao.nova_data_inicio.strftime('%d/%m/%Y')} a {renovacao.nova_data_fim.strftime('%d/%m/%Y')}
+- Valor: R$ {renovacao.novo_valor_aluguel:,.2f}
+
+📄 O contrato em DOCX/PDF será enviado por email para assinatura.
+
+Dúvidas? Entre em contato através do sistema.*HABITAT PRO - A&C Imóveis e Sistemas Imobiliários*"""
+        
+        mensagem_encoded = quote(mensagem)
+        whatsapp_url = f'https://wa.me/{telefone}?text={mensagem_encoded}'
+        
+        # Salvar na sessão (mesmo padrão de comandas)
+        request.session['whatsapp_redirect'] = whatsapp_url
+        
+        self.message_user(
+            request,
+            format_html(
+                '✅ Link WhatsApp gerado! <a href="{}" target="_blank" '
+                'style="background: #25d366; color: white; padding: 8px 15px; '
+                'border-radius: 5px; text-decoration: none; margin-left: 10px;">'
+                '💬 Abrir WhatsApp Web</a>',
+                whatsapp_url
+            ),
+            level='success'
+        )
+    
+    @admin.action(description='✅ Ativar Renovação (Criar Novo Contrato)')
+    def ativar_renovacao(self, request, queryset):
+        """
+        Ativa a renovação:
+        1. Inativa contrato antigo
+        2. Ativa contrato novo
+        3. Sistema gera comandas automaticamente
+        """
+        if queryset.count() != 1:
+            self.message_user(
+                request,
+                '❌ Selecione apenas UMA renovação por vez',
+                level='error'
+            )
+            return
+        
+        renovacao = queryset.first()
+        
+        # Validações
+        if renovacao.status != 'aprovada':
+            self.message_user(
+                request,
+                f'❌ Renovação deve estar APROVADA (status atual: {renovacao.get_status_display()})',
+                level='error'
+            )
+            return
+        
+        if not renovacao.nova_locacao:
+            self.message_user(
+                request,
+                '❌ Contrato ainda não foi gerado. Execute "Gerar Contrato" primeiro.',
+                level='error'
+            )
+            return
+        
+        # Ativar renovação
+        try:
+            # Inativar contrato antigo
+            renovacao.locacao_original.status = 'INACTIVE'
+            renovacao.locacao_original.save()
+            
+            # Ativar contrato novo
+            renovacao.nova_locacao.status = 'ACTIVE'
+            renovacao.nova_locacao.save()
+            
+            # Atualizar status da renovação
+            renovacao.status = 'ativa'
+            renovacao.save()
+            
+            self.message_user(
+                request,
+                format_html(
+                    '✅ <strong>Renovação ativada com sucesso!</strong><br><br>'
+                    '📋 Contrato Antigo: {} → <span style="color: #dc3545;">INATIVO</span><br>'
+                    '📋 Contrato Novo: {} → <span style="color: #28a745;">ATIVO</span><br><br>'
+                    '💡 Comandas serão geradas automaticamente a partir de {}',
+                    renovacao.locacao_original.numero_contrato,
+                    renovacao.nova_locacao.numero_contrato,
+                    renovacao.nova_data_inicio.strftime('%d/%m/%Y')
+                ),
+                level='success'
+            )
+            
+        except Exception as e:
+            self.message_user(
+                request,
+                f'❌ Erro ao ativar renovação: {e}',
+                level='error'
+            )

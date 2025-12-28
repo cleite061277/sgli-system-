@@ -374,3 +374,65 @@ def gerar_contrato_pdf(request, locacao_id):
     except Exception as e:
         messages.error(request, f'❌ Erro ao gerar PDF: {str(e)}')
         return redirect('admin:core_locacao_change', pk)
+
+
+# ════════════════════════════════════════════════════════════════════
+# FUNÇÕES PARA RENOVAÇÃO DE CONTRATOS - DEV_21
+# ════════════════════════════════════════════════════════════════════
+
+def preparar_contexto_renovacao(renovacao):
+    """
+    Prepara contexto para contrato de renovação.
+    Adiciona variáveis específicas de renovação ao contexto padrão.
+    """
+    # Usar contexto padrão da nova locação
+    contexto = preparar_contexto_contrato(renovacao.nova_locacao)
+    
+    # ✅ ADICIONAR VARIÁVEIS DE RENOVAÇÃO
+    contexto['eh_renovacao'] = True
+    contexto['contrato_anterior'] = renovacao.locacao_original.numero_contrato
+    contexto['vigencia_anterior_inicio'] = formatar_data(renovacao.locacao_original.data_inicio)
+    contexto['vigencia_anterior_fim'] = formatar_data(renovacao.locacao_original.data_fim)
+    contexto['valor_anterior'] = formatar_moeda(renovacao.locacao_original.valor_aluguel)
+    contexto['valor_novo'] = formatar_moeda(renovacao.novo_valor_aluguel)
+    contexto['aumento_percentual'] = f"{renovacao.aumento_percentual:.1f}%"
+    contexto['diferenca_valor'] = formatar_moeda(renovacao.diferenca_aluguel)
+    
+    return contexto
+
+
+def gerar_docx_contrato_renovacao(renovacao):
+    """
+    Gera DOCX de contrato de renovação.
+    Usa o mesmo sistema de templates, mas com variáveis de renovação.
+    """
+    # Buscar template (mesmo sistema de locações)
+    template_obj = buscar_template_contrato(renovacao.nova_locacao)
+    
+    if not template_obj:
+        raise Exception('Nenhum template de contrato encontrado.')
+    
+    # Preparar contexto COM VARIÁVEIS DE RENOVAÇÃO
+    contexto = preparar_contexto_renovacao(renovacao)
+    
+    # Carregar template
+    doc_template = DocxTemplate(template_obj.arquivo_template.path)
+    
+    # Preencher template
+    doc_template.render(contexto)
+    
+    # Salvar em memória
+    docx_io = io.BytesIO()
+    doc_template.save(docx_io)
+    docx_io.seek(0)
+    
+    # Adicionar cabeçalho e rodapé personalizados
+    doc = Document(docx_io)
+    adicionar_cabecalho_rodape(doc, renovacao.nova_locacao.numero_contrato)
+    
+    # Salvar novamente
+    final_io = io.BytesIO()
+    doc.save(final_io)
+    final_io.seek(0)
+    
+    return final_io

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Link Inválido - HABITAT PRO</title>
+    {% include 'renovacao/base_style.html' %}
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏠 HABITAT PRO</h1>
+            <p>Renovação de Contrato</p>
+        </div>
+        
+        <div class="content">
+            <div class="success-icon">⚠️</div>
+            
+            <div class="message-box">
+                <h2 style="margin-bottom: 20px;">Link Inválido ou Expirado</h2>
+                
+                <p style="color: #666; line-height: 1.6;">
+                    {{ mensagem }}
+                </p>
+                
+                <p style="color: #999; font-size: 14px; margin-top: 30px;">
+                    Se você acredita que isso é um erro, entre em contato conosco:
+                </p>
+                
+                <div style="margin-top: 20px;">
+                    <p><strong>Telefone:</strong> </p>
+                    <p><strong>Email:</strong> </p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <strong>HABITAT PRO - A&C Imóveis e Sistemas Imobiliários</strong>
+        </div>
+    </div>
+</body>
+</html>

@@ -314,3 +314,16 @@ else:
 # Configurar uploads
 FILE_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10MB
 DATA_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10MB
+
+
+# ════════════════════════════════════════════════════════════════
+# CONFIGURAÇÕES DE ALERTAS E VENCIMENTOS - DEV_21
+# ════════════════════════════════════════════════════════════════
+
+# Prazo padrão para alertas de vencimento de contratos (em dias)
+PRAZO_ALERTA_VENCIMENTO_DIAS = 90
+
+# Níveis de alerta baseados no tempo restante (OPÇÃO B - cores proporcionais)
+ALERTA_CRITICO_DIAS = 60   # Vermelho: < 60 dias
+ALERTA_MEDIO_DIAS = 90      # Amarelo: 60-90 dias
+# Verde: > 90 dias

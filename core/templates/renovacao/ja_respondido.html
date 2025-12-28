@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Renovação já Respondida - HABITAT PRO</title>
+    {% include 'renovacao/base_style.html' %}
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏠 HABITAT PRO</h1>
+            <p>Renovação de Contrato</p>
+        </div>
+        
+        <div class="content">
+            <div class="success-icon">
+                {% if decisao == 'aprovada' %}
+                    ✅
+                {% else %}
+                    ❌
+                {% endif %}
+            </div>
+            
+            <div class="message-box">
+                <h2 style="margin-bottom: 20px;">
+                    {% if decisao == 'aprovada' %}
+                        Renovação Já Aprovada
+                    {% else %}
+                        Renovação Já Recusada
+                    {% endif %}
+                </h2>
+                
+                <p style="color: #666; line-height: 1.6;">
+                    Você já respondeu a esta proposta de renovação anteriormente.
+                </p>
+                
+                {% if renovacao.data_aprovacao_proprietario and tipo == 'proprietario' %}
+                <p style="color: #999; font-size: 14px; margin-top: 20px;">
+                    Data da resposta: {{ renovacao.data_aprovacao_proprietario|date:"d/m/Y H:i" }}
+                </p>
+                {% endif %}
+                
+                {% if renovacao.data_aprovacao_locatario and tipo == 'locatario' %}
+                <p style="color: #999; font-size: 14px; margin-top: 20px;">
+                    Data da resposta: {{ renovacao.data_aprovacao_locatario|date:"d/m/Y H:i" }}
+                </p>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="footer">
+            Em caso de dúvidas, entre em contato através do sistema.</div>
+    </div>
+</body>
+</html>

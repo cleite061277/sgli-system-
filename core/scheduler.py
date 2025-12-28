@@ -161,3 +161,19 @@ def start_scheduler():
     except Exception as e:
         logger.error(f"❌ [SCHEDULER] Erro ao iniciar scheduler: {str(e)}")
         raise
+    
+    # ════════════════════════════════════════════════════════════════
+    # JOB 4: DETECÇÃO DE RENOVAÇÕES - DEV_21
+    # ════════════════════════════════════════════════════════════════
+    from core.management.commands.detectar_renovacoes import Command as DetectarRenovacoesCommand
+    
+    scheduler.add_job(
+        lambda: DetectarRenovacoesCommand().handle(dry_run=False, dias=90, aumento=0.0),
+        trigger=CronTrigger(hour=8, minute=0),  # Diariamente às 8h
+        id='detectar_renovacoes',
+        name='Detectar Renovações de Contratos (D-90)',
+        replace_existing=True,
+        max_instances=1,
+    )
+    logger.info("✅ Job 'detectar_renovacoes' agendado: Diariamente às 08:00")
+

@@ -11,8 +11,9 @@ from django.http import HttpResponse
 from django.db.models import Sum, Q, Count, F
 from django.utils import timezone
 from datetime import datetime, timedelta
+from django.conf import settings
 from decimal import Decimal
-from .models import Imovel, Locacao, Locatario, Comanda, Pagamento
+from .models import Imovel, Locacao, Locatario, Comanda, Pagamento, RenovacaoContrato
 
 
 @staff_member_required
@@ -22,16 +23,14 @@ def admin_index(request):
     ✅ MANTIDO: Função essencial para admin.py
     """
     hoje = datetime.now().date()
-    data_limite = hoje + timedelta(days=60)
+    data_limite = hoje + timedelta(days=settings.PRAZO_ALERTA_VENCIMENTO_DIAS)
     
     total_imoveis = Imovel.objects.filter(is_active=True).count()
     contratos_ativos = Locacao.objects.filter(status='ACTIVE', is_active=True).count()
     total_locatarios = Locatario.objects.filter(is_active=True).count()
-    contratos_vencendo = Locacao.objects.filter(
-        status='ACTIVE',
-        data_fim__gte=hoje,
-        data_fim__lte=data_limite,
-        is_active=True
+    # Contar renovações de contratos (foco em renovações ativas)
+    contratos_vencendo = RenovacaoContrato.objects.filter(
+        locacao_original__isnull=False
     ).count()
     
     context = {

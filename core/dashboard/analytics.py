@@ -1,7 +1,8 @@
 from django.utils import timezone
+from django.conf import settings
 from datetime import timedelta
 from decimal import Decimal
-from core.models import Comanda, Locacao, Imovel, Pagamento
+from core.models import Comanda, Locacao, Imovel, Pagamento, RenovacaoContrato
 
 
 class DashboardFinancialAnalytics:
@@ -163,12 +164,10 @@ class DashboardFinancialAnalytics:
                 'acao': 'Ver comandas'
             })
         
-        data_limite = self.hoje + timedelta(days=60)
-        contratos_vencendo = Locacao.objects.filter(
-            status='ACTIVE',
-            data_fim__gte=self.hoje,
-            data_fim__lte=data_limite,
-            is_active=True
+        data_limite = self.hoje + timedelta(days=settings.PRAZO_ALERTA_VENCIMENTO_DIAS)
+        # Contar renovações de contratos (foco em renovações ativas)
+        contratos_vencendo = RenovacaoContrato.objects.filter(
+            locacao_original__isnull=False
         ).count()
         
         if contratos_vencendo > 0:
@@ -176,8 +175,8 @@ class DashboardFinancialAnalytics:
                 'tipo': 'warning',
                 'icone': '📅',
                 'titulo': f'{contratos_vencendo} Contrato(s) Vencendo',
-                'mensagem': 'Vencimento nos próximos 60 dias',
-                'link': '/admin/core/locacao/',
+                'mensagem': 'Vencimento nos próximos 90 dias',
+                'link': '/admin/core/renovacaocontrato/',
                 'acao': 'Ver contratos'
             })
         

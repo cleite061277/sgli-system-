@@ -131,3 +131,304 @@ class EmailService:
             
             logger.error(f"❌ Erro ao enviar email: {comanda.numero_comanda} - {e}")
             return False
+
+    # ════════════════════════════════════════════════════════════════════
+    # MÉTODOS PARA RENOVAÇÃO DE CONTRATOS - DEV_21
+    # ════════════════════════════════════════════════════════════════════
+    
+    @classmethod
+    def notificar_admin_nova_renovacao(cls, renovacao):
+        """
+        Notifica administrador sobre nova renovação detectada.
+        
+        Args:
+            renovacao: Objeto RenovacaoContrato
+        """
+        from django.core.mail import send_mail
+        from django.utils.html import strip_tags
+        
+        locacao_atual = renovacao.locacao_original
+        
+        assunto = f'🔄 Nova Renovação Detectada - {locacao_atual.imovel.endereco_completo}'
+        
+        mensagem_html = f"""
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                        color: white; padding: 30px; text-align: center;">
+                <h1 style="margin: 0;">🏠 HABITAT PRO</h1>
+                <p style="margin: 10px 0 0 0;">Nova Renovação Detectada</p>
+            </div>
+            
+            <div style="padding: 30px; background: #f8f9fa;">
+                <h3>📋 Contrato Atual:</h3>
+                <ul style="line-height: 1.8;">
+                    <li><strong>Imóvel:</strong> {locacao_atual.imovel.endereco_completo}</li>
+                    <li><strong>Locatário:</strong> {locacao_atual.locatario.nome_razao_social}</li>
+                    <li><strong>Vencimento:</strong> {locacao_atual.data_fim.strftime('%d/%m/%Y')} 
+                        ({renovacao.dias_para_vencimento} dias)</li>
+                    <li><strong>Valor atual:</strong> R$ {locacao_atual.valor_aluguel:,.2f}</li>
+                </ul>
+                
+                <h3>💡 Proposta Criada:</h3>
+                <ul style="line-height: 1.8;">
+                    <li><strong>Nova vigência:</strong> {renovacao.nova_data_inicio.strftime('%d/%m/%Y')} 
+                        a {renovacao.nova_data_fim.strftime('%d/%m/%Y')}</li>
+                    <li><strong>Valor proposto:</strong> R$ {renovacao.novo_valor_aluguel:,.2f}</li>
+                    <li><strong>Status:</strong> {renovacao.get_status_display()}</li>
+                </ul>
+                
+                <div style="background: #fff3cd; padding: 15px; border-left: 4px solid #ffc107; 
+                            margin: 20px 0; border-radius: 4px;">
+                    <strong>⚠️ Ação Necessária:</strong><br>
+                    Acesse o admin para revisar valores e enviar proposta ao proprietário.
+                </div>
+                
+                <div style="text-align: center; margin: 30px 0;">
+                    <a href="{settings.SITE_URL}/admin/core/renovacaocontrato/{renovacao.id}/change/" 
+                       style="background: #28a745; color: white; padding: 15px 40px; 
+                              text-decoration: none; border-radius: 8px; font-weight: bold;
+                              display: inline-block;">
+                        📝 REVISAR RENOVAÇÃO
+                    </a>
+                </div>
+            </div>
+        </div>
+        """
+        
+        try:
+            send_mail(
+                subject=assunto,
+                message=strip_tags(mensagem_html),
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[settings.ADMINS[0][1] if settings.ADMINS else 'admin@aec.com.br'],
+                html_message=mensagem_html,
+                fail_silently=False,
+            )
+            logger.info(f"✅ Email enviado ao admin - Nova renovação {renovacao.id}")
+            return True
+        except Exception as e:
+            logger.error(f"❌ Erro ao enviar email ao admin: {e}")
+            return False
+    
+    @classmethod
+    def notificar_proprietario_renovacao(cls, renovacao):
+        """
+        Notifica proprietário sobre proposta de renovação com link para responder.
+        
+        Args:
+            renovacao: Objeto RenovacaoContrato
+        """
+        from django.core.mail import send_mail
+        from django.utils.html import strip_tags
+        
+        locacao_atual = renovacao.locacao_original
+        proprietario = locacao_atual.imovel.locador
+        
+        # Gerar URL completa
+        base_url = settings.SITE_URL
+        url_responder = f"{base_url}/renovacao/proprietario/{renovacao.token_proprietario}/"
+        
+        assunto = f'Proposta de Renovação - {locacao_atual.imovel.endereco_completo}'
+        
+        aumento = renovacao.aumento_percentual
+        
+        mensagem_html = f"""
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                        color: white; padding: 30px; text-align: center;">
+                <h1 style="margin: 0;">🏠 HABITAT PRO</h1>
+                <p style="margin: 10px 0 0 0;">Proposta de Renovação</p>
+            </div>
+            
+            <div style="padding: 30px; background: #f8f9fa;">
+                <p>Olá <strong>{proprietario.nome_razao_social}</strong>,</p>
+                
+                <p>O contrato do imóvel <strong>{locacao_atual.imovel.endereco_completo}</strong> 
+                vence em {renovacao.dias_para_vencimento} dias.</p>
+                
+                <div style="background: white; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                    <h3 style="margin-top: 0;">📋 Proposta de Renovação:</h3>
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <tr style="border-bottom: 1px solid #dee2e6;">
+                            <td style="padding: 10px;"><strong>Locatário:</strong></td>
+                            <td style="padding: 10px;">{locacao_atual.locatario.nome_razao_social}</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid #dee2e6;">
+                            <td style="padding: 10px;"><strong>Valor atual:</strong></td>
+                            <td style="padding: 10px;">R$ {locacao_atual.valor_aluguel:,.2f}</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid #dee2e6;">
+                            <td style="padding: 10px;"><strong>Valor novo:</strong></td>
+                            <td style="padding: 10px;">
+                                <strong style="color: #28a745;">R$ {renovacao.novo_valor_aluguel:,.2f}</strong>
+                                <span style="color: #666; font-size: 12px;">
+                                    ({'+' if aumento >= 0 else ''}{aumento:.1f}%)
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px;"><strong>Vigência:</strong></td>
+                            <td style="padding: 10px;">
+                                {renovacao.nova_data_inicio.strftime('%d/%m/%Y')} a 
+                                {renovacao.nova_data_fim.strftime('%d/%m/%Y')}
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                
+                <div style="text-align: center; margin: 30px 0;">
+                    <a href="{url_responder}" 
+                       style="background: #28a745; color: white; padding: 15px 40px; 
+                              text-decoration: none; border-radius: 8px; font-weight: bold;
+                              display: inline-block; font-size: 16px;">
+                        📝 RESPONDER AGORA
+                    </a>
+                </div>
+                
+                <p style="color: #666; font-size: 12px; margin-top: 30px;">
+                    ⏰ <strong>Prazo:</strong> 15 dias para resposta<br>
+                    🔒 Link seguro e exclusivo para você
+                </p>
+            </div>
+            
+            <div style="background: #333; color: white; padding: 20px; 
+                        text-align: center; font-size: 12px;">
+                Dúvidas? Entre em contato através do sistema.<br>
+                <strong>HABITAT PRO - A&C Imóveis e Sistemas Imobiliários</strong>
+            </div>
+        </div>
+        """
+        
+        try:
+            send_mail(
+                subject=assunto,
+                message=strip_tags(mensagem_html),
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[proprietario.email],
+                html_message=mensagem_html,
+                fail_silently=False,
+            )
+            
+            # Registrar comunicação
+            renovacao.registrar_comunicacao('email', 'proprietario', True, 
+                                           f'Email enviado para {proprietario.email}')
+            
+            logger.info(f"✅ Email enviado ao proprietário - Renovação {renovacao.id}")
+            return True
+        except Exception as e:
+            renovacao.registrar_comunicacao('email', 'proprietario', False, str(e))
+            logger.error(f"❌ Erro ao enviar email ao proprietário: {e}")
+            return False
+    
+    @classmethod
+    def notificar_locatario_renovacao(cls, renovacao):
+        """
+        Notifica locatário sobre proposta de renovação aprovada pelo proprietário.
+        
+        Args:
+            renovacao: Objeto RenovacaoContrato
+        """
+        from django.core.mail import send_mail
+        from django.utils.html import strip_tags
+        
+        locacao_atual = renovacao.locacao_original
+        locatario = locacao_atual.locatario
+        
+        # Gerar URL completa
+        base_url = settings.SITE_URL
+        url_responder = f"{base_url}/renovacao/locatario/{renovacao.token_locatario}/"
+        
+        assunto = f'Proposta de Renovação Aprovada - {locacao_atual.imovel.endereco_completo}'
+        
+        aumento = renovacao.aumento_percentual
+        diferenca = renovacao.diferenca_aluguel
+        
+        mensagem_html = f"""
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                        color: white; padding: 30px; text-align: center;">
+                <h1 style="margin: 0;">🏠 HABITAT PRO</h1>
+                <p style="margin: 10px 0 0 0;">Proposta de Renovação</p>
+            </div>
+            
+            <div style="padding: 30px; background: #f8f9fa;">
+                <p>Olá <strong>{locatario.nome_razao_social}</strong>,</p>
+                
+                <p>Seu contrato do imóvel <strong>{locacao_atual.imovel.endereco_completo}</strong> 
+                foi aprovado para renovação!</p>
+                
+                <div style="background: white; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                    <h3 style="margin-top: 0;">📋 Proposta de Renovação:</h3>
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <tr style="border-bottom: 1px solid #dee2e6;">
+                            <td style="padding: 10px;"><strong>Valor atual:</strong></td>
+                            <td style="padding: 10px;">R$ {locacao_atual.valor_aluguel:,.2f}</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid #dee2e6;">
+                            <td style="padding: 10px;"><strong>Valor novo:</strong></td>
+                            <td style="padding: 10px;">
+                                <strong style="color: #28a745;">R$ {renovacao.novo_valor_aluguel:,.2f}</strong>
+                                <span style="color: #666; font-size: 12px;">
+                                    ({'+' if aumento >= 0 else ''}{aumento:.1f}%)
+                                </span>
+                            </td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid #dee2e6;">
+                            <td style="padding: 10px;"><strong>Diferença mensal:</strong></td>
+                            <td style="padding: 10px;">
+                                R$ {diferenca:,.2f}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px;"><strong>Vigência:</strong></td>
+                            <td style="padding: 10px;">
+                                {renovacao.nova_data_inicio.strftime('%d/%m/%Y')} a 
+                                {renovacao.nova_data_fim.strftime('%d/%m/%Y')}
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                
+                <div style="text-align: center; margin: 30px 0;">
+                    <a href="{url_responder}" 
+                       style="background: #28a745; color: white; padding: 15px 40px; 
+                              text-decoration: none; border-radius: 8px; font-weight: bold;
+                              display: inline-block; font-size: 16px;">
+                        📝 ACEITAR OU RECUSAR
+                    </a>
+                </div>
+                
+                <p style="color: #666; font-size: 12px; margin-top: 30px;">
+                    ⏰ <strong>Prazo:</strong> 30 dias para resposta<br>
+                    🔒 Link seguro e exclusivo para você
+                </p>
+            </div>
+            
+            <div style="background: #333; color: white; padding: 20px; 
+                        text-align: center; font-size: 12px;">
+                Dúvidas? Entre em contato através do sistema.<br>
+                <strong>HABITAT PRO - A&C Imóveis e Sistemas Imobiliários</strong>
+            </div>
+        </div>
+        """
+        
+        try:
+            send_mail(
+                subject=assunto,
+                message=strip_tags(mensagem_html),
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[locatario.email],
+                html_message=mensagem_html,
+                fail_silently=False,
+            )
+            
+            # Registrar comunicação
+            renovacao.registrar_comunicacao('email', 'locatario', True, 
+                                           f'Email enviado para {locatario.email}')
+            
+            logger.info(f"✅ Email enviado ao locatário - Renovação {renovacao.id}")
+            return True
+        except Exception as e:
+            renovacao.registrar_comunicacao('email', 'locatario', False, str(e))
+            logger.error(f"❌ Erro ao enviar email ao locatário: {e}")
+            return False

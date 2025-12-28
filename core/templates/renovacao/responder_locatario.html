@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proposta de Renovação - HABITAT PRO</title>
+    {% include 'renovacao/base_style.html' %}
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏠 HABITAT PRO</h1>
+            <p>Proposta de Renovação de Contrato</p>
+        </div>
+        
+        <div class="content">
+            <div class="alert">
+                ✅ <strong>Proposta aprovada pelo proprietário!</strong><br>
+                Revise os valores e aceite ou recuse a renovação.
+            </div>
+            
+            <div class="section">
+                <h2>📋 Seu Contrato Atual</h2>
+                <div class="info-row">
+                    <span class="info-label">Imóvel:</span>
+                    <span class="info-value">{{ imovel.endereco_completo }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Vencimento:</span>
+                    <span class="info-value">{{ locacao_atual.data_fim|date:"d/m/Y" }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Valor Atual:</span>
+                    <span class="info-value">R$ {{ valor_atual|floatformat:2 }}</span>
+                </div>
+            </div>
+            
+            <div class="destaque">
+                <h3>💰 Nova Proposta</h3>
+                
+                <div class="valor-comparacao">
+                    <div class="valor-item">
+                        <div class="valor-label">Valor Atual</div>
+                        <div class="valor-numero">R$ {{ valor_atual|floatformat:2 }}</div>
+                    </div>
+                    <div class="valor-item">
+                        <div class="valor-label">→</div>
+                        <div class="aumento">{% if aumento_percentual >= 0 %}+{% endif %}{{ aumento_percentual|floatformat:1 }}%</div>
+                    </div>
+                    <div class="valor-item">
+                        <div class="valor-label">Valor Novo</div>
+                        <div class="valor-numero">R$ {{ valor_novo|floatformat:2 }}</div>
+                    </div>
+                </div>
+                
+                <p style="text-align: center; margin-top: 20px; font-size: 14px;">
+                    Diferença mensal: <strong>R$ {{ diferenca_valor|floatformat:2 }}</strong>
+                </p>
+            </div>
+            
+            <div class="section">
+                <h2>📝 Detalhes da Renovação</h2>
+                <div class="info-row">
+                    <span class="info-label">Nova Vigência:</span>
+                    <span class="info-value">
+                        {{ renovacao.nova_data_inicio|date:"d/m/Y" }} a {{ renovacao.nova_data_fim|date:"d/m/Y" }}
+                    </span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Duração:</span>
+                    <span class="info-value">{{ renovacao.nova_duracao_meses }} meses</span>
+                </div>
+                {% if caucao_info %}
+                <div class="info-row">
+                    <span class="info-label">Caução:</span>
+                    <span class="info-value">
+                        R$ {{ caucao_info.nova|floatformat:2 }}
+                        {% if caucao_info.diferenca > 0 %}
+                            <br><small style="color: #dc3545;">(+ R$ {{ caucao_info.diferenca|floatformat:2 }} a pagar)</small>
+                        {% endif %}
+                    </span>
+                </div>
+                {% endif %}
+            </div>
+            
+            <form method="post">
+                {% csrf_token %}
+                <div class="botoes">
+                    <button type="submit" name="decisao" value="aceitar" class="btn btn-aprovar">
+                        ✅ Aceitar Renovação
+                    </button>
+                    <button type="submit" name="decisao" value="recusar" class="btn btn-rejeitar">
+                        ❌ Recusar
+                    </button>
+                </div>
+            </form>
+        </div>
+        
+        <div class="footer">
+            🔒 Seus dados são protegidos pela LGPD<br>
+            Em caso de dúvidas, entre em contato através do sistema.</div>
+    </div>
+</body>
+</html>

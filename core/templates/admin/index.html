@@ -255,7 +255,7 @@
             <span class="stat-icon">📋</span>
             <div class="stat-value">{{ contratos_ativos|default:"0" }}</div>
             <div class="stat-label">Contratos Ativos</div>
-            <a href="{% url 'admin:core_locacao_changelist' %}" class="stat-link">Ver contratos →</a>
+            <a href="{% url 'admin:core_renovacaocontrato_changelist' %}" class="stat-link">Ver contratos →</a>
         </div>
 
         <div class="stat-card green">
@@ -268,8 +268,8 @@
         <div class="stat-card red">
             <span class="stat-icon">⚠️</span>
             <div class="stat-value">{{ contratos_vencendo|default:"0" }}</div>
-            <div class="stat-label">Vencendo em 60 dias</div>
-            <a href="{% url 'admin:core_locacao_changelist' %}" class="stat-link">Ver detalhes →</a>
+            <div class="stat-label">Vencendo em 90 dias</div>
+            <a href="{% url 'admin:core_renovacaocontrato_changelist' %}" class="stat-link">Ver detalhes →</a>
         </div>
     </div>
 
@@ -311,7 +311,7 @@
     <!-- Footer -->
     <div class="dashboard-footer">
         <p><strong>HABITAT PRO</strong> v1.0 | Sistema de Gestão Imobiliária</p>
-        <p>© 2025 Policorp | Paranaguá - PR</p>
+        <p>© 2025 A&C Imóveis e Sistemas Imobiliários | Paranaguá - PR</p>
     </div>
 
 </div>
