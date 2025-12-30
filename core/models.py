@@ -1461,6 +1461,27 @@ class Comanda(BaseModel):
             f"Não foi possível gerar numero_comanda único após {MAX_ATTEMPTS} tentativas"
         ) from last_exc
     
+
+    # ═══════════════════════════════════════════════════════════
+    # TOKENS PÚBLICOS (DEV_21.6)
+    # ═══════════════════════════════════════════════════════════
+    token = models.UUIDField(
+        default=uuid.uuid4,
+        unique=True,
+        editable=False,
+        help_text='Token público para acesso sem autenticação (expira em 30 dias)'
+    )
+    token_gerado_em = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text='Data/hora de geração do token'
+    )
+    token_expira_em = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text='Data/hora de expiração do token'
+    )
+
     def __str__(self) -> str:
         return f"Comanda {self.numero_comanda} - {self.mes_referencia:02d}/{self.ano_referencia}"
         
@@ -1588,6 +1609,27 @@ class Pagamento(BaseModel):
         self.comanda.valor_pago = total_pago
         self.comanda.save(update_fields=['valor_pago'])
     
+
+    # ═══════════════════════════════════════════════════════════
+    # TOKENS PÚBLICOS (DEV_21.6)
+    # ═══════════════════════════════════════════════════════════
+    token = models.UUIDField(
+        default=uuid.uuid4,
+        unique=True,
+        editable=False,
+        help_text='Token público para acesso ao recibo (expira em 30 dias)'
+    )
+    token_gerado_em = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text='Data/hora de geração do token'
+    )
+    token_expira_em = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text='Data/hora de expiração do token'
+    )
+
     def __str__(self):
         return f"{self.numero_pagamento} - {self.forma_pagamento} - R$ {self.valor_pago}"
     
@@ -1915,6 +1957,7 @@ except Exception:
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 from django.db.models import Sum
+from core.utils.token_publico import gerar_dados_token
 
 @receiver([post_save, post_delete], sender=Pagamento)
 def atualizar_status_comanda(sender, instance, **kwargs):
@@ -2232,6 +2275,19 @@ class RenovacaoContrato(BaseModel):
             models.Index(fields=['data_proposta']),
         ]
     
+
+    # Campos de expiração dos tokens (DEV_21.6)
+    token_gerado_em = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text='Data/hora de geração dos tokens'
+    )
+    token_expira_em = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text='Data/hora de expiração dos tokens (30 dias)'
+    )
+
     def __str__(self):
         return f"Renovação: {self.locacao_original.numero_contrato} ({self.get_status_display()})"
     
