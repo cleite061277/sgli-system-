@@ -2506,11 +2506,13 @@ Dúvidas? Entre em contato através do sistema.*HABITAT PRO - A&C Imóveis e Sis
         
         for renovacao in queryset:
             try:
-                # Validar se renovação está em status apropriado
-                if renovacao.status not in ['AGUARDANDO', 'AGUARDANDO_PROPRIETARIO', 'AGUARDANDO_LOCATARIO']:
+                # Validar se renovação NÃO está finalizada
+                # Bloqueia apenas: ativa, recusada, cancelada
+                # Permite: rascunho, pendente_proprietario, pendente_locatario, aprovada
+                if renovacao.status in ['ativa', 'recusada', 'cancelada']:
                     detalhes_erros.append(
                         f"Renovação {renovacao.locacao_original.numero_contrato}: "
-                        f"Status '{renovacao.get_status_display()}' não permite envio de notificação"
+                        f"Status '{renovacao.get_status_display()}' não permite envio (processo finalizado)"
                     )
                     erros += 1
                     continue
@@ -2573,7 +2575,8 @@ Dúvidas? Entre em contato através do sistema.*HABITAT PRO - A&C Imóveis e Sis
         links_gerados = []
         
         for renovacao in queryset:
-            if renovacao.status not in ['AGUARDANDO', 'AGUARDANDO_PROPRIETARIO', 'AGUARDANDO_LOCATARIO']:
+            # Bloqueia apenas renovações finalizadas
+            if renovacao.status in ['ativa', 'recusada', 'cancelada']:
                 continue
             
             locacao_atual = renovacao.locacao_original
