@@ -288,7 +288,9 @@ class LocacaoAdmin(admin.ModelAdmin):
     
     readonly_fields = ['created_at', 'updated_at', 'numero_contrato', 'caucao_valor_total']
     
-    actions = ['gerar_contrato_pdf_action', 'gerar_contrato_docx_action']
+    actions = [
+        'enviar_notificacao_renovacao_email',
+        'enviar_notificacao_renovacao_whatsapp','gerar_contrato_pdf_action', 'gerar_contrato_docx_action']
     
     fieldsets = (
         ('📋 Informações Básicas', {
@@ -2070,7 +2072,10 @@ class RenovacaoContratoAdmin(admin.ModelAdmin):
 # Adicionar ao final do RenovacaoContratoAdmin em core/admin.py
 # ════════════════════════════════════════════════════════════════════
 
-    actions = ['gerar_contrato_renovacao', 'gerar_contrato_pdf_renovacao', 'enviar_contrato_email', 'enviar_contrato_whatsapp', 'ativar_renovacao']
+    actions = [
+        'enviar_notificacao_renovacao_email',
+        'enviar_notificacao_renovacao_whatsapp',
+        'gerar_contrato_renovacao', 'gerar_contrato_pdf_renovacao', 'enviar_contrato_email', 'enviar_contrato_whatsapp', 'ativar_renovacao']
     
     @admin.action(description='📝 Gerar Contrato de Renovação (DOCX)')
     def gerar_contrato_renovacao(self, request, queryset):
@@ -2475,3 +2480,150 @@ Dúvidas? Entre em contato através do sistema.*HABITAT PRO - A&C Imóveis e Sis
                 f'❌ Erro ao ativar renovação: {e}',
                 level='error'
             )
+
+    # ════════════════════════════════════════════════════════════════
+    # ACTION: ENVIAR NOTIFICAÇÃO DE RENOVAÇÃO
+    # ════════════════════════════════════════════════════════════════
+    
+    @admin.action(description='🔔 Enviar Notificação de Renovação (Email)')
+    def enviar_notificacao_renovacao_email(self, request, queryset):
+        """
+        Envia notificação por email para proprietário e locatário
+        com links públicos para aprovação/rejeição da renovação.
+        
+        O email contém:
+        - Detalhes da proposta de renovação
+        - Link público para PROPRIETÁRIO responder (aprovar/rejeitar)
+        - Link público para LOCATÁRIO responder (aprovar/rejeitar)
+        - Sem necessidade de login no sistema
+        """
+        from core.services.email_service import EmailService
+        
+        enviados_prop = 0
+        enviados_loc = 0
+        erros = 0
+        detalhes_erros = []
+        
+        for renovacao in queryset:
+            try:
+                # Validar se renovação está em status apropriado
+                if renovacao.status not in ['AGUARDANDO', 'AGUARDANDO_PROPRIETARIO', 'AGUARDANDO_LOCATARIO']:
+                    detalhes_erros.append(
+                        f"Renovação {renovacao.locacao_original.numero_contrato}: "
+                        f"Status '{renovacao.get_status_display()}' não permite envio de notificação"
+                    )
+                    erros += 1
+                    continue
+                
+                # Enviar para proprietário
+                try:
+                    EmailService.notificar_proprietario_renovacao(renovacao)
+                    enviados_prop += 1
+                except Exception as e:
+                    detalhes_erros.append(
+                        f"Erro ao enviar para proprietário de {renovacao.locacao_original.numero_contrato}: {str(e)}"
+                    )
+                    erros += 1
+                
+                # Enviar para locatário
+                try:
+                    EmailService.notificar_locatario_renovacao(renovacao)
+                    enviados_loc += 1
+                except Exception as e:
+                    detalhes_erros.append(
+                        f"Erro ao enviar para locatário de {renovacao.locacao_original.numero_contrato}: {str(e)}"
+                    )
+                    erros += 1
+                
+            except Exception as e:
+                erros += 1
+                detalhes_erros.append(
+                    f"Erro geral em {renovacao.locacao_original.numero_contrato}: {str(e)}"
+                )
+        
+        # Mensagens de feedback
+        total_emails = enviados_prop + enviados_loc
+        
+        if total_emails > 0:
+            self.message_user(
+                request,
+                f"✅ {total_emails} email(s) enviado(s) com sucesso! "
+                f"(Proprietários: {enviados_prop}, Locatários: {enviados_loc})",
+                level='SUCCESS'
+            )
+        
+        if erros > 0:
+            self.message_user(
+                request,
+                f"⚠️ {erros} erro(s) ao enviar notificações",
+                level='WARNING'
+            )
+            
+            # Mostrar detalhes dos erros
+            for detalhe in detalhes_erros[:5]:  # Máximo 5 erros detalhados
+                self.message_user(request, f"  • {detalhe}", level='ERROR')
+    
+
+    @admin.action(description='💬 Enviar Notificação de Renovação (WhatsApp)')
+    def enviar_notificacao_renovacao_whatsapp(self, request, queryset):
+        """Gera links wa.me para notificação via WhatsApp"""
+        from core.services.whatsapp_service import WhatsAppService
+        from django.utils.safestring import mark_safe
+        
+        links_gerados = []
+        
+        for renovacao in queryset:
+            if renovacao.status not in ['AGUARDANDO', 'AGUARDANDO_PROPRIETARIO', 'AGUARDANDO_LOCATARIO']:
+                continue
+            
+            locacao_atual = renovacao.locacao_original
+            
+            # Proprietário
+            try:
+                proprietario = locacao_atual.imovel.locador
+                if proprietario.telefone:
+                    msg = WhatsAppService.gerar_mensagem_renovacao_proprietario(renovacao)
+                    link = WhatsAppService.gerar_link_whatsapp(proprietario.telefone, msg)
+                    links_gerados.append({
+                        'tipo': 'Proprietário',
+                        'nome': proprietario.nome_razao_social,
+                        'contrato': renovacao.locacao_original.numero_contrato,
+                        'link': link
+                    })
+            except:
+                pass
+            
+            # Locatário
+            try:
+                locatario = locacao_atual.locatario
+                if locatario.telefone:
+                    msg = WhatsAppService.gerar_mensagem_renovacao_locatario(renovacao)
+                    link = WhatsAppService.gerar_link_whatsapp(locatario.telefone, msg)
+                    links_gerados.append({
+                        'tipo': 'Locatário',
+                        'nome': locatario.nome_razao_social,
+                        'contrato': renovacao.locacao_original.numero_contrato,
+                        'link': link
+                    })
+            except:
+                pass
+        
+        if links_gerados:
+            html = f"<div><h3>💬 {len(links_gerados)} Link(s) WhatsApp</h3>"
+            for info in links_gerados:
+                html += f"""
+                <div style='margin:10px 0; padding:10px; background:#f0f0f0;'>
+                    <p><b>{info['tipo']}:</b> {info['nome']}<br>
+                    <b>Contrato:</b> {info['contrato']}</p>
+                    <a href='{info['link']}' target='_blank' 
+                       style='background:#25D366; color:white; padding:8px 15px; 
+                              text-decoration:none; border-radius:4px; display:inline-block;'>
+                        Abrir WhatsApp ➜
+                    </a>
+                </div>
+                """
+            html += "</div>"
+            self.message_user(request, mark_safe(html), level='SUCCESS')
+        else:
+            self.message_user(request, "Nenhum link gerado", level='WARNING')
+

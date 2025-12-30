@@ -4,7 +4,9 @@ Executa notificações de comandas sem necessidade de Redis/Celery
 
 JOBS CONFIGURADOS:
 - Diário às 8h: Envio de todas notificações programadas
+- Diário às 8h: Detecção de renovações D-90
 - A cada hora: Backup para vencimentos urgentes (hoje/amanhã)
+- Semanal (domingo 2h): Limpeza de execuções antigas
 """
 import logging
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -31,6 +33,23 @@ def enviar_notificacoes_job():
         logger.info("✅ [SCHEDULER] Job de notificações concluído com sucesso")
     except Exception as e:
         logger.error(f"❌ [SCHEDULER] Erro no job de notificações: {str(e)}")
+
+
+def detectar_renovacoes_job():
+    """
+    Job de detecção: Detecta contratos vencendo em 90 dias
+    Executa: Diariamente às 8h00
+    
+    Cria registros de RenovacaoContrato automaticamente para contratos
+    que estão a 90 dias do vencimento, permitindo inicio do processo
+    de renovação com antecedência adequada.
+    """
+    try:
+        logger.info("🔍 [SCHEDULER] Iniciando detecção de renovações D-90...")
+        call_command('detectar_renovacoes')
+        logger.info("✅ [SCHEDULER] Detecção de renovações concluída")
+    except Exception as e:
+        logger.error(f"❌ [SCHEDULER] Erro na detecção de renovações: {str(e)}")
 
 
 def verificar_vencimentos_urgentes_job():
@@ -116,7 +135,22 @@ def start_scheduler():
         )
         logger.info("✅ [SCHEDULER] Job 'notificacoes_diarias' agendado para 8h00")
         
-        # JOB 2: Backup a cada hora (vencimentos urgentes)
+        # JOB 2: Detecção de renovações D-90 às 8h
+        scheduler.add_job(
+            detectar_renovacoes_job,
+            trigger=CronTrigger(
+                hour=8,
+                minute=0,
+                timezone=pytz.timezone(settings.TIME_ZONE)
+            ),
+            id="detectar_renovacoes",
+            max_instances=1,
+            replace_existing=True,
+            name="Detectar Renovações de Contratos (D-90)"
+        )
+        logger.info("✅ [SCHEDULER] Job 'detectar_renovacoes' agendado para 8h00")
+        
+        # JOB 3: Backup a cada hora (vencimentos urgentes)
         scheduler.add_job(
             verificar_vencimentos_urgentes_job,
             trigger=IntervalTrigger(
@@ -130,7 +164,7 @@ def start_scheduler():
         )
         logger.info("✅ [SCHEDULER] Job 'vencimentos_urgentes' agendado (a cada 1h)")
         
-        # JOB 3: Limpeza semanal de execuções antigas (todo domingo às 2h)
+        # JOB 4: Limpeza semanal de execuções antigas (todo domingo às 2h)
         scheduler.add_job(
             delete_old_job_executions,
             trigger=CronTrigger(
@@ -161,19 +195,3 @@ def start_scheduler():
     except Exception as e:
         logger.error(f"❌ [SCHEDULER] Erro ao iniciar scheduler: {str(e)}")
         raise
-    
-    # ════════════════════════════════════════════════════════════════
-    # JOB 4: DETECÇÃO DE RENOVAÇÕES - DEV_21
-    # ════════════════════════════════════════════════════════════════
-    from core.management.commands.detectar_renovacoes import Command as DetectarRenovacoesCommand
-    
-    scheduler.add_job(
-        lambda: DetectarRenovacoesCommand().handle(dry_run=False, dias=90, aumento=0.0),
-        trigger=CronTrigger(hour=8, minute=0),  # Diariamente às 8h
-        id='detectar_renovacoes',
-        name='Detectar Renovações de Contratos (D-90)',
-        replace_existing=True,
-        max_instances=1,
-    )
-    logger.info("✅ Job 'detectar_renovacoes' agendado: Diariamente às 08:00")
-
