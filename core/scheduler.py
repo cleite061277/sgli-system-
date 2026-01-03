@@ -7,6 +7,7 @@ JOBS CONFIGURADOS:
 - Diário às 8h: Detecção de renovações D-90
 - A cada hora: Backup para vencimentos urgentes (hoje/amanhã)
 - Semanal (domingo 2h): Limpeza de execuções antigas
+- Semanal (domingo 2h30): Limpeza de tokens de contrato expirados
 """
 import logging
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -110,6 +111,24 @@ def delete_old_job_executions(max_age=604_800):
         logger.error(f"❌ [SCHEDULER] Erro na limpeza: {str(e)}")
 
 
+
+def limpar_tokens_contratos_job():
+    """
+    Job de limpeza: Remove tokens de contrato expirados há mais de 30 dias
+    Executa: Semanalmente (domingo às 2h30)
+    
+    Mantém o banco de dados limpo removendo tokens antigos que já expiraram,
+    economizando espaço e melhorando performance. Tokens expirados há menos
+    de 30 dias são mantidos para fins de auditoria e estatísticas.
+    """
+    try:
+        logger.info("🧹 [SCHEDULER] Iniciando limpeza de tokens de contrato...")
+        call_command('limpar_tokens_contratos', '--dias=30')
+        logger.info("✅ [SCHEDULER] Limpeza de tokens concluída")
+    except Exception as e:
+        logger.error(f"❌ [SCHEDULER] Erro na limpeza de tokens: {str(e)}")
+
+
 def start_scheduler():
     """
     Inicia o APScheduler com todos os jobs configurados
@@ -179,6 +198,23 @@ def start_scheduler():
             name="Limpeza semanal de execuções antigas"
         )
         logger.info("✅ [SCHEDULER] Job 'limpeza_execucoes' agendado (domingos 2h)")
+        
+        # JOB 5: Limpeza de tokens de contrato expirados (domingo 2h30)
+        scheduler.add_job(
+            limpar_tokens_contratos_job,
+            trigger=CronTrigger(
+                day_of_week="sun",
+                hour=2,
+                minute=30,
+                timezone=pytz.timezone(settings.TIME_ZONE)
+            ),
+            id="limpar_tokens_contratos",
+            max_instances=1,
+            replace_existing=True,
+            name="Limpeza semanal de tokens de contrato expirados"
+        )
+        logger.info("✅ [SCHEDULER] Job 'limpar_tokens_contratos' agendado (domingos 2h30)")
+        
         
         # Iniciar scheduler
         scheduler.start()
