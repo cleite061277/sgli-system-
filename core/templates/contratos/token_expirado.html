@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⏰ Link Expirado - HABITAT PRO</title>
+    <style>
+        body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;margin:0}
+        .container{background:white;border-radius:20px;padding:40px;max-width:500px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,0.3);text-align:center}
+        .icon{font-size:80px;margin-bottom:20px}
+        h1{color:#333;font-size:28px;margin-bottom:15px}
+        .info{background:#fff3cd;border-left:4px solid #ffc107;padding:15px;margin:20px 0;border-radius:8px;text-align:left}
+        .info p{color:#856404;margin:8px 0;font-size:14px}
+        .message{color:#666;line-height:1.6;margin:20px 0}
+        .contact{background:#e7f3ff;border-radius:10px;padding:20px;margin-top:25px}
+        .contact h3{color:#0066cc;margin-bottom:10px;font-size:18px}
+        .logo{font-size:20px;font-weight:bold;color:#667eea;margin-top:30px}
+        .logo span{color:#ff8c00}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="icon">⏰</div>
+        <h1>Link Expirado</h1>
+        <p class="message">O link para download do contrato expirou há <strong>{{ dias_expirado }} dia{{ dias_expirado|pluralize }}</strong>.</p>
+        <div class="info">
+            <p><strong>📋 Contrato:</strong> {{ renovacao.locacao_original.numero_contrato }}</p>
+            <p><strong>🏠 Imóvel:</strong> {{ renovacao.locacao_original.imovel.endereco_completo }}</p>
+            <p><strong>⏰ Expirou em:</strong> {{ token.expira_em|date:"d/m/Y às H:i" }}</p>
+        </div>
+        <div class="contact">
+            <h3>📞 Como obter o contrato?</h3>
+            <p>Entre em contato com a <strong>HABITAT PRO</strong> para solicitar um novo link de download.</p>
+        </div>
+        <div class="logo">HABITAT <span>PRO</span></div>
+    </div>
+</body>
+</html>

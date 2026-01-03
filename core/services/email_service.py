@@ -221,6 +221,23 @@ class EmailService:
         from django.core.mail import send_mail
         from django.utils.html import strip_tags
         
+        import logging
+        import traceback
+        
+        logger = logging.getLogger(__name__)
+        
+        try:
+            logger.info("🔍 DEBUG 1: Iniciando notificar_proprietario_renovacao")
+            logger.info(f"🔍 DEBUG 2: renovacao = {renovacao}")
+            logger.info(f"🔍 DEBUG 3: renovacao.id = {renovacao.id}")
+            
+            locacao_atual = renovacao.locacao_original
+            logger.info(f"🔍 DEBUG 4: locacao_atual OK = {locacao_atual}")
+        except Exception as e:
+            logger.error(f"❌ ERRO NO DEBUG: {e}")
+            logger.error(f"TRACEBACK: {traceback.format_exc()}")
+            raise
+        
         locacao_atual = renovacao.locacao_original
         proprietario = locacao_atual.imovel.locador
         

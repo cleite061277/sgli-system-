@@ -140,6 +140,13 @@
             <div class="message">
                 <p>{{ mensagem }}</p>
             </div>
+
+            {% if observacoes %}
+            <div class="secao">
+                <h4>📝 Observações Importantes</h4>
+                <p style="color: #555; line-height: 1.8;">{{ observacoes }}</p>
+            </div>
+            {% endif %}
             
             <div class="valores">
                 <h3>📋 Detalhes da Cobrança</h3>

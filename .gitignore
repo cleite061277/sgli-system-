@@ -117,3 +117,50 @@ core/static/admin/js/
 backups/
 *.backup
 *_backup_*
+
+# ════════════════════════════════════════
+# Arquivos de Backup (não enviar para produção)
+# ════════════════════════════════════════
+*.backup
+*.backup_*
+*.old
+*.bak
+*_backup
+*_old
+*.before_*
+*.backup_antes_*
+
+# Arquivos temporários de desenvolvimento
+*.tmp
+*.temp
+*.swp
+*~
+
+# Logs locais
+*.log
+
+# SQLite local (apenas desenvolvimento)
+db.sqlite3
+*.sqlite3
+
+# Media files (uploads locais)
+media/
+
+# Static files (coletados)
+staticfiles/
+
+
+# Arquivos de diagnóstico
+diagnostic_result_*.txt
+
+# Scripts de teste locais
+validar_*.sh
+
+# Locks do LibreOffice
+.~lock.*
+
+# Arquivos temporários de email
+Assunto:
+Conteúdo:
+Link:
+Para:

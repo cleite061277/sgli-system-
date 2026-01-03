@@ -1,5 +1,13 @@
 
 from django.contrib import admin
+from .dashboard_tokens import gerar_contexto_dashboard
+from .admin_actions_tokens import (
+    action_renovar_token_renovacao,
+    action_reenviar_link_comanda,
+    action_renovar_token_comanda,
+    action_reenviar_link_recibo,
+    action_renovar_token_recibo,
+)
 from django import forms
 from core.models import ConfiguracaoSistema, LogGeracaoComandas
 from django.contrib.auth.admin import UserAdmin
@@ -501,6 +509,14 @@ Data: 06/10/2025
 """
 
 from django.contrib import admin
+from .dashboard_tokens import gerar_contexto_dashboard
+from .admin_actions_tokens import (
+    action_renovar_token_renovacao,
+    action_reenviar_link_comanda,
+    action_renovar_token_comanda,
+    action_reenviar_link_recibo,
+    action_renovar_token_recibo,
+)
 from django.utils.html import format_html
 from django.db.models import Sum, Q
 from django.urls import reverse
@@ -575,6 +591,10 @@ class SaldoFilter(admin.SimpleListFilter):
 
 @admin.register(Comanda)
 class ComandaAdmin(admin.ModelAdmin):
+    actions = [
+        action_reenviar_link_comanda,
+        action_renovar_token_comanda,
+    ]
     """Admin melhorado para Comanda com organização por seções"""
     
     # ✅ Form customizado para excluir property valor_aluguel
@@ -804,6 +824,8 @@ class ComandaAdmin(admin.ModelAdmin):
     )
     
     actions = [
+        action_reenviar_link_comanda,
+        action_renovar_token_comanda,
         'aplicar_multas_juros',
         'marcar_como_paga',
         'cancelar_comandas',
@@ -1381,6 +1403,10 @@ class LogGeracaoComandaAdmin(admin.ModelAdmin):
 
 #@admin.register(Comanda)
 #class ComandaAdmin(admin.ModelAdmin):
+    actions = [
+        action_reenviar_link_comanda,
+        action_renovar_token_comanda,
+    ]
    # list_display = ('numero_comanda', 'locacao', 'mes_referencia', 'ano_referencia', 'status', 'data_vencimento')
    # list_filter = ('status', 'ano_referencia', 'mes_referencia', 'is_active')
    # search_fields = ('numero_comanda', 'locacao__numero_contrato', 'locacao__locatario__nome_razao_social')
@@ -1390,7 +1416,11 @@ class LogGeracaoComandaAdmin(admin.ModelAdmin):
 class PagamentoAdmin(admin.ModelAdmin):
     form = PagamentoAdminForm
     
-    actions = ['gerar_recibo']
+    actions = [
+        action_reenviar_link_recibo,
+        action_renovar_token_recibo,
+        'gerar_recibo',
+    ]
     
     def gerar_recibo(self, request, queryset):
         """Gerar recibos em Word."""
@@ -2073,6 +2103,7 @@ class RenovacaoContratoAdmin(admin.ModelAdmin):
 # ════════════════════════════════════════════════════════════════════
 
     actions = [
+        action_renovar_token_renovacao,
         'enviar_notificacao_renovacao_email',
         'enviar_notificacao_renovacao_whatsapp',
         'gerar_contrato_renovacao', 'gerar_contrato_pdf_renovacao', 'enviar_contrato_email', 'enviar_contrato_whatsapp', 'ativar_renovacao']
@@ -2284,9 +2315,18 @@ class RenovacaoContratoAdmin(admin.ModelAdmin):
         import io
         
         try:
-            # Gerar DOCX em memória
-            response = gerar_contrato_docx(renovacao.nova_locacao)
-            docx_content = response.content
+            # Gerar DOCX de RENOVAÇÃO (com variáveis específicas)
+            from core.views_gerar_contrato import gerar_docx_contrato_renovacao, converter_docx_para_pdf
+            
+            docx_io = gerar_docx_contrato_renovacao(renovacao)
+            
+            # Converter para PDF
+            pdf_io = converter_docx_para_pdf(docx_io)
+            
+            if not pdf_io:
+                raise Exception('Falha ao converter contrato para PDF')
+            
+            pdf_content = pdf_io.read()
             
             locacao = renovacao.locacao_original
             proprietario = locacao.imovel.locador
@@ -2304,7 +2344,9 @@ Dados da Renovação:
 - Imóvel: {locacao.imovel.endereco_completo}
 - Locatário: {locatario.nome_razao_social}
 - Vigência: {renovacao.nova_data_inicio.strftime('%d/%m/%Y')} a {renovacao.nova_data_fim.strftime('%d/%m/%Y')}
-- Valor: R$ {renovacao.novo_valor_aluguel:,.2f}
+- Valor Anterior: R$ {renovacao.locacao_original.valor_aluguel:,.2f}
+- Valor Novo: R$ {renovacao.novo_valor_aluguel:,.2f}
+- Reajuste: {renovacao.aumento_percentual:.1f}%
 
 Por favor, imprimam, assinem e devolvam 2 vias.
 
@@ -2316,11 +2358,11 @@ HABITAT PRO - A&C Imóveis e Sistemas Imobiliários
                 to=[proprietario.email, locatario.email],
             )
             
-            # Anexar DOCX
+            # Anexar PDF (não DOCX)
             email.attach(
-                f'Contrato_Renovacao_{renovacao.nova_locacao.numero_contrato}.docx',
-                docx_content,
-                'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+                f'Contrato_Renovacao_{renovacao.nova_locacao.numero_contrato}.pdf',
+                pdf_content,
+                'application/pdf'
             )
             
             email.send()
@@ -2342,74 +2384,71 @@ HABITAT PRO - A&C Imóveis e Sistemas Imobiliários
     
     @admin.action(description='💬 Enviar Contrato por WhatsApp')
     def enviar_contrato_whatsapp(self, request, queryset):
-        """
-        Gera link wa.me para enviar contrato via WhatsApp.
-        Segue o mesmo padrão usado em comandas.
-        """
+        """Gera link wa.me para enviar contrato via WhatsApp com link de download seguro"""
         if queryset.count() != 1:
-            self.message_user(
-                request,
-                '❌ Selecione apenas UMA renovação por vez',
-                level='error'
-            )
+            self.message_user(request, '❌ Selecione apenas UMA renovação por vez', level='error')
             return
         
         renovacao = queryset.first()
         
         if not renovacao.nova_locacao:
-            self.message_user(
-                request,
-                '❌ Contrato ainda não foi gerado. Execute "Gerar Contrato" primeiro.',
-                level='error'
-            )
+            self.message_user(request, '❌ Contrato ainda não foi gerado. Execute "Gerar Contrato" primeiro.', level='error')
             return
         
         from urllib.parse import quote
+        from django.urls import reverse
+        from core.models import ContratoDownloadToken
         
         locacao = renovacao.locacao_original
         locatario = locacao.locatario
+        imovel = locacao.imovel
         
-        # Limpar telefone
+        # Criar token de download
+        try:
+            token = ContratoDownloadToken.criar_token(renovacao=renovacao, tipo_destinatario='locatario', dias_validade=7)
+            download_url = request.build_absolute_uri(reverse('download_contrato_token', kwargs={'token': token.token}))
+        except Exception as e:
+            self.message_user(request, f'❌ Erro ao criar link de download: {e}', level='error')
+            return
+        
+        # Preparar telefone
         telefone = ''.join(filter(str.isdigit, locatario.telefone))
-        
-        # Adicionar código do Brasil se necessário
         if not telefone.startswith('55'):
             telefone = f'55{telefone}'
         
-        # Mensagem
-        base_url = settings.SITE_URL
+        # Mensagem padronizada
         mensagem = f"""🏠 *HABITAT PRO - Contrato de Renovação*
 
 Olá *{locatario.nome_razao_social}*,
 
 Seu contrato de renovação foi aprovado! ✅
 
-📋 *Dados do Contrato:*
-- Imóvel: {locacao.imovel.endereco_completo}
+📋 *Dados da Renovação:*
+- Imóvel: {imovel.endereco_completo}
 - Vigência: {renovacao.nova_data_inicio.strftime('%d/%m/%Y')} a {renovacao.nova_data_fim.strftime('%d/%m/%Y')}
-- Valor: R$ {renovacao.novo_valor_aluguel:,.2f}
+- Valor Anterior: R$ {renovacao.locacao_original.valor_aluguel:,.2f}
+- Valor Novo: R$ {renovacao.novo_valor_aluguel:,.2f}
+- Reajuste: {renovacao.aumento_percentual:.1f}%
 
-📄 O contrato em DOCX/PDF será enviado por email para assinatura.
+📄 *BAIXAR CONTRATO (PDF):*
+{download_url}
 
-Dúvidas? Entre em contato através do sistema.*HABITAT PRO - A&C Imóveis e Sistemas Imobiliários*"""
+⏰ Link válido por 7 dias
+
+Por favor, imprima, assine e devolva 2 vias.
+
+*HABITAT PRO - A&C Imóveis e Sistemas Imobiliários*"""
         
         mensagem_encoded = quote(mensagem)
         whatsapp_url = f'https://wa.me/{telefone}?text={mensagem_encoded}'
-        
-        # Salvar na sessão (mesmo padrão de comandas)
         request.session['whatsapp_redirect'] = whatsapp_url
         
-        self.message_user(
-            request,
-            format_html(
-                '✅ Link WhatsApp gerado! <a href="{}" target="_blank" '
-                'style="background: #25d366; color: white; padding: 8px 15px; '
-                'border-radius: 5px; text-decoration: none; margin-left: 10px;">'
-                '💬 Abrir WhatsApp Web</a>',
-                whatsapp_url
-            ),
-            level='success'
-        )
+        self.message_user(request, format_html(
+            '✅ Link WhatsApp gerado com link de download seguro!<br>'
+            '📄 Token válido por 7 dias<br>'
+            '🔗 Total de acessos será registrado<br><br>'
+            '<a href="{}" target="_blank" style="background:#25d366;color:white;padding:10px 20px;border-radius:5px;text-decoration:none;display:inline-block;margin-top:10px;">💬 Abrir WhatsApp Web</a>',
+            whatsapp_url), level='success')
     
     @admin.action(description='✅ Ativar Renovação (Criar Novo Contrato)')
     def ativar_renovacao(self, request, queryset):
@@ -2504,7 +2543,13 @@ Dúvidas? Entre em contato através do sistema.*HABITAT PRO - A&C Imóveis e Sis
         erros = 0
         detalhes_erros = []
         
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.info(f"🔍 ACTION DEBUG 1: Iniciando enviar_notificacao_renovacao_email com {queryset.count()} renovações")
+        
         for renovacao in queryset:
+            logger.info(f"🔍 ACTION DEBUG 2: Processando renovacao id={renovacao.id}")
+            logger.info(f"🔍 ACTION DEBUG 3: renovacao.__dict__ = {renovacao.__dict__}")
             try:
                 # Validar se renovação NÃO está finalizada
                 # Bloqueia apenas: ativa, recusada, cancelada
@@ -2574,7 +2619,13 @@ Dúvidas? Entre em contato através do sistema.*HABITAT PRO - A&C Imóveis e Sis
         
         links_gerados = []
         
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.info(f"🔍 ACTION DEBUG 1: Iniciando enviar_notificacao_renovacao_email com {queryset.count()} renovações")
+        
         for renovacao in queryset:
+            logger.info(f"🔍 ACTION DEBUG 2: Processando renovacao id={renovacao.id}")
+            logger.info(f"🔍 ACTION DEBUG 3: renovacao.__dict__ = {renovacao.__dict__}")
             # Bloqueia apenas renovações finalizadas
             if renovacao.status in ['ativa', 'recusada', 'cancelada']:
                 continue
@@ -2630,3 +2681,33 @@ Dúvidas? Entre em contato através do sistema.*HABITAT PRO - A&C Imóveis e Sis
         else:
             self.message_user(request, "Nenhum link gerado", level='WARNING')
 
+
+
+# ═══════════════════════════════════════════════════════════════
+# CUSTOM ADMIN SITE COM WIDGETS DE TOKENS (DEV_21.6 - Fase 4)
+# ═══════════════════════════════════════════════════════════════
+
+from django.contrib.admin import AdminSite
+from django.shortcuts import render
+
+class CustomAdminSite(AdminSite):
+    """Admin site customizado com widgets de monitoramento de tokens."""
+    
+    def index(self, request, extra_context=None):
+        """
+        Override do index para adicionar contexto dos tokens.
+        """
+        extra_context = extra_context or {}
+        
+        # Adicionar contexto dos tokens
+        try:
+            contexto_tokens = gerar_contexto_dashboard()
+            extra_context.update(contexto_tokens)
+        except Exception as e:
+            # Se der erro, não quebrar o admin
+            print(f"Erro ao carregar widgets de tokens: {e}")
+        
+        return super().index(request, extra_context=extra_context)
+
+# Usar custom admin site
+# admin_site = CustomAdminSite(name='admin')

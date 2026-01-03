@@ -1,3 +1,4 @@
+from core.views_download_contrato import download_contrato_token, verificar_token
 """
 URLs do core - VERSÃO DEV_21
 Adicionado: Rotas de Renovação de Contratos
@@ -61,4 +62,8 @@ urlpatterns = [
     path('renovacao/locatario/<uuid:token>/', 
          views_renovacao.responder_renovacao_locatario, 
          name='responder_renovacao_locatario'),
+    # URLs de download de contrato via token
+    path('contrato/<uuid:token>/', download_contrato_token, name='download_contrato_token'),
+    path('contrato/<uuid:token>/status/', verificar_token, name='verificar_token_contrato'),
+
 ]

@@ -98,8 +98,8 @@ def gerar_mensagem_whatsapp(request, comanda_id):
         telefone_limpo = '55' + telefone_limpo
     
     # Gerar URL da página da comanda (se quiser implementar página pública)
-    # comanda_url = request.build_absolute_uri(f'/comanda/{comanda.token}/')
-    comanda_url = None  # Por enquanto sem página pública
+    comanda_url = request.build_absolute_uri(f'/comanda/{comanda.token}/')
+    # comanda_url = None  # Agora COM página pública!
     
     # Formatar mensagem
     mensagem = MessageFormatter.formatar_mensagem_whatsapp_comanda(

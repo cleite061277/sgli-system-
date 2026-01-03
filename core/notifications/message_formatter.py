@@ -56,11 +56,19 @@ def formatar_mensagem_whatsapp_recibo(pagamento, recibo_url: str = None) -> str:
     if recibo_url:
         lines += ["", f"🔗 Ver recibo completo: {recibo_url}"]
 
+    # Adicionar link da comanda (se fornecido)
+    if comanda_url:
+        lines += [
+            "",
+            "🔗 Ver comanda completa:",
+            comanda_url
+        ]
+    
     lines += ["", "—", "HABITAT PRO", "Sistema de Gestão Imobiliária"]
     return "\n".join(lines)
 
 
-def formatar_mensagem_whatsapp_comanda(comanda) -> str:
+def formatar_mensagem_whatsapp_comanda(comanda, comanda_url: str = None) -> str:
     """
     Formata mensagem de comanda (aviso de vencimento) para WhatsApp.
     
@@ -134,6 +142,14 @@ def formatar_mensagem_whatsapp_comanda(comanda) -> str:
             "Mantenha seus pagamentos em dia.",
         ]
 
+    # Adicionar link da comanda (se fornecido)
+    if comanda_url:
+        lines += [
+            "",
+            "🔗 Ver comanda completa:",
+            comanda_url
+        ]
+    
     lines += ["", "—", "HABITAT PRO", "Sistema de Gestão Imobiliária"]
     return "\n".join(lines)
 
@@ -152,9 +168,9 @@ class MessageFormatter:
         return formatar_mensagem_whatsapp_recibo(pagamento, recibo_url=recibo_url)
 
     @staticmethod
-    def formatar_mensagem_whatsapp_comanda(comanda) -> str:
+    def formatar_mensagem_whatsapp_comanda(comanda, comanda_url: str = None) -> str:
         """Formata comanda para WhatsApp."""
-        return formatar_mensagem_whatsapp_comanda(comanda)
+        return formatar_mensagem_whatsapp_comanda(comanda, comanda_url=comanda_url)
 
     @staticmethod
     def formatar(pagamento, recibo_url: str = None) -> str:

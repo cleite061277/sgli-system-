@@ -50,6 +50,7 @@ def comanda_web_view(request, comanda_id, token):
         'valor_total': f"{comanda.valor_total:,.2f}",
         'tem_multa_juros': comanda.is_vencida,
         'dias_atraso': comanda.dias_atraso if comanda.is_vencida else 0,
+        'observacoes': comanda.observacoes,  # DEV_21.6 - Observações
     }
     
     # Determinar tipo de mensagem

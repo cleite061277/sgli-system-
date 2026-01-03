@@ -2388,3 +2388,142 @@ class RenovacaoContrato(BaseModel):
         self.save(update_fields=['historico_comunicacoes', 'updated_at'])
 
     
+
+
+# ════════════════════════════════════════════════════════════════
+# MODEL: ContratoDownloadToken (DEV_21.7 - Tokens On-Demand)
+# ════════════════════════════════════════════════════════════════
+
+import uuid
+from django.utils import timezone
+from datetime import timedelta
+
+
+class ContratoDownloadToken(BaseModel):
+    """
+    Token temporário para download seguro de contratos via WhatsApp.
+    Gera PDF on-demand (não armazena arquivo) com token UUID seguro.
+    """
+    
+    token = models.UUIDField(
+        default=uuid.uuid4,
+        unique=True,
+        db_index=True,
+        editable=False,
+        help_text="Token UUID único para acesso seguro"
+    )
+    
+    renovacao = models.ForeignKey(
+        'RenovacaoContrato',
+        on_delete=models.CASCADE,
+        related_name='tokens_download',
+        help_text="Renovação de contrato associada"
+    )
+    
+    TIPO_DESTINATARIO_CHOICES = [
+        ('locatario', 'Locatário'),
+        ('proprietario', 'Proprietário'),
+    ]
+    
+    tipo_destinatario = models.CharField(
+        max_length=20,
+        choices=TIPO_DESTINATARIO_CHOICES,
+        default='locatario',
+        help_text="Destinatário do link"
+    )
+    
+    expira_em = models.DateTimeField(
+        help_text="Data/hora de expiração do token (7 dias padrão)"
+    )
+    
+    acessos = models.IntegerField(
+        default=0,
+        help_text="Número total de downloads realizados"
+    )
+    
+    ultimo_acesso = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text="Data/hora do último acesso"
+    )
+    
+    ip_acessos = models.JSONField(
+        default=list,
+        blank=True,
+        help_text="Log de IPs que acessaram o link"
+    )
+    
+    class Meta:
+        db_table = 'core_contrato_download_token'
+        verbose_name = 'Token de Download de Contrato'
+        verbose_name_plural = 'Tokens de Download de Contratos'
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['token']),
+            models.Index(fields=['expira_em']),
+        ]
+    
+    def __str__(self):
+        return f"Token {self.token.hex[:8]}... - {self.renovacao.locacao_original.numero_contrato}"
+    
+    def save(self, *args, **kwargs):
+        if not self.pk and not self.expira_em:
+            self.expira_em = timezone.now() + timedelta(days=7)
+        super().save(*args, **kwargs)
+    
+    @property
+    def esta_expirado(self):
+        return timezone.now() > self.expira_em
+    
+    @property
+    def dias_restantes(self):
+        if self.esta_expirado:
+            return 0
+        delta = self.expira_em - timezone.now()
+        return delta.days
+    
+    def gerar_pdf_on_demand(self):
+        from core.views_gerar_contrato import gerar_docx_contrato_renovacao, converter_docx_para_pdf
+        docx_io = gerar_docx_contrato_renovacao(self.renovacao)
+        pdf_io = converter_docx_para_pdf(docx_io)
+        if not pdf_io:
+            raise Exception('Falha ao converter contrato para PDF')
+        return pdf_io
+    
+    def registrar_acesso(self, ip_address=None, user_agent=None):
+        self.acessos += 1
+        self.ultimo_acesso = timezone.now()
+        log_entry = {
+            'timestamp': timezone.now().isoformat(),
+            'ip': ip_address or 'unknown',
+            'user_agent': user_agent or 'unknown',
+        }
+        if not isinstance(self.ip_acessos, list):
+            self.ip_acessos = []
+        self.ip_acessos.append(log_entry)
+        if len(self.ip_acessos) > 50:
+            self.ip_acessos = self.ip_acessos[-50:]
+        self.save(update_fields=['acessos', 'ultimo_acesso', 'ip_acessos'])
+    
+    def get_url_publica(self, request=None):
+        from django.urls import reverse
+        path = reverse('download_contrato_token', kwargs={'token': self.token})
+        if request:
+            return request.build_absolute_uri(path)
+        else:
+            from django.conf import settings
+            return f"{settings.SITE_URL}{path}"
+    
+    @classmethod
+    def criar_token(cls, renovacao, tipo_destinatario='locatario', dias_validade=7):
+        return cls.objects.create(
+            renovacao=renovacao,
+            tipo_destinatario=tipo_destinatario,
+            expira_em=timezone.now() + timedelta(days=dias_validade)
+        )
+    
+    @classmethod
+    def limpar_tokens_expirados(cls, dias_apos_expiracao=30):
+        limite = timezone.now() - timedelta(days=dias_apos_expiracao)
+        deletados = cls.objects.filter(expira_em__lt=limite).delete()
+        return deletados[0]
