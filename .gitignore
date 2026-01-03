@@ -165,3 +165,6 @@ Conteúdo:
 Link:
 Para:
 backup_padronizacao_*.tar.gz
+
+# Backups tar.gz
+backup_*.tar.gz
