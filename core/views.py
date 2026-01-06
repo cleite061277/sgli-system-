@@ -436,6 +436,7 @@ def comanda_web_view(request, comanda_id):
         'mostrar_alerta_atraso': mostrar_alerta_atraso,
         'aviso_pagamento': aviso_pagamento,
         'mensagem': f'Comanda referente ao imóvel {loc.imovel.endereco}.',
+        'observacoes': comanda.observacoes,  # DEV_21.8 - Observações em HTML/Email
     }
     
     return render(request, 'admin/comanda_web.html', context)

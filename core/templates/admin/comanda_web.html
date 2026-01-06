@@ -1,384 +1,218 @@
-{% load static %}
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ titulo }} - HABITAT PRO</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            line-height: 1.6; 
+            color: #333;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 20px;
-            color: #333;
         }
-        
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
+        .container { 
+            max-width: 600px; 
+            margin: 0 auto; 
             background: white;
             border-radius: 16px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
             overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
         }
-        
-        .header {
-            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
-            color: white;
-            padding: 30px;
+        .header { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; 
+            padding: 40px 30px; 
             text-align: center;
         }
-        
-        .header h1 {
-            font-size: 28px;
-            font-weight: 700;
-            margin-bottom: 8px;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        }
-        
-        .header .numero-comanda {
-            font-size: 18px;
-            opacity: 0.95;
-            font-weight: 500;
-        }
-        
-        .content {
-            padding: 40px;
-        }
-        
-        .info-section {
+        .header h1 { font-size: 32px; margin-bottom: 10px; }
+        .header p { font-size: 18px; opacity: 0.95; }
+        .content { padding: 30px; }
+        .greeting { font-size: 18px; margin-bottom: 20px; }
+        .greeting strong { color: #667eea; }
+        .message { 
+            background: #f8f9ff; 
+            padding: 20px; 
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
             margin-bottom: 30px;
-            padding-bottom: 25px;
-            border-bottom: 2px solid #f0f0f0;
         }
-        
-        .info-section:last-child {
-            border-bottom: none;
-            margin-bottom: 0;
+        .valores { 
+            background: #f9f9f9; 
+            padding: 25px; 
+            border-radius: 12px;
+            margin: 20px 0;
         }
-        
-        .info-section h2 {
-            color: #1e3a8a;
-            font-size: 18px;
-            margin-bottom: 15px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+        .valores h3 { 
+            color: #667eea; 
+            margin-bottom: 20px;
+            font-size: 20px;
         }
-        
         .info-row {
             display: flex;
             justify-content: space-between;
             padding: 12px 0;
-            border-bottom: 1px solid #f5f5f5;
+            border-bottom: 1px solid #eee;
         }
-        
-        .info-row:last-child {
-            border-bottom: none;
+        .info-row:last-child { border-bottom: none; }
+        .info-label { color: #666; }
+        .info-value { font-weight: bold; color: #333; }
+        .secao { 
+            margin: 20px 0; 
+            padding: 20px; 
+            border-left: 4px solid #667eea;
+            background: white;
+            border-radius: 0 8px 8px 0;
         }
-        
-        .info-label {
-            color: #666;
-            font-weight: 500;
-            font-size: 14px;
+        .secao h4 { 
+            color: #667eea; 
+            margin-bottom: 15px;
+            font-size: 16px;
         }
-        
-        .info-value {
-            color: #333;
-            font-weight: 600;
-            font-size: 14px;
-            text-align: right;
+        .secao.atraso {
+            border-left-color: #e74c3c;
+            background: #fff5f5;
         }
-        
-        .valor-destaque {
+        .secao.atraso h4 { color: #e74c3c; }
+        .secao.atraso .valor-destaque { color: #e74c3c; }
+        .total { 
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 20px;
+            color: white; 
+            padding: 25px; 
+            text-align: center; 
+            font-size: 28px; 
+            font-weight: bold;
             border-radius: 12px;
-            text-align: center;
-            margin: 25px 0;
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+            margin: 30px 0;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
         }
-        
-        .valor-destaque .label {
-            font-size: 14px;
-            opacity: 0.9;
-            margin-bottom: 8px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        
-        .valor-destaque .valor {
-            font-size: 36px;
-            font-weight: 700;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        }
-        
-        .alert {
-            background: #fef3c7;
-            border-left: 4px solid #f59e0b;
-            padding: 15px 20px;
-            border-radius: 8px;
+        .btn { 
+            display: inline-block; 
+            padding: 15px 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; 
+            text-decoration: none;
+            border-radius: 30px;
             margin: 20px 0;
-            display: flex;
-            align-items: center;
-            gap: 12px;
+            font-weight: bold;
+            transition: transform 0.2s;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
         }
-        
-        .alert.danger {
-            background: #fee2e2;
-            border-left-color: #dc2626;
+        .btn:hover { transform: translateY(-2px); }
+        .footer { 
+            text-align: center; 
+            padding: 30px; 
+            color: #666;
+            background: #f9f9f9;
+            border-top: 1px solid #eee;
         }
-        
-        .alert-icon {
-            font-size: 24px;
-        }
-        
-        .alert-text {
-            flex: 1;
-            font-size: 14px;
-            color: #78350f;
-        }
-        
-        .alert.danger .alert-text {
-            color: #7f1d1d;
-        }
-        
-        .footer {
-            background: #f9fafb;
-            padding: 25px 40px;
-            text-align: center;
-            border-top: 1px solid #e5e7eb;
-        }
-        
-        .footer p {
-            color: #6b7280;
-            font-size: 13px;
-            margin: 5px 0;
-        }
-        
-        .footer .brand {
-            color: #667eea;
-            font-weight: 600;
-        }
-        
-        .badge {
+        .footer p { margin: 5px 0; font-size: 14px; }
+        .badge-atraso {
             display: inline-block;
-            padding: 6px 14px;
+            background: #e74c3c;
+            color: white;
+            padding: 8px 16px;
             border-radius: 20px;
-            font-size: 13px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            font-size: 14px;
+            font-weight: bold;
+            margin-top: 10px;
         }
-        
-        .badge.warning {
-            background: #fef3c7;
-            color: #92400e;
-        }
-        
-        .badge.danger {
-            background: #fee2e2;
-            color: #991b1b;
-        }
-        
         @media (max-width: 600px) {
-            .container {
-                border-radius: 0;
-            }
-            
-            .content {
-                padding: 25px 20px;
-            }
-            
-            .header {
-                padding: 25px 20px;
-            }
-            
-            .header h1 {
-                font-size: 24px;
-            }
-            
-            .valor-destaque .valor {
-                font-size: 28px;
-            }
-            
-            .info-row {
-                flex-direction: column;
-                gap: 5px;
-            }
-            
-            .info-value {
-                text-align: left;
-            }
-        }
-        
-        @media print {
-            body {
-                background: white;
-                padding: 0;
-            }
-            
-            .container {
-                box-shadow: none;
-                border-radius: 0;
-            }
-            
-            .header {
-                background: #1e3a8a;
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
-            }
-            
-            .valor-destaque {
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
-            }
+            body { padding: 10px; }
+            .header h1 { font-size: 24px; }
+            .total { font-size: 22px; }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- HEADER -->
         <div class="header">
-            <h1>📋 COMANDA DE PAGAMENTO</h1>
-            <div class="numero-comanda">{{ numero_comanda }}</div>
+            <h1>🏠 HABITAT PRO</h1>
+            <p>{{ titulo }}</p>
         </div>
         
-        <!-- CONTENT -->
         <div class="content">
-            <!-- INFORMAÇÕES DO LOCATÁRIO -->
-            <div class="info-section">
-                <h2>👤 Locatário</h2>
-                <div class="info-row">
-                    <span class="info-label">Nome</span>
-                    <span class="info-value">{{ locatario_nome }}</span>
-                </div>
-            </div>
+            <p class="greeting">Olá <strong>{{ locatario_nome }}</strong>,</p>
             
-            <!-- INFORMAÇÕES DO IMÓVEL -->
-            <div class="info-section">
-                <h2>🏠 Imóvel</h2>
-                <div class="info-row">
-                    <span class="info-label">Endereço</span>
-                    <span class="info-value">{{ imovel_endereco }}</span>
-                </div>
+            <div class="message">
+                <p>{{ mensagem }}</p>
             </div>
-            
-            <!-- VENCIMENTO -->
-            <div class="info-section">
-                <h2>📅 Vencimento</h2>
-                <div class="info-row">
-                    <span class="info-label">Data de Vencimento</span>
-                    <span class="info-value">{{ data_vencimento }}</span>
-                </div>
-                
-                <!-- ✅ ALERTA INTELIGENTE BASEADO NO STATUS -->
-                {% if mostrar_alerta_atraso %}
-                <div class="alert {% if tipo_alerta == 'danger' %}danger{% else %}warning{% endif %}">
-                    <span class="alert-icon">⚠️</span>
-                    <div class="alert-text">
-                        <strong>{{ mensagem_status }}</strong>
-                    </div>
-                </div>
-                {% elif tipo_alerta == 'success' %}
-                <div class="alert" style="background: #d4edda; border-left-color: #28a745;">
-                    <span class="alert-icon">✅</span>
-                    <div class="alert-text" style="color: #155724;">
-                        <strong>{{ mensagem_status }}</strong>
-                    </div>
-                </div>
-                {% elif tipo_alerta == 'warning' %}
-                <div class="alert warning">
-                    <span class="alert-icon">⚡</span>
-                    <div class="alert-text">
-                        <strong>{{ mensagem_status }}</strong>
-                    </div>
-                </div>
-                {% elif tipo_alerta == 'info' %}
-                <div class="alert" style="background: #d1ecf1; border-left-color: #17a2b8;">
-                    <span class="alert-icon">⏳</span>
-                    <div class="alert-text" style="color: #0c5460;">
-                        <strong>{{ mensagem_status }}</strong>
-                    </div>
-                </div>
-                {% endif %}
-            </div>
-            
-            <!-- DETALHAMENTO DE VALORES -->
-            <div class="info-section">
-                <h2>💰 Detalhamento dos Valores</h2>
-                
-                <div class="info-row">
-                    <span class="info-label">Aluguel</span>
-                    <span class="info-value">R$ {{ valor_aluguel }}</span>
-                </div>
-                
-                <div class="info-row">
-                    <span class="info-label">Condomínio</span>
-                    <span class="info-value">R$ {{ valor_condominio }}</span>
-                </div>
-                
-                <div class="info-row">
-                    <span class="info-label">IPTU</span>
-                    <span class="info-value">R$ {{ valor_iptu }}</span>
-                </div>
-                
-                {% if tem_multa_juros %}
-                <div class="info-row">
-                    <span class="info-label">Multa (10%)</span>
-                    <span class="info-value" style="color: #dc2626;">R$ {{ valor_multa }}</span>
-                </div>
-                
-                <div class="info-row">
-                    <span class="info-label">Juros (1% a.m.)</span>
-                    <span class="info-value" style="color: #dc2626;">R$ {{ valor_juros }}</span>
-                </div>
-                
-                <div class="alert warning">
-                    <span class="alert-icon">💡</span>
-                    <div class="alert-text">
-                        Esta comanda possui encargos por atraso no pagamento.
-                    </div>
-                </div>
-                {% endif %}
-            </div>
-            
-            <!-- VALOR TOTAL -->
-            <div class="valor-destaque">
-                <div class="label">Valor Total a Pagar</div>
-                <div class="valor">R$ {{ valor_total }}</div>
-            </div>
-            
-            <!-- MENSAGEM -->
-            {% if mensagem %}
-            <div class="info-section">
-                <h2>📝 Observações</h2>
-                <p style="color: #666; font-size: 14px; line-height: 1.6;">{{ mensagem }}</p>
+
+            {% if observacoes %}
+            <div class="secao">
+                <h4>📝 Observações Importantes</h4>
+                <p style="color: #555; line-height: 1.8;">{{ observacoes }}</p>
             </div>
             {% endif %}
             
-            <!-- AVISO IMPORTANTE -->
-            <div class="alert warning" style="margin-top: 20px;">
-                <span class="alert-icon">⚠️</span>
-                <div class="alert-text">
-                    <strong>IMPORTANTE:</strong> {{ aviso_pagamento }}
+            <div class="valores">
+                <h3>📋 Detalhes da Cobrança</h3>
+                
+                <div class="info-row">
+                    <span class="info-label">Imóvel:</span>
+                    <span class="info-value">{{ imovel_endereco }}</span>
                 </div>
+                <div class="info-row">
+                    <span class="info-label">Comanda:</span>
+                    <span class="info-value">{{ numero_comanda }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Vencimento:</span>
+                    <span class="info-value">{{ data_vencimento }}</span>
+                </div>
+                
+                <div class="secao">
+                    <h4>💵 Valores Base</h4>
+                    <div class="info-row">
+                        <span class="info-label">Aluguel:</span>
+                        <span class="info-value">R$ {{ valor_aluguel }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Condomínio:</span>
+                        <span class="info-value">R$ {{ valor_condominio }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">IPTU:</span>
+                        <span class="info-value">R$ {{ valor_iptu }}</span>
+                    </div>
+                </div>
+                
+                {% if tem_multa_juros %}
+                <div class="secao atraso">
+                    <h4>⚠️ Ajustes Financeiros</h4>
+                    <div class="info-row">
+                        <span class="info-label">Multa (10%):</span>
+                        <span class="info-value valor-destaque">R$ {{ valor_multa }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Juros (1% a.m.):</span>
+                        <span class="info-value valor-destaque">R$ {{ valor_juros }}</span>
+                    </div>
+                    <div class="badge-atraso">Atraso: {{ dias_atraso }} dia{{ dias_atraso|pluralize }}</div>
+                </div>
+                {% endif %}
+                
+                <div class="total">
+                    TOTAL: R$ {{ valor_total }}
+                </div>
+            </div>
+            
+            <div style="text-align: center; padding: 20px; background: #f9f9f9; border-radius: 12px; margin: 20px 0;">
+                <p style="color: #667eea; font-weight: 600; font-size: 16px; margin: 0;">
+                    💬 Para falar sobre comanda ou valores, entre em contato com o(a) gestor(a) de seu contrato.
+                </p>
             </div>
         </div>
         
-        <!-- FOOTER -->
         <div class="footer">
-            <p>Documento gerado via <span class="brand">HABITAT PRO v1.0</span></p>
-            <p>Sistema de Gestão Imobiliária</p>
+            <p><strong>HABITAT PRO</strong></p>
+            <p>Sistema de Gestão Inteligente de Imóveis</p>
+            <p style="font-size: 12px; color: #999; margin-top: 10px;">
+                Esta é uma cobrança automática. Para dúvidas, entre em contato.
+            </p>
         </div>
     </div>
 </body>

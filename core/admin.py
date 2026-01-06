@@ -1106,10 +1106,20 @@ TOTAL: *R$ {obj.valor_total:,.2f}*
 ━━━━━━━━━━━━━━━━━━━━━━━━━━
 📍 *IMÓVEL*
 ━━━━━━━━━━━━━━━━━━━━━━━━━━
-{imovel.endereco}, {imovel.numero}
+{imovel.endereco}, {imovel.numero}'''
+
+        # 📝 OBSERVAÇÕES (se existirem)
+        if hasattr(obj, 'observacoes') and obj.observacoes and obj.observacoes.strip():
+            msg += f'''
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━
+📝 *COMENTÁRIOS*
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+{obj.observacoes.strip()}'''
 
+        msg += f'''
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━
 ⚠️ *IMPORTANTE*
 Pague seus débitos em dia e evite multas, juros e outras correções conforme contrato de locação.
 
