@@ -180,6 +180,25 @@
                     </div>
                 </div>
                 
+                
+                {% if outros_debitos or outros_creditos %}
+                <div class="secao">
+                    <h4>💳 Outros Valores</h4>
+                    {% if outros_debitos %}
+                    <div class="info-row">
+                        <span class="info-label">Outras despesas:</span>
+                        <span class="info-value">R$ {{ outros_debitos }}</span>
+                    </div>
+                    {% endif %}
+                    {% if outros_creditos %}
+                    <div class="info-row">
+                        <span class="info-label">Créditos:</span>
+                        <span class="info-value" style="color: #27ae60;">R$ -{{ outros_creditos }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+                
                 {% if tem_multa_juros %}
                 <div class="secao atraso">
                     <h4>⚠️ Ajustes Financeiros</h4>

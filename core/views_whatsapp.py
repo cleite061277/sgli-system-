@@ -11,7 +11,7 @@ from decimal import Decimal
 import urllib.parse
 
 from .models import Comanda, Locacao
-from .notifications.message_formatter import MessageFormatter
+from .notifications.message_formatter import formatar_mensagem_whatsapp_comanda, formatar_mensagem_whatsapp_recibo
 
 
 @login_required
@@ -102,7 +102,7 @@ def gerar_mensagem_whatsapp(request, comanda_id):
     # comanda_url = None  # Agora COM página pública!
     
     # Formatar mensagem
-    mensagem = MessageFormatter.formatar_mensagem_whatsapp_comanda(
+    mensagem = formatar_mensagem_whatsapp_comanda(
         comanda, 
         comanda_url=comanda_url
     )

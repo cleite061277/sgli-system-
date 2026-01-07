@@ -437,6 +437,8 @@ def comanda_web_view(request, comanda_id):
         'aviso_pagamento': aviso_pagamento,
         'mensagem': f'Comanda referente ao imóvel {loc.imovel.endereco}.',
         'observacoes': comanda.observacoes,  # DEV_21.8 - Observações em HTML/Email
+        'outros_debitos': f"{comanda.outros_debitos:,.2f}" if comanda.outros_debitos > 0 else None,
+        'outros_creditos': f"{comanda.outros_creditos:,.2f}" if comanda.outros_creditos > 0 else None,
     }
     
     return render(request, 'admin/comanda_web.html', context)
@@ -504,6 +506,15 @@ VALORES:
   • Aluguel: R$ {comanda.valor_aluguel:,.2f}
   • Condomínio: R$ {comanda.valor_condominio:,.2f}
   • IPTU: R$ {comanda.valor_iptu:,.2f}'''
+
+        # Adicionar outros débitos/créditos se houver
+        if comanda.outros_debitos > 0:
+            corpo += f'''
+  • Outras despesas: R$ {comanda.outros_debitos:,.2f}'''
+        
+        if comanda.outros_creditos > 0:
+            corpo += f'''
+  • Créditos: R$ -{comanda.outros_creditos:,.2f}'''
 
         # Adicionar multa/juros se houver
         if comanda.valor_multa > 0 or comanda.valor_juros > 0:
