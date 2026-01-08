@@ -25,7 +25,7 @@ from .dashboard_views import (
 from . import views_renovacao
 
 urlpatterns = [    
-    path('comanda/<uuid:comanda_id>/web/', comanda_web_view, name='comanda_web_view'),
+    path('comanda/<uuid:comanda_id>/<str:token>/', comanda_web_view, name='comanda_web_view'),
     path('comanda/<uuid:comanda_id>/enviar-email/', enviar_comanda_email, name='enviar_comanda_email'),
     
     # Recibos
