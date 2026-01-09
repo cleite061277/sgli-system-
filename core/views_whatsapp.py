@@ -11,6 +11,7 @@ from decimal import Decimal
 import urllib.parse
 
 from .models import Comanda, Locacao
+from core.views_comanda_web import gerar_token_comanda
 from .notifications.message_formatter import formatar_mensagem_whatsapp_comanda, formatar_mensagem_whatsapp_recibo
 
 
@@ -98,7 +99,8 @@ def gerar_mensagem_whatsapp(request, comanda_id):
         telefone_limpo = '55' + telefone_limpo
     
     # Gerar URL da página da comanda (se quiser implementar página pública)
-    comanda_url = request.build_absolute_uri(f'/comanda/{comanda.token}/')
+    token = gerar_token_comanda(str(comanda.id))
+    comanda_url = request.build_absolute_uri(f'/comanda/{comanda.id}/{token}/')
     # comanda_url = None  # Agora COM página pública!
     
     # Formatar mensagem

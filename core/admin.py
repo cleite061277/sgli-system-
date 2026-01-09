@@ -14,6 +14,7 @@ from django.contrib.auth.admin import UserAdmin
 from django.utils import timezone
 from .forms import PagamentoAdminForm
 from .models import Fiador, Usuario, Locador, Imovel, Locatario, Locacao, Comanda, Pagamento, TemplateContrato
+from core.views_comanda_web import gerar_token_comanda
 from django.http import HttpResponse
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
@@ -524,6 +525,7 @@ from django.utils.safestring import mark_safe
 from decimal import Decimal
 
 from .models import Comanda, Pagamento
+from core.views_comanda_web import gerar_token_comanda
 
 
 class PagamentoInline(admin.TabularInline):
@@ -1011,7 +1013,8 @@ class ComandaAdmin(admin.ModelAdmin):
         if not domain:
             domain = "http://127.0.0.1:8000"
         
-        comanda_url = f"{domain}/comanda/{obj.id}/web/"
+        token = gerar_token_comanda(str(obj.id))
+        comanda_url = f"{domain}/comanda/{obj.id}/{token}/"
         
         loc = obj.locacao.locatario
         imovel = obj.locacao.imovel
