@@ -353,7 +353,7 @@ def visualizar_recibo_pagamento(request, pagamento_id):
 
 
 @staff_member_required
-def comanda_web_view(request, comanda_id):
+def comanda_web_view_OLD_DEPRECATED(request, comanda_id):
     """Página web da comanda com lógica inteligente de status"""
     from django.shortcuts import render, get_object_or_404
     from .models import Comanda

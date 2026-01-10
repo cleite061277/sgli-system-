@@ -7,11 +7,11 @@ from django.urls import path
 from django.contrib import admin
 
 from .views import (
-    comanda_web_view,
     enviar_comanda_email,
     download_recibo_pagamento,
     pagina_recibo_pagamento,
 )
+from .views_comanda_web import comanda_web_view
 
 # ✅ DEV_20: Import das views do dashboard
 from .dashboard_views import (
@@ -62,8 +62,8 @@ urlpatterns = [
     path('renovacao/locatario/<uuid:token>/', 
          views_renovacao.responder_renovacao_locatario, 
          name='responder_renovacao_locatario'),
+    
     # URLs de download de contrato via token
     path('contrato/<uuid:token>/', download_contrato_token, name='download_contrato_token'),
     path('contrato/<uuid:token>/status/', verificar_token, name='verificar_token_contrato'),
-
 ]
