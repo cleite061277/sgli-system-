@@ -1334,6 +1334,25 @@ class Comanda(BaseModel):
         # O cálculo deve ocorrer APENAS se a comanda estiver vencida E tiver data_vencimento
         return (timezone.now().date() - self.data_vencimento).days
     
+    
+    @property
+    def dias_vencimento(self) -> int:
+        """
+        Calcula dias restantes até o vencimento.
+        Retorna 0 se já venceu ou não tem data de vencimento.
+        """
+        if not self.data_vencimento:
+            return 0
+        
+        hoje = timezone.now().date()
+        
+        # Se já venceu, retorna 0
+        if hoje >= self.data_vencimento:
+            return 0
+        
+        # Calcula dias restantes
+        return (self.data_vencimento - hoje).days
+    
     def calcular_multa_juros(self, data_referencia: date = None) -> dict:
         """
         Calculate late fees and interest based on overdue days.
