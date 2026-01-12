@@ -17,6 +17,7 @@ ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost').split(',')
 
 INSTALLED_APPS = [
     'django_apscheduler',
+    'storages',  # django-storages (Cloudflare R2)
     'core.apps.CoreConfig',  # ← DEVE VIR PRIMEIRO para templates customizados
     'django.contrib.admin',
     'django.contrib.auth',
@@ -327,3 +328,34 @@ PRAZO_ALERTA_VENCIMENTO_DIAS = 90
 ALERTA_CRITICO_DIAS = 60   # Vermelho: < 60 dias
 ALERTA_MEDIO_DIAS = 90      # Amarelo: 60-90 dias
 # Verde: > 90 dias
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# CLOUDFLARE R2 STORAGE (django-storages + boto3)
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+# Credenciais R2 (via variáveis de ambiente no Railway)
+AWS_ACCESS_KEY_ID = os.environ.get('R2_ACCESS_KEY_ID', '')
+AWS_SECRET_ACCESS_KEY = os.environ.get('R2_SECRET_ACCESS_KEY', '')
+AWS_STORAGE_BUCKET_NAME = os.environ.get('R2_BUCKET_NAME', 'habitat-pro-storage')
+AWS_S3_ENDPOINT_URL = os.environ.get('R2_ENDPOINT_URL', '')
+
+# Configurações S3-compatible
+AWS_S3_REGION_NAME = 'auto'
+AWS_S3_SIGNATURE_VERSION = 's3v4'
+AWS_S3_FILE_OVERWRITE = False
+AWS_DEFAULT_ACL = None
+AWS_QUERYSTRING_AUTH = False  # URLs públicas sem query string
+AWS_S3_OBJECT_PARAMETERS = {
+    'CacheControl': 'max-age=86400',  # Cache de 1 dia
+}
+
+# django-storages backend
+if AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY:
+    # Usar R2 se credenciais estiverem configuradas
+    DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+    print("✅ Cloudflare R2 ativado (django-storages)")
+else:
+    # Fallback para filesystem local (desenvolvimento)
+    print("⚠️  R2 não configurado - usando MEDIA local")
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

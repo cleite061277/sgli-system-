@@ -2546,3 +2546,12 @@ class ContratoDownloadToken(BaseModel):
         limite = timezone.now() - timedelta(days=dias_apos_expiracao)
         deletados = cls.objects.filter(expira_em__lt=limite).delete()
         return deletados[0]
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# MODELS DE VISTORIAS (Inspection System)
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+from .models_inspection import (
+    Inspection,
+    InspectionPhoto,
+    InspectionPDF
+)

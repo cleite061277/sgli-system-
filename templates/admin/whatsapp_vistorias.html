@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enviar Vistorias via WhatsApp</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            padding: 30px;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .total {
+            color: #666;
+            margin-bottom: 30px;
+        }
+        
+        .whatsapp-card {
+            border: 1px solid #e5e7eb;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            background: #fafafa;
+        }
+        
+        .whatsapp-card h3 {
+            color: #333;
+            margin-top: 0;
+            margin-bottom: 8px;
+        }
+        
+        .phone {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+        
+        .message-preview {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 15px;
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 13px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+        
+        .btn-copy {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-copy:hover {
+            background: #5568d3;
+        }
+        
+        .btn-whatsapp {
+            background: #25d366;
+            color: white;
+        }
+        
+        .btn-whatsapp:hover {
+            background: #20ba5a;
+        }
+        
+        .btn-back {
+            background: #6b7280;
+            color: white;
+            margin-top: 30px;
+        }
+        
+        .btn-back:hover {
+            background: #4b5563;
+        }
+        
+        .success-toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #10b981;
+            color: white;
+            padding: 16px 24px;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            display: none;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #9ca3af;
+        }
+        
+        .empty-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📱 Enviar Vistorias via WhatsApp</h1>
+        <p class="total">Total de destinatários: <strong>{{ total }}</strong></p>
+        
+        {% if mensagens %}
+            {% for msg in mensagens %}
+            <div class="whatsapp-card">
+                <h3>{{ msg.nome }}</h3>
+                <p class="phone">📞 Telefone: <strong>{{ msg.telefone }}</strong></p>
+                
+                <div class="message-preview" id="msg-{{ forloop.counter }}">{{ msg.mensagem }}</div>
+                
+                <div class="button-group">
+                    <button class="btn btn-copy" onclick="copiarMensagem('msg-{{ forloop.counter }}')">
+                        📋 Copiar Mensagem
+                    </button>
+                    
+                    <a href="https://wa.me/55{{ msg.telefone|slice:'2:' }}?text={{ msg.mensagem|urlencode }}" 
+                       target="_blank" 
+                       class="btn btn-whatsapp">
+                        💬 Abrir WhatsApp Web
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                <div class="empty-icon">📭</div>
+                <h3>Nenhuma mensagem para enviar</h3>
+                <p>As vistorias selecionadas não têm PDF gerado ou não possuem contatos cadastrados.</p>
+            </div>
+        {% endif %}
+        
+        <div style="text-align: center;">
+            <a href="{% url 'admin:core_inspection_changelist' %}" class="btn btn-back">
+                ← Voltar para Vistorias
+            </a>
+        </div>
+    </div>
+    
+    <div class="success-toast" id="successToast">
+        ✅ Mensagem copiada para área de transferência!
+    </div>
+    
+    <script>
+        function copiarMensagem(elementId) {
+            const elemento = document.getElementById(elementId);
+            const texto = elemento.textContent;
+            
+            navigator.clipboard.writeText(texto).then(() => {
+                // Mostrar toast de sucesso
+                const toast = document.getElementById('successToast');
+                toast.style.display = 'block';
+                
+                setTimeout(() => {
+                    toast.style.display = 'none';
+                }, 3000);
+            }).catch(err => {
+                alert('Erro ao copiar: ' + err);
+            });
+        }
+    </script>
+</body>
+</html>

@@ -122,6 +122,9 @@ urlpatterns = [
     
     # === ADMIN (UMA VEZ, NO FINAL) ===
     # LEGADO - Desativado DEV_20:     path('dashboard/', include('core.dashboard.urls')),
+    # Vistorias (rotas públicas com token)
+    path('', include('core.urls_inspection')),
+    
     path('admin/', admin.site.urls),
     path('', include('core.urls')),
 ]

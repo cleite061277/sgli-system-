@@ -2724,3 +2724,13 @@ class CustomAdminSite(AdminSite):
 
 # Usar custom admin site
 # admin_site = CustomAdminSite(name='admin')
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# ADMIN DE VISTORIAS (Inspection System)
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+from core.admin_inspection import (
+    InspectionAdmin,
+    InspectionPhotoAdmin,
+    InspectionPDFAdmin
+)
+# Os modelos já estão registrados com @admin.register no admin_inspection.py
