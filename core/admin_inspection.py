@@ -378,7 +378,7 @@ Policorp Imóveis | Paranaguá - PR
             
             locacao = inspection.locacao
             imovel = locacao.imovel
-            pdf_url = inspection.pdf.arquivo.url
+            pdf_url = inspection.pdf.get_presigned_url()
             
             # Mensagem para proprietário
             if locacao.proprietario.celular:
