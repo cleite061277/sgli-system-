@@ -353,7 +353,11 @@ class InspectionPDF(models.Model):
         Returns:
             URL assinada ou URL direta como fallback
         """
+        import logging
+        logger = logging.getLogger(__name__)
+        
         if not self.arquivo:
+            logger.warning("get_presigned_url: arquivo não existe")
             return None
         
         try:
@@ -361,9 +365,18 @@ class InspectionPDF(models.Model):
             from django.conf import settings
             
             # Verificar se credenciais R2 estão configuradas
+            logger.info(f"get_presigned_url: Tentando gerar para {self.arquivo.name}")
+            has_key = bool(settings.AWS_ACCESS_KEY_ID)
+            has_secret = bool(settings.AWS_SECRET_ACCESS_KEY)
+            logger.info(f"get_presigned_url: AWS_ACCESS_KEY_ID ok: {has_key}")
+            logger.info(f"get_presigned_url: AWS_SECRET_ACCESS_KEY ok: {has_secret}")
+            
             if not (settings.AWS_ACCESS_KEY_ID and settings.AWS_SECRET_ACCESS_KEY):
-                # Fallback para URL local se R2 não configurado
+                logger.warning("get_presigned_url: Credenciais não configuradas - fallback")
                 return self.arquivo.url
+            
+            logger.info(f"get_presigned_url: Endpoint: {settings.AWS_S3_ENDPOINT_URL}")
+            logger.info(f"get_presigned_url: Bucket: {settings.AWS_STORAGE_BUCKET_NAME}")
             
             s3_client = boto3.client(
                 's3',
@@ -372,6 +385,8 @@ class InspectionPDF(models.Model):
                 endpoint_url=settings.AWS_S3_ENDPOINT_URL,
                 region_name='auto'
             )
+            
+            logger.info("get_presigned_url: Cliente S3 criado!")
             
             # Gerar presigned URL
             url = s3_client.generate_presigned_url(
@@ -383,10 +398,15 @@ class InspectionPDF(models.Model):
                 ExpiresIn=expiration
             )
             
+            logger.info(f"get_presigned_url: URL gerada! Length: {len(url)}")
+            logger.info(f"get_presigned_url: Tem assinatura: {'X-Amz-Algorithm' in url}")
+            
             return url
             
         except Exception as e:
-            print(f"Erro ao gerar presigned URL: {e}")
+            logger.error(f"get_presigned_url: ERRO {type(e).__name__}: {str(e)}")
+            import traceback
+            logger.error(f"get_presigned_url: Traceback: {traceback.format_exc()}")
             # Fallback para URL direta
             return self.arquivo.url
 
