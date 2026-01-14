@@ -413,7 +413,7 @@
             <h2>Vistoria Finalizada!</h2>
             <p style="color: #666; margin-top: 10px;">O PDF foi gerado com sucesso.</p>
             {% if has_pdf %}
-            <a href="{{ inspection.pdf.arquivo.url }}" class="btn btn-primary" style="margin-top: 20px; display: inline-block; text-decoration: none;">
+            <a href="{{ pdf_url }}" class="btn btn-primary" style="margin-top: 20px; display: inline-block; text-decoration: none;">
                 📥 Baixar PDF
             </a>
             {% endif %}

@@ -42,6 +42,7 @@ def abrir_vistoria_mobile(request, token):
         'total_fotos': inspection.total_fotos,
         'max_fotos': 50,  # Limite de fotos
         'has_pdf': inspection.has_pdf,
+        'pdf_url': inspection.pdf.get_presigned_url() if inspection.has_pdf else None,
     }
     
     return render(request, 'inspection/mobile_form.html', context)
