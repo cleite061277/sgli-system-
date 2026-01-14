@@ -155,7 +155,7 @@ class InspectionAdmin(admin.ModelAdmin):
         if obj.has_pdf:
             return format_html(
                 '<a href="{}" target="_blank" style="color: #10b981; font-weight: 600;">📄 PDF</a>',
-                obj.pdf.arquivo.url
+                obj.pdf.get_presigned_url()
             )
         return format_html('<span style="color: #9ca3af;">-</span>')
     pdf_badge.short_description = 'PDF'
@@ -198,7 +198,7 @@ class InspectionAdmin(admin.ModelAdmin):
                 pdf.nome_arquivo,
                 pdf.paginas,
                 pdf.tamanho_mb,
-                pdf.arquivo.url
+                pdf.get_presigned_url()
             )
         return format_html('<em style="color: #9ca3af;">PDF ainda não gerado</em>')
     pdf_download_link.short_description = 'PDF Gerado'
