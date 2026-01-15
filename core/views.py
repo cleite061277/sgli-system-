@@ -467,7 +467,10 @@ def enviar_comanda_email(request, comanda_id):
         # ⚡ TIMEOUT DE 10 SEGUNDOS - Evitar worker timeout
         socket.setdefaulttimeout(10)
 
-        url = request.build_absolute_uri(f'/comanda/{comanda.id}/web/')
+        # 🔧 DEV_21.8.11: Usar mesma URL do WhatsApp (com token e fallback)
+        from .views_comanda_web import gerar_token_comanda
+        token = gerar_token_comanda(str(comanda.id))
+        url = request.build_absolute_uri(f'/comanda/{comanda.id}/{token}/')
         
         # ✅ LÓGICA INTELIGENTE DE STATUS
         status_comanda = comanda.status
