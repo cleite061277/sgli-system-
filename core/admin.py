@@ -1138,8 +1138,8 @@ _Documento gerado via HABITAT PRO v1.0_'''
         return format_html(
             '<a href="{}" target="_blank" style="background:#25D366;color:white;padding:6px 12px;border-radius:6px;text-decoration:none;font-weight:bold;font-size:11px;">💬 WhatsApp</a> '
             '<a href="/comanda/{}/enviar-email/" style="background:#3b82f6;color:white;padding:6px 12px;border-radius:6px;text-decoration:none;font-weight:bold;font-size:11px;">📧 Email</a> '
-            '<a href="/comanda/{}/web/" target="_blank" style="background:#8b5cf6;color:white;padding:6px 12px;border-radius:6px;text-decoration:none;font-weight:bold;font-size:11px;">👁️ Ver</a>',
-            wa_url, obj.id, obj.id
+            '<a href="{}" target="_blank" style="background:#8b5cf6;color:white;padding:6px 12px;border-radius:6px;text-decoration:none;font-weight:bold;font-size:11px;">👁️ Ver</a>',
+            wa_url, obj.id, comanda_url
         )
     
     def saldo_display(self, obj):
