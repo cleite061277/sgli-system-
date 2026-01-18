@@ -180,6 +180,24 @@
                     </div>
                 </div>
                 
+                {% if outros_debitos or outros_creditos %}
+                <div class="secao">
+                    <h4>💳 Outros Valores</h4>
+                    {% if outros_debitos %}
+                    <div class="info-row">
+                        <span class="info-label">Outras despesas:</span>
+                        <span class="info-value">R$ {{ outros_debitos }}</span>
+                    </div>
+                    {% endif %}
+                    {% if outros_creditos %}
+                    <div class="info-row">
+                        <span class="info-label">Créditos:</span>
+                        <span class="info-value" style="color: #27ae60;">R$ -{{ outros_creditos }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+                
                 {% if tem_multa_juros %}
                 <div class="secao atraso">
                     <h4>⚠️ Ajustes Financeiros</h4>
@@ -201,15 +219,15 @@
             </div>
             
             <p style="text-align: center;">
-                <a href="https://wa.me/554199999999?text=Olá,%20preciso%20de%20ajuda%20com%20a%20comanda%20{{ numero_comanda }}" class="btn">
+                <a href="https://wa.me/5541372320032?text=Olá,%20preciso%20de%20ajuda%20com%20a%20comanda%20{{ numero_comanda }}" class="btn">
                     💬 Falar no WhatsApp
                 </a>
             </p>
         </div>
         
         <div class="footer">
-            <p><strong>HABITAT PRO</strong></p>
-            <p>Sistema de Gestão Inteligente de Imóveis</p>
+            <p><strong>HABITAT PRO v1.0 | Sistema de Gestão Imobiliária</strong></p>
+            <p>© 2025 A&C Imóveis e Sistemas Imobiliários | Paranaguá - PR</p>
             <p style="font-size: 12px; color: #999; margin-top: 10px;">
                 Esta é uma cobrança automática. Para dúvidas, entre em contato.
             </p>
