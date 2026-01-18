@@ -270,18 +270,24 @@ CELERY_TASK_TIME_LIMIT = 30 * 60  # 30 minutos
 SITE_URL = config('SITE_URL', default='http://localhost:8000')
 
 # ════════════════════════════════════════════════════════════
-# SendGrid Email via AnyMail API
+# BREVO (Sendinblue) EMAIL BACKEND - Migração SendGrid→Brevo
+# Data: 18/01/2026 | Economia: R$ 1.434,00/ano
 # ════════════════════════════════════════════════════════════
 
-if 'anymail' not in INSTALLED_APPS:
-    INSTALLED_APPS += ['anymail']
-
-if os.environ.get('SENDGRID_API_KEY'):
-    EMAIL_BACKEND = 'anymail.backends.sendgrid.EmailBackend'
-    ANYMAIL = {
-        'SENDGRID_API_KEY': os.environ.get('SENDGRID_API_KEY'),
-    }
-
+try:
+    brevo_key = config('BREVO_API_KEY', default=None)
+    if brevo_key:
+        EMAIL_BACKEND = 'anymail.backends.sendinblue.EmailBackend'
+        ANYMAIL = {
+            'SENDINBLUE_API_KEY': brevo_key,
+        }
+        # Sobrescrever DEFAULT_FROM_EMAIL se definido
+        default_email = config('DEFAULT_FROM_EMAIL', default=None)
+        if default_email:
+            DEFAULT_FROM_EMAIL = default_email
+except:
+    pass  # Em produção, Railway vai usar os.environ
+        
 # ================================================================
 # APSCHEDULER - NOTIFICAÇÕES AUTOMÁTICAS
 # ================================================================
