@@ -1,0 +1,37 @@
+════════════════════════════════════════════════════════════
+🔐 VARIÁVEIS DE AMBIENTE - CLOUDFLARE R2 (RAILWAY)
+════════════════════════════════════════════════════════════
+
+Acesse: https://railway.app → Seu projeto → Variables
+
+Adicione as seguintes variáveis:
+
+R2_ACCESS_KEY_ID=47a0692454108b4ed5dadb44708ea0e1
+
+R2_SECRET_ACCESS_KEY=9f878dad68967e8e410adb714d34da25798cb61d76be41976aa830cac400cec4
+
+R2_BUCKET_NAME=habitat-pro-storage
+
+R2_ENDPOINT_URL=https://4e46dfe4280b9b3fd2503d1967761c38.r2.cloudflarestorage.com
+
+SITE_URL=https://romantic-liberation-production.up.railway.app
+
+════════════════════════════════════════════════════════════
+
+⚠️  IMPORTANTE:
+- Token Name: Habitat Pro - Token
+- Token criado em: 12/01/2026
+- Token válido até: 12/01/2027 (365 dias)
+- Não commitar esse arquivo no Git (já está em .gitignore)
+- Credenciais já configuradas no Railway
+
+CUSTO ESTIMADO:
+- 10 GB gratuitos por mês (Cloudflare R2)
+- 19 imóveis × 2 vistorias/ano × 4.2 MB = 159 MB/ano
+- Custo: R$ 0,00 (dentro do free tier)
+
+HISTÓRICO DE ALTERAÇÕES:
+- 11/01/2026: Credenciais iniciais (token antigo)
+- 12/01/2026: Credenciais atualizadas (token correto após teste)
+
+════════════════════════════════════════════════════════════

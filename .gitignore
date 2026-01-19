@@ -168,3 +168,6 @@ backup_padronizacao_*.tar.gz
 
 # Backups tar.gz
 backup_*.tar.gz
+*.bkp_*
+*.backup
+**/settings.py.bkp_*

@@ -1,0 +1,2667 @@
+==========================================
+🏠 HABITAT PRO - DIAGNÓSTICO DO SISTEMA
+==========================================
+
+==========================================
+1️⃣ INFORMAÇÕES DO AMBIENTE
+==========================================
+[1;33m→ Diretório atual:[0m
+/home/usuario/sgli_system
+
+[1;33m→ Versão Python:[0m
+Python 3.11.2
+
+[1;33m→ Versão Django:[0m
+4.2.8
+
+[1;33m→ Pip freeze (dependências instaladas):[0m
+Django==4.2.8
+
+==========================================
+2️⃣ ESTRUTURA DO PROJETO
+==========================================
+[1;33m→ Árvore de diretórios (nível 2):[0m
+.
+├── add_logging_to_method.py
+├── apply_fallback_DEV21.8.9.sh
+├── Assunto:
+├── backup_credenciais_antigas.sh
+├── backup_padronizacao_90dias_20251228_122936
+│   ├── admin.py
+│   ├── analytics.py
+│   ├── dashboard_views.py
+│   ├── index.html
+│   ├── models.py
+│   ├── reports.py
+│   └── settings.py
+├── backup_padronizacao_90dias_20251228_122936.tar.gz
+├── backup_pre_organizacao_20251124_133229
+│   ├── 0002_alter_comanda_forma_pagamento.py
+│   ├── admin(0).py
+│   ├── admin (1).py
+│   ├── admin_Backup em 09112025_1245hrs.py
+│   ├── admin_corrigido.py
+│   ├── adminok_10112025_1245.py
+│   ├── admin.py.backup
+│   ├── admin .py.backup2
+│   ├── atualizar_admin.py
+│   ├── check_tables.py
+│   ├── comandos_uteis.sh
+│   ├── core_admin_Version5.py
+│   ├── core_backups
+│   ├── core_migrations_backup_20251104_004330.tar.gz
+│   ├── core_migrations_backup_20251104_004551.tar.gz
+│   ├── core_migrations_backup_20251104_005221.tar.gz
+│   ├── core_models_Version5.py
+│   ├── core_models_Version6.py
+│   ├── core_utils_recibo_links_Version2.py
+│   ├── corrigir_permissoes.py
+│   ├── create_superuser.py
+│   ├── db.sqlite3.backup.20251104_004330
+│   ├── db.sqlite3.backup.20251104_004551
+│   ├── db.sqlite3.backup.20251104_005221
+│   ├── db.sqlite3.bak
+│   ├── def save_formset.py
+│   ├── deploy_completo_v2.sh
+│   ├── deploy.sh
+│   ├── desktop.sh
+│   ├── diagnostic_notificacoes.sh
+│   ├── etapa1_alerta_60_dias.sh
+│   ├── etapa2_botao_recibo.sh
+│   ├── etapa3_envio_comandas.sh
+│   ├── extract_sgli_core_files.sh
+│   ├── fix_admin_final.py
+│   ├── fix_admin.sh
+│   ├── fix_dia_vencimento.py
+│   ├── fix_encoding.py
+│   ├── fix_indentation.py
+│   ├── fix_models_urgente.sh
+│   ├── fix_pagamento_admin.py
+│   ├── fix_vencimento (1).py
+│   ├── fix_whatsapp2.sh
+│   ├── fix_whatsapp_method.sh
+│   ├── implementacao_completa.sh
+│   ├── implementacao_completa_v2.sh
+│   ├── implementar_alerta_vencimento.sh
+│   ├── implementar_melhoria3_valor_aluguel.sh
+│   ├── iniciar_worker.sh
+│   ├── instalar_geracao_contratos.sh
+│   ├── install_whatsapp.sh
+│   ├── manage.py
+│   ├── models(0).py
+│   ├── models (1).py
+│   ├── models_Backup em 09112025_1245hrs.py
+│   ├── modelsok_10112025_1245.py
+│   ├── models.py
+│   ├── organizar_admins.py
+│   ├── populate_initial_data.py
+│   ├── railway.json.backup
+│   ├── railway.json.backup_20251120_142952
+│   ├── recibo_urls.py
+│   ├── recibo_views.py
+│   ├── reindent_admin.sh
+│   ├── requirements.txt.backup_pytz
+│   ├── requirements.txt.backup_sync_20251120_151539
+│   ├── reset_database.py
+│   ├── start_celery.sh
+│   ├── start_sgli.sh
+│   ├── start_sgli.sh.backup_20251029_015755
+│   ├── testar_celery.sh
+│   ├── testar_email.py
+│   ├── test_sequence_concurrency.py
+│   ├── test_whatsapp.sh
+│   ├── urls_whatsapp.py
+│   ├── validate_whatsapp.sh
+│   └── verificar_instalacao.sh
+├── backup_pre_renovacao_20251227_104029
+│   ├── core
+│   ├── db.sqlite3
+│   └── sgli_project
+├── backup_pre_renovacao_20251227_161031
+│   ├── core
+│   └── db.sqlite3
+├── backups
+│   ├── 2025-11-24
+│   ├── admin_history
+│   ├── admin.py.backup_20251104_211715
+│   ├── apscheduler_20251124_082429
+│   ├── backup
+│   ├── backup_20251029_012804
+│   ├── backup_pre_sprint_20251102_105155.tar.gz
+│   ├── backups_dev9_completo_20251109_171550
+│   ├── backups_habitat
+│   ├── backups_sgli
+│   ├── codigo_antigo
+│   ├── correcoes_dev9
+│   ├── correcoes_habitat
+│   ├── dashboard_20251020_142756
+│   ├── dashboard_20251020_142916
+│   ├── dashboard_implementation_20251127_214318
+│   ├── dashboard_implementation_v2_20251127_215754
+│   ├── dev20_v3_flat_20251201_161316
+│   ├── disaster_recovery
+│   ├── estado_funcional_parcial_20251020_225416
+│   ├── master_fix_20251102_222106
+│   ├── message_formatter.py.backup_20251104_211853
+│   ├── models_history
+│   ├── models.py.backup_20251104_211715
+│   ├── pre_deploy
+│   ├── pre_restauracao_20251101_230555
+│   ├── replace_core_comanda_20251104_214249
+│   ├── replace_core_comanda_20251104_214401
+│   ├── safe_recibo_20251104_221831
+│   ├── safe_recibo_20251104_223051
+│   ├── signals.py.backup_20251104_211715
+│   ├── sistema_funcional_completo_20251021_132705
+│   ├── template_fase2_20251128_132044
+│   └── template_fase2_20251128_134103
+├── backups_dashboard_20251124_222901
+│   └── core
+├── backups_dashboard_20251124_230410
+│   └── core
+├── backups_dashboard_20251124_231002
+│   └── core
+├── backups_dashboard_final_20251125_000230
+│   ├── dashboard_views.py.backup
+│   ├── rollback.sh
+│   └── views_relatorios.py.backup
+├── backups_dashboard_v3_20251124_234014
+│   ├── rollback.sh
+│   └── views_relatorios.py.backup
+├── backups_dashboard_v3_20251124_234313
+│   ├── rollback.sh
+│   └── views_relatorios.py.backup
+├── CHECKLIST_RENOVACAO_R2.md
+├── configurar_lembrete_r2.sh
+├── Conteúdo:
+├── core
+│   ├── admin_actions_tokens.py
+│   ├── admin_actions_tokens.py.backup_20251231_190404
+│   ├── admin_Backup em 09112025_1245hrs.py
+│   ├── admin_inspection.py
+│   ├── admin_inspection.py.backup_before_renovacao_20260111_205857
+│   ├── admin_inspection.py.backup_fix_download
+│   ├── admin_inspection.py.backup_indent_error_20260111_210709
+│   ├── admin_inspection.py.backup_presigned_20260112_231907
+│   ├── admin.py
+│   ├── admin.py.backup_04012026_225601
+│   ├── admin.py.BACKUP_20251103_192254
+│   ├── admin.py.backup_20260109_003306
+│   ├── admin.py.backup_20260117_175517
+│   ├── admin.py.backup_action_notificacao
+│   ├── admin.py.backup_action_whatsapp
+│   ├── admin.py.backup_antes_correcao
+│   ├── admin.py.backup_antes_whatsapp_token
+│   ├── admin.py.backup_before_final_fix
+│   ├── admin.py.backup_before_pdf
+│   ├── admin.py.backup_bug
+│   ├── admin.py.backup_email_20260117_175651
+│   ├── admin.py.backup_final_20260117_181751
+│   ├── admin.py.backup_fix_lista
+│   ├── admin.py.backup_fix_status_correto
+│   ├── admin.py.backup_pagamento_fix
+│   ├── admin.py.backup_pre_actions
+│   ├── admin.py.backup_pre_inspection_20260111_155633
+│   ├── admin.py.backup_pre_renovacao
+│   ├── admin.py.backup_rebranding
+│   ├── admin.py.backup_whatsapp_v2
+│   ├── admin.py.bak
+│   ├── admin.py.bak_20251105_015056
+│   ├── admin.py.bak_20251105_132025
+│   ├── admin.py.bak_20251105_140056
+│   ├── admin.py.bak_20251105_213705
+│   ├── admin.py.bak_20251105_213737
+│   ├── admin.py.bak_20251105_213939
+│   ├── admin.py.bak_20251105_224954
+│   ├── admin.py.bak_20251105_230644
+│   ├── admin.py.bak_20251105_230943
+│   ├── admin.py.bak_20251105_231556
+│   ├── admin.py.bak.20251108_214447
+│   ├── admin.py.bak_action1
+│   ├── admin.py.bak_action2
+│   ├── admin.py.bak_action3
+│   ├── admin.py.bak.addimport_20251107_003925
+│   ├── admin.py.bak_after_indent_fix_20251105_214851
+│   ├── admin.py.bak_autofix_20251105_215023
+│   ├── admin.py.bak_autoindent_20251105_221311
+│   ├── admin.py.bak.before_indent_fix_20251107_233025
+│   ├── admin.py.bak.before_register_20251107_000618
+│   ├── admin.py.bak_callfix
+│   ├── admin.py.bak_except
+│   ├── admin.py.bak_export
+│   ├── admin.py.bak_fix_return_20251105_220146
+│   ├── admin.py.bak_fixwhatsapp_20251105_214202
+│   ├── admin.py.bak.full_20251108_161508
+│   ├── admin.py.bak.full_20251108_163131
+│   ├── admin.py.bak.full_20251108_183645
+│   ├── admin.py.bak.full_20251108_192113
+│   ├── admin.py.bak_if_locacao
+│   ├── admin.py.bak_if_return
+│   ├── admin.py.bak_indent
+│   ├── admin.py.bak.indent_fix_20251107_232242
+│   ├── admin.py.bak.manual_20251106_233503
+│   ├── admin.py.bak.pre_comanda_restore_20251107_231423
+│   ├── admin.py.bak.pre_fix_20251106_235214
+│   ├── admin.py.bak.pre_fix_20251107_235119
+│   ├── admin.py.bak.pre_if_fix_20251108_154623
+│   ├── admin.py.bak.pre_indent_20251108_153606
+│   ├── admin.py.bak.pre_indent_fix_20251108_160404
+│   ├── admin.py.bak.pre_indent_fix_20251108_160522
+│   ├── admin.py.bak_syntaxfix_20251106_235249
+│   ├── admin.py.bak.tc_uncomment_20251107_003720
+│   ├── admin.py.bak_try
+│   ├── admin.py.bak_try_block
+│   ├── admin.py.bak_unindent
+│   ├── admin.py.before_patch
+│   ├── admin.py.before_pdf_patch
+│   ├── admin.py.before_timezone_fix
+│   ├── admin.py.BROKEN_20251108_194805
+│   ├── admin.py.CORRUPTED_FINAL_20251108_200210
+│   ├── admin.py.CORRUPTED_FINAL_20251108_203736
+│   ├── admin.py.debug_backup
+│   ├── admin.py.pre_test_20251109_105247
+│   ├── apps.py
+│   ├── apps.py.backup_antes_scheduler
+│   ├── apps.py.bak
+│   ├── comanda_extensions.py
+│   ├── comanda_status.py
+│   ├── contrato_generator.py
+│   ├── dashboard
+│   ├── dashboard_tokens.py
+│   ├── dashboard_views.py
+│   ├── dashboard_views.py.backup_card_renovacoes
+│   ├── document_generator.py
+│   ├── forms.py
+│   ├── __init__.py
+│   ├── management
+│   ├── middleware
+│   ├── migrations
+│   ├── models
+│   ├── models_Backup em 09112025_1245hrs.py
+│   ├── models_inspection.py
+│   ├── models_inspection.py.backup_before_logging
+│   ├── models_inspection.py.backup_before_renovacao_20260111_205452
+│   ├── models_inspection.py.backup_presigned_20260112_231907
+│   ├── models.py
+│   ├── models.py.backup_antes_token
+│   ├── models.py.backup_DEV21.8.7_20260109_225832
+│   ├── models.py.backup_pre_inspection_20260111_155633
+│   ├── models.py.backup_pre_renovacao
+│   ├── models.py.backup_pre_tokens
+│   ├── models.py.bak_20251105_021944
+│   ├── models.py.bak.20251108_214434
+│   ├── models.py.pre_test_20251109_105247
+│   ├── models.py.quebrado
+│   ├── notifications
+│   ├── odt_converter.py
+│   ├── permissions.py
+│   ├── rbac.py
+│   ├── reports
+│   ├── reports.py
+│   ├── scheduler.py
+│   ├── scheduler.py.backup_antes_tokens
+│   ├── scheduler.py.backup_job4_fix
+│   ├── scheduler.py.backup_limpeza
+│   ├── scheduler.py.backup_solucao_limpa
+│   ├── scripts
+│   ├── serializers_broken.py
+│   ├── serializers.py
+│   ├── services
+│   ├── signals.py
+│   ├── sms_utils.py
+│   ├── sms_zenvia.py
+│   ├── static
+│   ├── tasks.py
+│   ├── templates
+│   ├── tests
+│   ├── tests.py
+│   ├── urls_dashboard.py
+│   ├── urls_inspection.py
+│   ├── urls.py
+│   ├── urls.py.BACKUP_20251103_192254
+│   ├── urls.py.backup_20260108_132036
+│   ├── urls.py.backup_20260109_215224
+│   ├── urls.py.backup_antes_token
+│   ├── urls.py.backup_pre_publico
+│   ├── urls.py.backup_pre_renovacao
+│   ├── urls.py.backup_rotas_20260117_182635
+│   ├── urls.py.corrompido_090120262214
+│   ├── urls.py.QUEBRADO
+│   ├── urls.py.restored_base
+│   ├── utils
+│   ├── utils.py
+│   ├── views_comanda_web.py
+│   ├── views_comanda_web.py.backup_DEV21.8.9_20260110_155510
+│   ├── views_comanda_web.py.backup_DEV21.8.9_20260110_161329
+│   ├── views_dashboard.py
+│   ├── views_django_simples.py
+│   ├── views_documentos.py
+│   ├── views_download_contrato.py
+│   ├── views_financeiro.py
+│   ├── views_financeiro_simples.py
+│   ├── views_gerar_comandas.py
+│   ├── views_gerar_contrato.py
+│   ├── views_gerar_contrato.py.backup_20251209_225656
+│   ├── views_gerar_contrato.py.backup_profissao_20251209_231751
+│   ├── views_inspection.py
+│   ├── views_inspection.py.backup_pdf_mobile
+│   ├── views_publico.py
+│   ├── views.py
+│   ├── views.py.backup_20260106_005201
+│   ├── views.py.backup_20260106_130047
+│   ├── views.py.backup_20260109_215224
+│   ├── views.py.backup_DEV21.8.11_20260114_235159
+│   ├── views.py.backup_DEV21.8.3_20260107_125801
+│   ├── views.py.backup_MANUAL_20260106_130047
+│   ├── views_relatorios.py
+│   ├── views_relatorios.py.backup
+│   ├── views_relatorios.py.backup_20251124_231937
+│   ├── views_renovacao.py
+│   ├── views_whatsapp.py
+│   ├── views_whatsapp.py.backup_20260109_003306
+│   ├── views_whatsapp.py.backup_antes_commit
+│   ├── views_whatsapp.py.backup_final
+│   ├── views_whatsapp.py.backup_funcao_direta
+│   ├── views_whatsapp.py.backup_reload
+│   └── widgets.py
+├── correcao_final_admin.sh
+├── corrigir_3_botoes_admin_VALIDADO.sh
+├── corrigir_botao_email.sh
+├── corrigir_dashboard_v3.sh
+├── corrigir_ordem_rotas.sh
+├── corrigir_template_comanda.sh
+├── dashboard_views.py
+├── db.sqlite3
+├── db.sqlite3.backup_pre_renovacao_20251227_104029
+├── db.sqlite3.backup_pre_renovacao_20251227_161031
+├── DEPLOY_RAILWAY_DEV21.md
+├── diag_bash.txt
+├── diagnostic_django.py
+├── diagnostic_habitat_dev21.sh
+├── diagnostic_habitat_pro.sh
+├── diagnostico_botao_admin.sh
+├── diagnostico_geracao_links.sh
+├── diagnostico_links.sh
+├── diagnostico_r2_authorization.sh
+├── diagnostico_vistorias_erros.sh
+├── diagnostic_result_20251231_184904.txt
+├── docs
+│   ├── ARQUITETURA_TECNICA.md
+│   ├── CORRECAO_URGENTE.md
+│   ├── CORRECOES_ERROS - admin e models-09112026 1100hrs.md
+│   ├── CORRECOES_E_SOLUCOES.md
+│   ├── CORRECOES_FINAIS_V1.2.md
+│   ├── DEPLOY_GUIDE.md
+│   ├── DEPLOY_RAPIDO.md
+│   ├── diagnostico_20251028_123030.txt
+│   ├── diagnostico_completo_20251124_130938.txt
+│   ├── DOCUMENTACAO_COMPLETA_SGLI.md
+│   ├── DOCUMENTACAO_HABITAT_PRO_v1.5.md
+│   ├── DOCUMENTACAO_TECNICA.md
+│   ├── erro_completo.txt
+│   ├── GUIA_IMPLEMENTACAO.md
+│   ├── GUIA_IMPLEMENTACAO_RECIBO.md
+│   ├── GUIA_INSTALACAO.md
+│   ├── GUIA_RAPIDO_v2.md
+│   ├── IMPLEMENTACAO_CONCLUIDA.txt
+│   ├── INDICE_ARQUIVOS.md
+│   ├── MANUAL_USUARIO.md
+│   ├── MANUTENCAO_DOCXCOMPOSE.md
+│   ├── NOTIFICACOES_AUTOMATICAS.md
+│   ├── NOTIFICACOES_README.md
+│   ├── PROJETO_SGLI_STATUS.md
+│   ├── README_INSTALACAO.md
+│   ├── README.md
+│   ├── RECOVERY_REPORT_FINAL.md
+│   ├── reorganizacao_20251124_133229.log
+│   ├── RESUMO_EXECUTIVO.md
+│   ├── REVISAO_FINAL_DEPLOY_DEV19_DEV20.md
+│   ├── script comandas.odt
+│   ├── SISTEMA_HABITAT_PRO.md
+│   ├── SUPERUSER_CONFIG.txt
+│   └── system_status.txt
+├── fix_dias_vencimento.sh
+├── implementar_dashboard.sh
+├── implementar_dashboard_v2.sh
+├── index.html
+├── instalacao_dashboard_20251124_222901.log
+├── instalar_completo.sh
+├── instalar_completo_v2.sh
+├── instalar_dashboard.sh
+├── Link:
+├── logs
+│   ├── safe_recibo_20251104_221831.log
+│   ├── safe_recibo_20251104_223051.log
+│   └── sgli.log
+├── manage.py
+├── modificar_settings_brevo.sh
+├── nixpacks.toml
+├── Para:
+├── patch_logging_presigned.py
+├── patch_pdf_melhorias.py
+├── patch_view_mobile.py
+├── Procfile
+├── Procfile.backup
+├── railway_env_variables.txt
+├── railway_env_variables.txt.backup_20260112_230756
+├── railway.json
+├── README.md
+├── RELATORIO_CARD_RENOVACOES_DEV21.3.md
+├── RENOVACAO_R2_2027.md
+├── RENOVACAO_R2_2027.md.backup_20260112_230756
+├── reports
+│   └── admin_changelist_report_20251104_225319.txt
+├── requirements.txt
+├── requirements.txt.backup_20260112_130657
+├── resumo_implementacao_final.md
+├── rollback_dashboard_20251124_231002.sh
+├── runtime.txt
+├── scripts
+│   ├── archived
+│   ├── deploy
+│   ├── fix_admin_changelist_interactive.sh
+│   └── maintenance
+├── sendgrid_backup.env
+├── server.log
+├── sgli_project
+│   ├── asgi.py
+│   ├── celery.py
+│   ├── __init__.py
+│   ├── settings.py
+│   ├── settings.py.backup
+│   ├── settings.py.backup_20251019_130657
+│   ├── settings.py.backup_20251029_015755
+│   ├── settings.py.backup_before_storages_20260111_160227
+│   ├── settings.py.backup_final
+│   ├── settings.py.backup_pre_inspection_20260111_155539
+│   ├── settings.py.backup_pre_notif
+│   ├── settings.py.backup_pre_railway
+│   ├── settings.py.backup_staticfix
+│   ├── settings.py.bkp_pre_config_fix
+│   ├── settings.py.bkp_sendgrid_20260118_143708
+│   ├── settings.py.ERRO_222313
+│   ├── urls.py
+│   ├── urls.py.backup_20251208_132043
+│   ├── urls.py.backup_before_inspection_20260111_203349
+│   ├── urls.py.backup_namespace
+│   ├── urls.py.backup_pre_inspection_20260111_155539
+│   ├── urls.py.backup_whatsapp
+│   └── wsgi.py
+├── start_sgli.sh
+├── static
+│   ├── admin
+│   ├── css
+│   ├── images
+│   ├── js
+│   └── Logo
+├── templates
+│   ├── admin
+│   ├── comanda
+│   ├── core
+│   ├── emails
+│   ├── inspection
+│   └── registration
+├── testar_credenciais_r2.py
+├── teste_presigned_local.py
+├── teste_vistoria_completo.sh
+├── test_whatsapp_message.py
+├── TOKENS_DOWNLOAD_CONTRATOS.md
+├── urls.py
+├── validar_atualizacao_credenciais.sh
+├── validar_deploy.sh
+├── validar_email_brevo_local.py
+├── verificar_arquitetura_links.sh
+├── verificar_expiracao_r2.py
+├── ver_metodo_completo_admin.sh
+└── views_relatorios.py
+
+83 directories, 410 files
+
+[1;33m→ Apps instalados (INSTALLED_APPS):[0m
+Arquivo: ./backup_pre_renovacao_20251227_104029/sgli_project/settings.py
+INSTALLED_APPS = [
+    'django_apscheduler',
+    'core.apps.CoreConfig',  # ← DEVE VIR PRIMEIRO para templates customizados
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'rest_framework',
+    'rest_framework.authtoken',
+    'corsheaders',
+    'django_filters',
+]
+
+MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
+
+ROOT_URLCONF = 'sgli_project.urls'
+
+TEMPLATES = [
+    {
+--
+if 'anymail' not in INSTALLED_APPS:
+    INSTALLED_APPS += ['anymail']
+
+if os.environ.get('SENDGRID_API_KEY'):
+    EMAIL_BACKEND = 'anymail.backends.sendgrid.EmailBackend'
+    ANYMAIL = {
+        'SENDGRID_API_KEY': os.environ.get('SENDGRID_API_KEY'),
+    }
+
+# ================================================================
+# APSCHEDULER - NOTIFICAÇÕES AUTOMÁTICAS
+# ================================================================
+APSCHEDULER_DATETIME_FORMAT = "N j, Y, f:s a"
+APSCHEDULER_RUN_NOW_TIMEOUT = 25
+
+# ==========================================
+# CONFIGURAÇÃO DE MEDIA FILES
+# ==========================================
+
+import os
+
+# Detectar ambiente
+IS_RAILWAY = os.environ.get('RAILWAY_ENVIRONMENT') is not None
+
+if IS_RAILWAY:
+    # PRODUÇÃO (Railway): Usar volume persistente
+    MEDIA_ROOT = '/data/media'
+    MEDIA_URL = '/media/'
+    
+    # Criar diretórios se não existirem
+    import pathlib
+    pathlib.Path(MEDIA_ROOT).mkdir(parents=True, exist_ok=True)
+Arquivo: ./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/backups/sistema_funcional_completo_20251021_132705/settings.py
+INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'rest_framework',
+    'rest_framework.authtoken',
+    'corsheaders',
+    'django_filters',
+    'core.apps.CoreConfig',
+]
+
+MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
+
+ROOT_URLCONF = 'sgli_project.urls'
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+Arquivo: ./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/sgli_project/settings.py
+INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'rest_framework',
+    'rest_framework.authtoken',
+    'corsheaders',
+    'django_filters',
+    'core.apps.CoreConfig',
+]
+
+MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
+
+ROOT_URLCONF = 'sgli_project.urls'
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+Arquivo: ./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/backups/sistema_funcional_completo_20251021_132705/settings.py
+INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'rest_framework',
+    'rest_framework.authtoken',
+    'corsheaders',
+    'django_filters',
+    'core.apps.CoreConfig',
+]
+
+MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
+
+ROOT_URLCONF = 'sgli_project.urls'
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+Arquivo: ./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/sgli_project/settings.py
+INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'rest_framework',
+    'rest_framework.authtoken',
+    'corsheaders',
+    'django_filters',
+    'core.apps.CoreConfig',
+]
+
+MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
+
+ROOT_URLCONF = 'sgli_project.urls'
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+Arquivo: ./backups/backups_sgli/backup_seguro_20251021_234934/sgli_system/backups/sistema_funcional_completo_20251021_132705/settings.py
+INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'rest_framework',
+    'rest_framework.authtoken',
+    'corsheaders',
+    'django_filters',
+    'core.apps.CoreConfig',
+]
+
+MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
+
+ROOT_URLCONF = 'sgli_project.urls'
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+Arquivo: ./backups/backups_sgli/backup_seguro_20251021_234934/sgli_system/sgli_project/settings.py
+INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'rest_framework',
+    'rest_framework.authtoken',
+    'corsheaders',
+    'django_filters',
+    'core.apps.CoreConfig',
+]
+
+MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
+
+ROOT_URLCONF = 'sgli_project.urls'
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+Arquivo: ./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/backups/sistema_funcional_completo_20251021_132705/settings.py
+INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'rest_framework',
+    'rest_framework.authtoken',
+    'corsheaders',
+    'django_filters',
+    'core.apps.CoreConfig',
+]
+
+MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
+
+ROOT_URLCONF = 'sgli_project.urls'
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+Arquivo: ./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/sgli_project/settings.py
+INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'rest_framework',
+    'rest_framework.authtoken',
+    'corsheaders',
+    'django_filters',
+    'core.apps.CoreConfig',
+]
+
+MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
+
+ROOT_URLCONF = 'sgli_project.urls'
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+Arquivo: ./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/backups/sistema_funcional_completo_20251021_132705/settings.py
+INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'rest_framework',
+    'rest_framework.authtoken',
+    'corsheaders',
+    'django_filters',
+    'core.apps.CoreConfig',
+]
+
+MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
+
+ROOT_URLCONF = 'sgli_project.urls'
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+Arquivo: ./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/sgli_project/settings.py
+INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'rest_framework',
+    'rest_framework.authtoken',
+    'corsheaders',
+    'django_filters',
+    'core.apps.CoreConfig',
+]
+
+MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
+
+ROOT_URLCONF = 'sgli_project.urls'
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+Arquivo: ./backups/backups_sgli/backup_postgresql_20251021_235356/sgli_system/backups/sistema_funcional_completo_20251021_132705/settings.py
+INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'rest_framework',
+    'rest_framework.authtoken',
+    'corsheaders',
+    'django_filters',
+    'core.apps.CoreConfig',
+]
+
+MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
+
+ROOT_URLCONF = 'sgli_project.urls'
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+Arquivo: ./backups/backups_sgli/backup_postgresql_20251021_235356/sgli_system/sgli_project/settings.py
+INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'rest_framework',
+    'rest_framework.authtoken',
+    'corsheaders',
+    'django_filters',
+    'core.apps.CoreConfig',
+]
+
+MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
+
+ROOT_URLCONF = 'sgli_project.urls'
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+Arquivo: ./backups/backups_sgli/master_20251102_233026/settings.py
+INSTALLED_APPS = [
+    'core.apps.CoreConfig',  # ← DEVE VIR PRIMEIRO para templates customizados
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'rest_framework',
+    'rest_framework.authtoken',
+    'corsheaders',
+    'django_filters',
+]
+
+MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
+
+ROOT_URLCONF = 'sgli_project.urls'
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+Arquivo: ./backups/sistema_funcional_completo_20251021_132705/settings.py
+INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'rest_framework',
+    'rest_framework.authtoken',
+    'corsheaders',
+    'django_filters',
+    'core.apps.CoreConfig',
+]
+
+MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
+
+ROOT_URLCONF = 'sgli_project.urls'
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+Arquivo: ./sgli_project/settings.py
+INSTALLED_APPS = [
+    'django_apscheduler',
+    'storages',  # django-storages (Cloudflare R2)
+    'core.apps.CoreConfig',  # ← DEVE VIR PRIMEIRO para templates customizados
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'rest_framework',
+    'rest_framework.authtoken',
+    'corsheaders',
+    'django_filters',
+]
+
+MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
+
+ROOT_URLCONF = 'sgli_project.urls'
+
+TEMPLATES = [
+Arquivo: ./backup_padronizacao_90dias_20251228_122936/settings.py
+INSTALLED_APPS = [
+    'django_apscheduler',
+    'core.apps.CoreConfig',  # ← DEVE VIR PRIMEIRO para templates customizados
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'rest_framework',
+    'rest_framework.authtoken',
+    'corsheaders',
+    'django_filters',
+]
+
+MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
+
+ROOT_URLCONF = 'sgli_project.urls'
+
+TEMPLATES = [
+    {
+--
+if 'anymail' not in INSTALLED_APPS:
+    INSTALLED_APPS += ['anymail']
+
+if os.environ.get('SENDGRID_API_KEY'):
+    EMAIL_BACKEND = 'anymail.backends.sendgrid.EmailBackend'
+    ANYMAIL = {
+        'SENDGRID_API_KEY': os.environ.get('SENDGRID_API_KEY'),
+    }
+
+# ================================================================
+# APSCHEDULER - NOTIFICAÇÕES AUTOMÁTICAS
+# ================================================================
+APSCHEDULER_DATETIME_FORMAT = "N j, Y, f:s a"
+APSCHEDULER_RUN_NOW_TIMEOUT = 25
+
+# ==========================================
+# CONFIGURAÇÃO DE MEDIA FILES
+# ==========================================
+
+import os
+
+# Detectar ambiente
+IS_RAILWAY = os.environ.get('RAILWAY_ENVIRONMENT') is not None
+
+if IS_RAILWAY:
+    # PRODUÇÃO (Railway): Usar volume persistente
+    MEDIA_ROOT = '/data/media'
+    MEDIA_URL = '/media/'
+    
+    # Criar diretórios se não existirem
+    import pathlib
+    pathlib.Path(MEDIA_ROOT).mkdir(parents=True, exist_ok=True)
+
+==========================================
+3️⃣ CONFIGURAÇÕES DO ADMIN
+==========================================
+[1;33m→ Arquivos admin.py encontrados:[0m
+./backup_pre_renovacao_20251227_161031/core/admin.py
+./backup_pre_renovacao_20251227_104029/core/admin.py
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/backups/dashboard_20251020_142756/admin.py
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/backups/sistema_funcional_completo_20251021_132705/admin.py
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/backups/dashboard_20251020_142916/admin.py
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/core/admin.py
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/backups/dashboard_20251020_142756/admin.py
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/backups/sistema_funcional_completo_20251021_132705/admin.py
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/backups/dashboard_20251020_142916/admin.py
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/core/admin.py
+./backups/backups_sgli/backup_seguro_20251021_234934/sgli_system/backups/dashboard_20251020_142756/admin.py
+./backups/backups_sgli/backup_seguro_20251021_234934/sgli_system/backups/sistema_funcional_completo_20251021_132705/admin.py
+./backups/backups_sgli/backup_seguro_20251021_234934/sgli_system/backups/dashboard_20251020_142916/admin.py
+./backups/backups_sgli/backup_seguro_20251021_234934/sgli_system/core/admin.py
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/backups/dashboard_20251020_142756/admin.py
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/backups/sistema_funcional_completo_20251021_132705/admin.py
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/backups/dashboard_20251020_142916/admin.py
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/core/admin.py
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/backups/dashboard_20251020_142756/admin.py
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/backups/sistema_funcional_completo_20251021_132705/admin.py
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/backups/dashboard_20251020_142916/admin.py
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/core/admin.py
+./backups/backups_sgli/backup_postgresql_20251021_235356/sgli_system/backups/dashboard_20251020_142756/admin.py
+./backups/backups_sgli/backup_postgresql_20251021_235356/sgli_system/backups/sistema_funcional_completo_20251021_132705/admin.py
+./backups/backups_sgli/backup_postgresql_20251021_235356/sgli_system/backups/dashboard_20251020_142916/admin.py
+./backups/backups_sgli/backup_postgresql_20251021_235356/sgli_system/core/admin.py
+./backups/backups_sgli/master_20251102_233026/admin.py
+./backups/dashboard_20251020_142756/admin.py
+./backups/pre_restauracao_20251101_230555/admin.py
+./backups/sistema_funcional_completo_20251021_132705/admin.py
+./backups/dev20_v3_flat_20251201_161316/core/admin.py
+./backups/dashboard_20251020_142916/admin.py
+./core/admin.py
+./backup_padronizacao_90dias_20251228_122936/admin.py
+
+[1;33m→ Conteúdo do core/admin.py (primeiras 100 linhas):[0m
+
+from django.contrib import admin
+from .dashboard_tokens import gerar_contexto_dashboard
+from .admin_actions_tokens import (
+    action_renovar_token_renovacao,
+    action_reenviar_link_comanda,
+    action_renovar_token_comanda,
+    action_reenviar_link_recibo,
+    action_renovar_token_recibo,
+)
+from django import forms
+from core.models import ConfiguracaoSistema, LogGeracaoComandas
+from django.contrib.auth.admin import UserAdmin
+from django.utils import timezone
+from .forms import PagamentoAdminForm
+from .models import Fiador, Usuario, Locador, Imovel, Locatario, Locacao, Comanda, Pagamento, TemplateContrato
+from core.views_comanda_web import gerar_token_comanda
+from django.http import HttpResponse
+from reportlab.lib.pagesizes import A4
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.units import cm
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
+from reportlab.lib import colors
+from docx import Document
+from docx.shared import Pt, Inches
+from docx.enum.text import WD_ALIGN_PARAGRAPH
+from datetime import datetime
+from io import BytesIO
+from .contrato_generator import gerar_contrato_pdf, gerar_contrato_docx
+from django.utils.html import format_html
+from django.urls import reverse
+from django.db.models import Sum, Q, F, Count
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from django.contrib.auth.forms import UserCreationForm, UserChangeForm
+from django.urls import reverse
+from django.utils.html import format_html
+
+class UsuarioCreationForm(UserCreationForm):
+    """Form para criação de usuário com senha criptografada"""
+    class Meta:
+        model = Usuario
+        fields = ('username', 'email', 'first_name', 'last_name', 'cpf', 'telefone', 'tipo_usuario')
+
+class UsuarioChangeForm(UserChangeForm):
+    """Form para edição de usuário"""
+    class Meta:
+        model = Usuario
+        fields = '__all__'
+
+@admin.register(Usuario)
+class UsuarioAdmin(BaseUserAdmin):
+    """Admin organizado para Usuario com senha criptografada"""
+    
+    # Forms corretos que criptografam senha
+    add_form = UsuarioCreationForm
+    form = UsuarioChangeForm
+    
+    list_display = ['username', 'get_full_name', 'email', 'tipo_usuario', 'is_staff', 'is_active', 'date_joined']
+    list_filter = ['tipo_usuario', 'is_active', 'is_staff', 'date_joined']
+    search_fields = ['username', 'email', 'first_name', 'last_name', 'cpf']
+    
+    # Fieldsets para ADICIONAR usuário (usa password1 e password2)
+    add_fieldsets = (
+        (None, {
+            'classes': ('wide',),
+            'fields': ('username', 'password1', 'password2'),
+        }),
+        ('👤 Dados Pessoais', {
+            'fields': ('first_name', 'last_name', 'email', 'cpf', 'telefone', 'avatar')
+        }),
+        ('🎭 Perfil do Sistema', {
+            'fields': ('tipo_usuario',)
+        }),
+    )
+    
+    # Fieldsets para EDITAR usuário (usa password widget especial)
+    fieldsets = (
+        ('🔐 Autenticação', {
+            'fields': ('username', 'password')
+        }),
+        ('👤 Dados Pessoais', {
+            'fields': ('first_name', 'last_name', 'email', 'cpf', 'telefone', 'avatar')
+        }),
+        ('🎭 Perfil do Sistema', {
+            'fields': ('tipo_usuario',)
+        }),
+        ('🔑 Permissões', {
+            'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions'),
+            'classes': ['collapse'],
+        }),
+        ('📅 Datas Importantes', {
+            'fields': ('date_joined', 'last_login'),
+            'classes': ['collapse'],
+        }),
+    )
+    
+    readonly_fields = ['date_joined', 'last_login']
+    
+    def save_model(self, request, obj, form, change):
+        """
+
+[1;33m→ Customizações do AdminSite:[0m
+backup_pre_renovacao_20251227_161031/core/admin.py:1617:# admin.site.index = admin_index  # COMENTADO - Dashboard isolado
+backup_pre_renovacao_20251227_161031/core/admin_Backup em 09112025_1245hrs.py:1077:admin.site.index = admin_index
+backup_pre_renovacao_20251227_161031/core/migrations/0001_initial.py:34:                ('is_staff', models.BooleanField(default=False, help_text='Designates whether the user can log into this admin site.', verbose_name='staff status')),
+backup_pre_renovacao_20251227_161031/core/urls.py:34:#         admin.site.admin_view(painel_whatsapp), 
+backup_pre_renovacao_20251227_161031/core/urls.py:38:#         admin.site.admin_view(gerar_mensagem_whatsapp), 
+backup_pre_renovacao_20251227_161031/core/urls.py:52:         admin.site.admin_view(dashboard_financeiro), 
+backup_pre_renovacao_20251227_161031/core/urls.py:56:         admin.site.admin_view(exportar_dashboard_excel), 
+backup_pre_renovacao_20251227_161031/core/urls.py:60:         admin.site.admin_view(exportar_dashboard_pdf), 
+backup_pre_renovacao_20251227_161031/core/urls.py:64:         admin.site.admin_view(enviar_relatorio_email), 
+backup_pre_renovacao_20251227_104029/core/admin.py:1617:# admin.site.index = admin_index  # COMENTADO - Dashboard isolado
+backup_pre_renovacao_20251227_104029/core/admin_Backup em 09112025_1245hrs.py:1077:admin.site.index = admin_index
+backup_pre_renovacao_20251227_104029/core/migrations/0001_initial.py:34:                ('is_staff', models.BooleanField(default=False, help_text='Designates whether the user can log into this admin site.', verbose_name='staff status')),
+backup_pre_renovacao_20251227_104029/core/urls.py:34:#         admin.site.admin_view(painel_whatsapp), 
+backup_pre_renovacao_20251227_104029/core/urls.py:38:#         admin.site.admin_view(gerar_mensagem_whatsapp), 
+backup_pre_renovacao_20251227_104029/core/urls.py:52:         admin.site.admin_view(dashboard_financeiro), 
+backup_pre_renovacao_20251227_104029/core/urls.py:56:         admin.site.admin_view(exportar_dashboard_excel), 
+backup_pre_renovacao_20251227_104029/core/urls.py:60:         admin.site.admin_view(exportar_dashboard_pdf), 
+backup_pre_renovacao_20251227_104029/core/urls.py:64:         admin.site.admin_view(enviar_relatorio_email), 
+backup_pre_renovacao_20251227_104029/sgli_project/urls.py:59:admin.site.site_header = "HABITAT PRO - Administração"
+backup_pre_renovacao_20251227_104029/sgli_project/urls.py:60:admin.site.site_title = "HABITAT PRO Admin"
+
+==========================================
+4️⃣ TEMPLATES CUSTOMIZADOS
+==========================================
+[1;33m→ Diretórios de templates:[0m
+./backup_pre_renovacao_20251227_161031/core/templates
+./backup_pre_renovacao_20251227_104029/core/templates
+./backups_dashboard_20251124_222901/core/templates
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/core/templates
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/templates
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/core/templates
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/templates
+./backups/backups_sgli/backup_seguro_20251021_234934/sgli_system/core/templates
+./backups/backups_sgli/backup_seguro_20251021_234934/sgli_system/templates
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/core/templates
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/templates
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/core/templates
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/templates
+./backups/backups_sgli/backup_postgresql_20251021_235356/sgli_system/core/templates
+./backups/backups_sgli/backup_postgresql_20251021_235356/sgli_system/templates
+./core/templates
+./templates
+./backups_dashboard_20251124_231002/core/templates
+
+[1;33m→ Templates do admin customizados:[0m
+./backup_pre_renovacao_20251227_161031/core/templates/admin/recibo_modal.html
+./backup_pre_renovacao_20251227_161031/core/templates/admin/index.html.backup_links_20251102_000050
+./backup_pre_renovacao_20251227_161031/core/templates/admin/dashboard_financeiro.html
+./backup_pre_renovacao_20251227_161031/core/templates/admin/index.html
+./backup_pre_renovacao_20251227_161031/core/templates/admin/app_index.html
+./backup_pre_renovacao_20251227_161031/core/templates/admin/includes/app_list.html
+./backup_pre_renovacao_20251227_161031/core/templates/admin/index.html.backup_ajustes
+./backup_pre_renovacao_20251227_161031/core/templates/admin/index.html.backup_20251127_221935
+./backup_pre_renovacao_20251227_161031/core/templates/admin/dashboard_financeiro.html.backup_20251128_161203
+./backup_pre_renovacao_20251227_161031/core/templates/admin/base_site.html
+./backup_pre_renovacao_20251227_161031/core/templates/admin/comanda_web.html
+./backup_pre_renovacao_20251227_161031/core/templates/admin/core/locacao/change_form.html
+./backup_pre_renovacao_20251227_161031/core/templates/admin/dashboard_financeiro.html.backup_20251128_161818
+./backup_pre_renovacao_20251227_161031/core/templates/admin/index.html.backup_20251102_001152
+./backup_pre_renovacao_20251227_161031/core/templates/admin/pagamento_recibo.html
+./backup_pre_renovacao_20251227_161031/core/templates/admin/whatsapp/painel.html
+./backup_pre_renovacao_20251227_161031/core/templates/admin/index.html.backup)20251122_232725
+./backup_pre_renovacao_20251227_161031/core/templates/admin/index.html.backup_final
+./backup_pre_renovacao_20251227_104029/core/templates/admin/recibo_modal.html
+./backup_pre_renovacao_20251227_104029/core/templates/admin/index.html.backup_links_20251102_000050
+./backup_pre_renovacao_20251227_104029/core/templates/admin/dashboard_financeiro.html
+./backup_pre_renovacao_20251227_104029/core/templates/admin/index.html
+./backup_pre_renovacao_20251227_104029/core/templates/admin/app_index.html
+./backup_pre_renovacao_20251227_104029/core/templates/admin/includes/app_list.html
+./backup_pre_renovacao_20251227_104029/core/templates/admin/index.html.backup_ajustes
+./backup_pre_renovacao_20251227_104029/core/templates/admin/index.html.backup_20251127_221935
+./backup_pre_renovacao_20251227_104029/core/templates/admin/dashboard_financeiro.html.backup_20251128_161203
+./backup_pre_renovacao_20251227_104029/core/templates/admin/base_site.html
+./backup_pre_renovacao_20251227_104029/core/templates/admin/comanda_web.html
+./backup_pre_renovacao_20251227_104029/core/templates/admin/core/locacao/change_form.html
+./backup_pre_renovacao_20251227_104029/core/templates/admin/dashboard_financeiro.html.backup_20251128_161818
+./backup_pre_renovacao_20251227_104029/core/templates/admin/index.html.backup_20251102_001152
+./backup_pre_renovacao_20251227_104029/core/templates/admin/pagamento_recibo.html
+./backup_pre_renovacao_20251227_104029/core/templates/admin/whatsapp/painel.html
+./backup_pre_renovacao_20251227_104029/core/templates/admin/index.html.backup)20251122_232725
+./backup_pre_renovacao_20251227_104029/core/templates/admin/index.html.backup_final
+./backups_dashboard_20251124_222901/core/templates/admin/index.html
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/core/templates/admin/base_site.html
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/core/templates/admin/core/locacao/change_form.html
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/templates/admin/index.html
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/templates/admin/core/locacao/change_form.html
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/core/templates/admin/base_site.html
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/core/templates/admin/core/locacao/change_form.html
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/templates/admin/index.html
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/templates/admin/core/locacao/change_form.html
+./backups/backups_sgli/backup_seguro_20251021_234934/sgli_system/core/templates/admin/base_site.html
+./backups/backups_sgli/backup_seguro_20251021_234934/sgli_system/core/templates/admin/core/locacao/change_form.html
+./backups/backups_sgli/backup_seguro_20251021_234934/sgli_system/templates/admin/index.html
+./backups/backups_sgli/backup_seguro_20251021_234934/sgli_system/templates/admin/core/locacao/change_form.html
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/core/templates/admin/base_site.html
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/core/templates/admin/core/locacao/change_form.html
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/templates/admin/index.html
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/templates/admin/core/locacao/change_form.html
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/core/templates/admin/base_site.html
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/core/templates/admin/core/locacao/change_form.html
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/templates/admin/index.html
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/templates/admin/core/locacao/change_form.html
+./backups/backups_sgli/backup_postgresql_20251021_235356/sgli_system/core/templates/admin/base_site.html
+./backups/backups_sgli/backup_postgresql_20251021_235356/sgli_system/core/templates/admin/core/locacao/change_form.html
+./backups/backups_sgli/backup_postgresql_20251021_235356/sgli_system/templates/admin/index.html
+./backups/backups_sgli/backup_postgresql_20251021_235356/sgli_system/templates/admin/core/locacao/change_form.html
+./core/templates/admin/recibo_modal.html
+./core/templates/admin/index.html.backup_link_contratos
+./core/templates/admin/index.html.backup_card_renovacoes
+./core/templates/admin/index.html.backup_links_20251102_000050
+./core/templates/admin/dashboard_financeiro.html
+./core/templates/admin/index.html
+./core/templates/admin/app_index.html
+./core/templates/admin/includes/app_list.html
+./core/templates/admin/comanda_web.html.backup_20260106_005201
+./core/templates/admin/comanda_web.html.backup_DEV21.8.3_20260107_125801
+./core/templates/admin/index.html.backup_ajustes
+./core/templates/admin/index.html.backup_20251127_221935
+./core/templates/admin/dashboard_financeiro.html.backup_20251128_161203
+./core/templates/admin/base_site.html
+./core/templates/admin/comanda_web.html
+./core/templates/admin/comanda_web.html.backup_20260106_010602
+./core/templates/admin/core/locacao/change_form.html
+./core/templates/admin/dashboard_financeiro.html.backup_20251128_161818
+./core/templates/admin/index.html.backup_20251102_001152
+./core/templates/admin/dashboard_tokens_widget.html
+./core/templates/admin/pagamento_recibo.html
+./core/templates/admin/whatsapp/painel.html
+./core/templates/admin/index.html.backup)20251122_232725
+./core/templates/admin/index.html.backup_final
+./templates/admin/index.html.backup_link_contratos
+./templates/admin/index.html.backup_card_renovacoes
+./templates/admin/index.html
+./templates/admin/index.html.backup_pre_dashboard
+./templates/admin/login.html
+./templates/admin/base_site.html
+./templates/admin/core/locacao/change_form.html
+./templates/admin/error_500.html
+./templates/admin/pagamento_recibo.html
+./templates/admin/base_site.html.backup_20251208_124256
+./templates/admin/whatsapp/painel.html
+./templates/admin/whatsapp_vistorias.html
+./templates/admin/login.html.backup_final
+./templates/admin/index.html.backup_final
+./templates/admin/index.html.backup_20251208_123138
+./backups_dashboard_20251124_231002/core/templates/admin/index.html
+
+[1;33m→ Configuração TEMPLATES no settings.py:[0m
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [BASE_DIR / 'templates'],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
+]
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [BASE_DIR / 'templates', BASE_DIR / 'core' / 'templates'],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
+]
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [BASE_DIR / 'templates', BASE_DIR / 'core' / 'templates'],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
+]
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [BASE_DIR / 'templates', BASE_DIR / 'core' / 'templates'],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
+]
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [BASE_DIR / 'templates', BASE_DIR / 'core' / 'templates'],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
+]
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [BASE_DIR / 'templates', BASE_DIR / 'core' / 'templates'],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
+]
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [BASE_DIR / 'templates', BASE_DIR / 'core' / 'templates'],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
+]
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [BASE_DIR / 'templates', BASE_DIR / 'core' / 'templates'],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
+]
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [BASE_DIR / 'templates', BASE_DIR / 'core' / 'templates'],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
+]
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [BASE_DIR / 'templates', BASE_DIR / 'core' / 'templates'],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
+]
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [BASE_DIR / 'templates', BASE_DIR / 'core' / 'templates'],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
+]
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [BASE_DIR / 'templates', BASE_DIR / 'core' / 'templates'],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
+]
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [BASE_DIR / 'templates', BASE_DIR / 'core' / 'templates'],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
+]
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [BASE_DIR / 'templates'],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
+]
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [BASE_DIR / 'templates', BASE_DIR / 'core' / 'templates'],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
+]
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [BASE_DIR / 'templates'],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
+]
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [BASE_DIR / 'templates'],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
+]
+
+
+==========================================
+5️⃣ ARQUIVOS ESTÁTICOS
+==========================================
+[1;33m→ Diretórios static:[0m
+./backup_pre_renovacao_20251227_161031/core/static
+./backup_pre_renovacao_20251227_104029/core/static
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/core/static
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/static
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/core/static
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/static
+./backups/backups_sgli/backup_seguro_20251021_234934/sgli_system/core/static
+./backups/backups_sgli/backup_seguro_20251021_234934/sgli_system/static
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/core/static
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/static
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/core/static
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/static
+./backups/backups_sgli/backup_postgresql_20251021_235356/sgli_system/core/static
+./backups/backups_sgli/backup_postgresql_20251021_235356/sgli_system/static
+./backups/pre_restauracao_20251101_230555/static
+./core/static
+./static
+
+[1;33m→ CSS customizado para admin:[0m
+./backup_pre_renovacao_20251227_161031/core/static/admin/css/custom_admin.css
+./backup_pre_renovacao_20251227_104029/core/static/admin/css/custom_admin.css
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/css/responsive.css
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/css/rtl.css
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/css/responsive_rtl.css
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/css/login.css
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/css/dark_mode.css
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/css/vendor/select2/select2.min.css
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/css/vendor/select2/select2.css
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/css/nav_sidebar.css
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/css/changelists.css
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/css/dashboard.css
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/css/autocomplete.css
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/css/widgets.css
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/css/forms.css
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/css/base.css
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/css/responsive.css
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/css/rtl.css
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/css/responsive_rtl.css
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/css/login.css
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/css/dark_mode.css
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/css/vendor/select2/select2.min.css
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/css/vendor/select2/select2.css
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/css/nav_sidebar.css
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/css/changelists.css
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/css/dashboard.css
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/css/autocomplete.css
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/css/widgets.css
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/css/forms.css
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/css/base.css
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/core/static/admin/css/custom_admin.css
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/static/admin/css/custom_admin.css
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/css/responsive.css
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/css/rtl.css
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/css/responsive_rtl.css
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/css/login.css
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/css/dark_mode.css
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/css/vendor/select2/select2.min.css
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/css/vendor/select2/select2.css
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/css/nav_sidebar.css
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/css/changelists.css
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/css/dashboard.css
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/css/autocomplete.css
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/css/widgets.css
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/css/forms.css
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/css/base.css
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/core/static/admin/css/custom_admin.css
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/static/admin/css/custom_admin.css
+./backups/backups_sgli/backup_seguro_20251021_234934/sgli_system/core/static/admin/css/custom_admin.css
+./backups/backups_sgli/backup_seguro_20251021_234934/sgli_system/static/admin/css/custom_admin.css
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/css/responsive.css
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/css/rtl.css
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/css/responsive_rtl.css
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/css/login.css
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/css/dark_mode.css
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/css/vendor/select2/select2.min.css
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/css/vendor/select2/select2.css
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/css/nav_sidebar.css
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/css/changelists.css
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/css/dashboard.css
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/css/autocomplete.css
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/css/widgets.css
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/css/forms.css
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/css/base.css
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/core/static/admin/css/custom_admin.css
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/static/admin/css/custom_admin.css
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/css/responsive.css
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/css/rtl.css
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/css/responsive_rtl.css
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/css/login.css
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/css/dark_mode.css
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/css/vendor/select2/select2.min.css
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/css/vendor/select2/select2.css
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/css/nav_sidebar.css
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/css/changelists.css
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/css/dashboard.css
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/css/autocomplete.css
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/css/widgets.css
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/css/forms.css
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/css/base.css
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/core/static/admin/css/custom_admin.css
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/static/admin/css/custom_admin.css
+./backups/backups_sgli/backup_postgresql_20251021_235356/sgli_system/core/static/admin/css/custom_admin.css
+./backups/backups_sgli/backup_postgresql_20251021_235356/sgli_system/static/admin/css/custom_admin.css
+./backups/pre_restauracao_20251101_230555/static/admin/css/custom_admin.css
+./backups/pre_restauracao_20251101_230555/static/admin/css/comanda_custom.css
+./core/static/admin/css/custom_admin.css
+./static/admin/css/app_style.css
+./static/admin/css/custom_admin.css
+./static/admin/css/comanda_custom.css
+./static/admin/css/public_style.css
+
+[1;33m→ JavaScript customizado para admin:[0m
+./backup_pre_renovacao_20251227_161031/core/static/admin/js/garantias_dinamicas.js
+./backup_pre_renovacao_20251227_104029/core/static/admin/js/garantias_dinamicas.js
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/change_form.js
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/actions.js
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/popup_response.js
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/prepopulate_init.js
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/admin/DateTimeShortcuts.js
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/admin/RelatedObjectLookups.js
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/cancel.js
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/collapse.js
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/filters.js
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/prepopulate.js
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/urlify.js
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/select2.full.min.js
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/select2.full.js
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/ro.js
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/lv.js
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/ko.js
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/lt.js
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/he.js
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/et.js
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/ms.js
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/bn.js
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/fi.js
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/nb.js
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/vi.js
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/pt-BR.js
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/pt.js
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/sl.js
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/az.js
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/hi.js
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/is.js
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/en.js
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/ne.js
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/fa.js
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/th.js
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/sr-Cyrl.js
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/cs.js
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/gl.js
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/uk.js
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/ps.js
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/hr.js
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/pl.js
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/sr.js
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/sv.js
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/ar.js
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/eu.js
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/mk.js
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/zh-CN.js
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/ka.js
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/el.js
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/hu.js
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/hy.js
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/zh-TW.js
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/id.js
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/bs.js
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/tk.js
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/nl.js
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/tr.js
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/af.js
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/de.js
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/sq.js
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/es.js
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/bg.js
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/dsb.js
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/km.js
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/it.js
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/hsb.js
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/da.js
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/sk.js
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/ru.js
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/ja.js
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/fr.js
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/ca.js
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/jquery/jquery.min.js
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/jquery/jquery.js
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/xregexp/xregexp.js
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/xregexp/xregexp.min.js
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/autocomplete.js
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/core.js
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/inlines.js
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/SelectFilter2.js
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/calendar.js
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/theme.js
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/SelectBox.js
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/nav_sidebar.js
+./venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/jquery.init.js
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/change_form.js
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/actions.js
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/popup_response.js
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/prepopulate_init.js
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/admin/DateTimeShortcuts.js
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/admin/RelatedObjectLookups.js
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/cancel.js
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/collapse.js
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/filters.js
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/prepopulate.js
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/urlify.js
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/select2.full.min.js
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/select2.full.js
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/ro.js
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/lv.js
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/ko.js
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/lt.js
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/he.js
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/et.js
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/ms.js
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/bn.js
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/fi.js
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/nb.js
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/vi.js
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/pt-BR.js
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/pt.js
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/sl.js
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/az.js
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/hi.js
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/is.js
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/en.js
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/ne.js
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/fa.js
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/th.js
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/sr-Cyrl.js
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/cs.js
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/gl.js
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/uk.js
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/ps.js
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/hr.js
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/pl.js
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/sr.js
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/sv.js
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/ar.js
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/eu.js
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/mk.js
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/zh-CN.js
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/ka.js
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/el.js
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/hu.js
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/hy.js
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/zh-TW.js
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/id.js
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/bs.js
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/tk.js
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/nl.js
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/tr.js
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/af.js
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/de.js
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/sq.js
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/es.js
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/bg.js
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/dsb.js
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/km.js
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/it.js
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/hsb.js
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/da.js
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/sk.js
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/ru.js
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/ja.js
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/fr.js
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/ca.js
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/jquery/jquery.min.js
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/jquery/jquery.js
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/xregexp/xregexp.js
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/xregexp/xregexp.min.js
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/autocomplete.js
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/core.js
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/inlines.js
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/SelectFilter2.js
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/calendar.js
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/theme.js
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/SelectBox.js
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/nav_sidebar.js
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/jquery.init.js
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/static/admin/js/comanda_info.js
+./backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/static/admin/js/pagamento_admin.js
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/change_form.js
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/actions.js
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/popup_response.js
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/prepopulate_init.js
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/admin/DateTimeShortcuts.js
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/admin/RelatedObjectLookups.js
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/cancel.js
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/collapse.js
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/filters.js
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/prepopulate.js
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/urlify.js
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/select2.full.min.js
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/select2.full.js
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/ro.js
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/lv.js
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/ko.js
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/lt.js
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/he.js
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/et.js
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/ms.js
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/bn.js
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/fi.js
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/nb.js
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/vi.js
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/pt-BR.js
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/pt.js
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/sl.js
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/az.js
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/hi.js
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/is.js
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/en.js
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/ne.js
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/fa.js
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/th.js
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/sr-Cyrl.js
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/cs.js
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/gl.js
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/uk.js
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/ps.js
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/hr.js
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/pl.js
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/sr.js
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/sv.js
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/ar.js
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/eu.js
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/mk.js
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/zh-CN.js
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/ka.js
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/el.js
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/hu.js
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/hy.js
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/zh-TW.js
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/id.js
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/bs.js
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/tk.js
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/nl.js
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/tr.js
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/af.js
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/de.js
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/sq.js
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/es.js
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/bg.js
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/dsb.js
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/km.js
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/it.js
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/hsb.js
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/da.js
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/sk.js
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/ru.js
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/ja.js
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/fr.js
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/ca.js
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/jquery/jquery.min.js
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/jquery/jquery.js
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/xregexp/xregexp.js
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/xregexp/xregexp.min.js
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/autocomplete.js
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/core.js
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/inlines.js
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/SelectFilter2.js
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/calendar.js
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/theme.js
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/SelectBox.js
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/nav_sidebar.js
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/jquery.init.js
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/static/admin/js/comanda_info.js
+./backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/static/admin/js/pagamento_admin.js
+./backups/backups_sgli/backup_seguro_20251021_234934/sgli_system/static/admin/js/comanda_info.js
+./backups/backups_sgli/backup_seguro_20251021_234934/sgli_system/static/admin/js/pagamento_admin.js
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/change_form.js
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/actions.js
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/popup_response.js
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/prepopulate_init.js
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/admin/DateTimeShortcuts.js
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/admin/RelatedObjectLookups.js
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/cancel.js
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/collapse.js
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/filters.js
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/prepopulate.js
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/urlify.js
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/select2.full.min.js
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/select2.full.js
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/ro.js
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/lv.js
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/ko.js
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/lt.js
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/he.js
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/et.js
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/ms.js
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/bn.js
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/fi.js
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/nb.js
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/vi.js
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/pt-BR.js
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/pt.js
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/sl.js
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/az.js
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/hi.js
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/is.js
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/en.js
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/ne.js
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/fa.js
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/th.js
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/sr-Cyrl.js
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/cs.js
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/gl.js
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/uk.js
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/ps.js
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/hr.js
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/pl.js
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/sr.js
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/sv.js
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/ar.js
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/eu.js
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/mk.js
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/zh-CN.js
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/ka.js
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/el.js
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/hu.js
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/hy.js
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/zh-TW.js
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/id.js
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/bs.js
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/tk.js
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/nl.js
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/tr.js
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/af.js
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/de.js
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/sq.js
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/es.js
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/bg.js
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/dsb.js
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/km.js
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/it.js
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/hsb.js
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/da.js
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/sk.js
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/ru.js
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/ja.js
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/fr.js
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/ca.js
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/jquery/jquery.min.js
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/jquery/jquery.js
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/xregexp/xregexp.js
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/xregexp/xregexp.min.js
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/autocomplete.js
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/core.js
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/inlines.js
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/SelectFilter2.js
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/calendar.js
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/theme.js
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/SelectBox.js
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/nav_sidebar.js
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/jquery.init.js
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/static/admin/js/comanda_info.js
+./backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/static/admin/js/pagamento_admin.js
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/change_form.js
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/actions.js
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/popup_response.js
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/prepopulate_init.js
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/admin/DateTimeShortcuts.js
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/admin/RelatedObjectLookups.js
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/cancel.js
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/collapse.js
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/filters.js
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/prepopulate.js
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/urlify.js
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/select2.full.min.js
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/select2.full.js
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/ro.js
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/lv.js
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/ko.js
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/lt.js
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/he.js
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/et.js
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/ms.js
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/bn.js
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/fi.js
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/nb.js
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/vi.js
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/pt-BR.js
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/pt.js
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/sl.js
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/az.js
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/hi.js
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/is.js
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/en.js
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/ne.js
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/fa.js
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/th.js
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/sr-Cyrl.js
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/cs.js
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/gl.js
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/uk.js
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/ps.js
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/hr.js
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/pl.js
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/sr.js
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/sv.js
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/ar.js
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/eu.js
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/mk.js
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/zh-CN.js
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/ka.js
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/el.js
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/hu.js
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/hy.js
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/zh-TW.js
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/id.js
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/bs.js
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/tk.js
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/nl.js
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/tr.js
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/af.js
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/de.js
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/sq.js
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/es.js
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/bg.js
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/dsb.js
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/km.js
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/it.js
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/hsb.js
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/da.js
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/sk.js
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/ru.js
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/ja.js
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/fr.js
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/select2/i18n/ca.js
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/jquery/jquery.min.js
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/jquery/jquery.js
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/xregexp/xregexp.js
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/vendor/xregexp/xregexp.min.js
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/autocomplete.js
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/core.js
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/inlines.js
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/SelectFilter2.js
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/calendar.js
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/theme.js
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/SelectBox.js
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/nav_sidebar.js
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/venv/lib/python3.11/site-packages/django/contrib/admin/static/admin/js/jquery.init.js
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/static/admin/js/comanda_info.js
+./backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/static/admin/js/pagamento_admin.js
+./backups/backups_sgli/backup_postgresql_20251021_235356/sgli_system/static/admin/js/comanda_info.js
+./backups/backups_sgli/backup_postgresql_20251021_235356/sgli_system/static/admin/js/pagamento_admin.js
+./backups/pre_restauracao_20251101_230555/static/admin/js/comanda_custom.js
+./backups/pre_restauracao_20251101_230555/static/admin/js/comanda_info.js
+./backups/pre_restauracao_20251101_230555/static/admin/js/pagamento_admin.js
+./core/static/admin/js/garantias_dinamicas.js
+./static/admin/js/comanda_custom.js
+./static/admin/js/comanda_info.js
+./static/admin/js/dashboard_premium.js
+./static/admin/js/pagamento_admin.js
+
+[1;33m→ Configuração STATIC no settings.py:[0m
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_DIRS = [
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_DIRS = [BASE_DIR / 'static']
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_DIRS = [BASE_DIR / 'static']
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_DIRS = [BASE_DIR / 'static']
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_DIRS = [BASE_DIR / 'static']
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_DIRS = [BASE_DIR / 'static']
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_DIRS = [BASE_DIR / 'static']
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_DIRS = [BASE_DIR / 'static']
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_DIRS = [BASE_DIR / 'static']
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_DIRS = [BASE_DIR / 'static']
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_DIRS = [BASE_DIR / 'static']
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_DIRS = [BASE_DIR / 'static']
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_DIRS = [BASE_DIR / 'static']
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_DIRS = [
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_DIRS = [BASE_DIR / 'static']
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_DIRS = [
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_DIRS = [
+
+==========================================
+6️⃣ CONFIGURAÇÕES DE URLS
+==========================================
+[1;33m→ Arquivo urls.py principal:[0m
+"""
+URL configuration - CORRIGIDO
+"""
+from django.contrib import admin
+from django.urls import path, include
+from django.conf import settings
+from django.conf.urls.static import static
+from django.http import HttpResponse
+from django.contrib.auth import views as auth_views
+
+# Views
+from core.views_whatsapp import painel_whatsapp, gerar_mensagem_whatsapp
+from core.views_comanda_web import comanda_web_view
+from core.views_gerar_contrato import gerar_contrato_docx, gerar_contrato_pdf
+from core.views import download_recibo_pagamento, pagina_recibo_pagamento
+from core.dashboard_views import admin_index
+
+
+def home_view(request):
+    """Home page"""
+    return HttpResponse('''
+    <html>
+        <head>
+            <title>HABITAT PRO</title>
+            <style>
+                body {
+                    font-family: Arial, sans-serif;
+                    text-align: center;
+                    padding: 50px;
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    color: white;
+                }
+                h1 { font-size: 48px; margin: 20px 0; }
+                a {
+                    display: inline-block;
+                    margin: 10px;
+                    padding: 15px 30px;
+                    background: white;
+                    color: #667eea;
+                    text-decoration: none;
+                    border-radius: 8px;
+                    font-weight: bold;
+                }
+                a:hover { transform: scale(1.05); }
+            </style>
+        </head>
+        <body>
+            <h1>🏢 HABITAT PRO</h1>
+            <h2 style="color: #90EE90;">✅ Sistema Operacional</h2>
+            <p><a href="/admin/">🔐 Acessar Dashboard</a></p>
+        </body>
+    </html>
+    ''')
+
+
+# === CUSTOMIZAÇÃO DO ADMIN (ANTES das URLs!) ===
+admin.site.site_header = "HABITAT PRO - Administração"
+admin.site.site_title = "HABITAT PRO Admin"
+admin.site.index_title = "Sistema de Gestão Inteligente de Imóveis"
+admin.site.index = admin_index
+
+
+# === URL PATTERNS (TODAS JUNTAS!) ===
+urlpatterns = [
+    # Home
+    path('', home_view, name='home'),
+    
+    # === WHATSAPP ===
+    path('admin/whatsapp/', painel_whatsapp, name='painel_whatsapp'),
+    path('admin/whatsapp/api/mensagem/<uuid:comanda_id>/', 
+         gerar_mensagem_whatsapp, 
+         name='api_mensagem_comanda'),
+    
+    # === COMANDA WEB ===
+    path('comanda/<uuid:comanda_id>/<str:token>/', 
+         comanda_web_view, 
+         name='comanda_web'),
+    
+    # === CONTRATOS ===
+    path('contrato/<uuid:locacao_id>/docx/', 
+         gerar_contrato_docx, 
+         name='gerar_contrato_docx'),
+    path('contrato/<uuid:locacao_id>/pdf/', 
+         gerar_contrato_pdf, 
+         name='gerar_contrato_pdf'),
+    
+    # === RECIBOS ===
+    path('pagamento/<uuid:pagamento_id>/recibo/', 
+         pagina_recibo_pagamento, 
+         name='pagina_recibo_pagamento'),
+    path('pagamento/<uuid:pagamento_id>/recibo/download/', 
+         download_recibo_pagamento, 
+         name='download_recibo_pagamento'),
+    
+    # === PASSWORD RESET (CRÍTICO!) ===
+    path('reset-senha/', 
+         auth_views.PasswordResetView.as_view(
+             template_name='registration/password_reset_form.html',
+             email_template_name='registration/password_reset_email.html',
+         ), 
+         name='password_reset'),
+    
+    path('reset-senha/enviado/', 
+         auth_views.PasswordResetDoneView.as_view(
+             template_name='registration/password_reset_done.html'
+         ), 
+         name='password_reset_done'),
+    
+    path('reset-senha/<uidb64>/<token>/', 
+         auth_views.PasswordResetConfirmView.as_view(
+             template_name='registration/password_reset_confirm.html'
+         ), 
+         name='password_reset_confirm'),
+    
+    path('reset-senha/concluido/', 
+         auth_views.PasswordResetCompleteView.as_view(
+             template_name='registration/password_reset_complete.html'
+         ), 
+         name='password_reset_complete'),
+    
+    # === ADMIN (UMA VEZ, NO FINAL) ===
+    path('admin/', admin.site.urls),
+    path('', include('core.urls')),
+]
+
+# Static/Media
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+
+[1;33m→ Rotas do admin:[0m
+backup_pre_renovacao_20251227_161031/core/urls.py:33:#    path('admin/whatsapp/', 
+backup_pre_renovacao_20251227_161031/core/urls.py:37:#    path('admin/whatsapp/gerar-mensagem/<uuid:comanda_id>/', 
+backup_pre_renovacao_20251227_104029/core/urls.py:33:#    path('admin/whatsapp/', 
+backup_pre_renovacao_20251227_104029/core/urls.py:37:#    path('admin/whatsapp/gerar-mensagem/<uuid:comanda_id>/', 
+backup_pre_renovacao_20251227_104029/sgli_project/urls.py:71:#    path('admin/whatsapp/', painel_whatsapp, name='painel_whatsapp'),
+backup_pre_renovacao_20251227_104029/sgli_project/urls.py:72:#    path('admin/whatsapp/api/mensagem/<uuid:comanda_id>/', 
+backup_pre_renovacao_20251227_104029/sgli_project/urls.py:125:    path('admin/', admin.site.urls),
+backups_dashboard_20251124_222901/core/urls.py:24:#    path('admin/whatsapp/', 
+backups_dashboard_20251124_222901/core/urls.py:28:#    path('admin/whatsapp/gerar-mensagem/<uuid:comanda_id>/', 
+backups_dashboard_20251124_230410/core/urls.py:24:#    path('admin/whatsapp/', 
+backups_dashboard_20251124_230410/core/urls.py:28:#    path('admin/whatsapp/gerar-mensagem/<uuid:comanda_id>/', 
+backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/backups/sistema_funcional_completo_20251021_132705/urls.py:39:    path('admin/', admin.site.urls),
+backups/backups_sgli/sgli_backup_20251021_225845/sgli_system/sgli_project/urls.py:39:    path('admin/', admin.site.urls),
+backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/backups/sistema_funcional_completo_20251021_132705/urls.py:39:    path('admin/', admin.site.urls),
+backups/backups_sgli/pre_notificacoes_20251021_233936/sgli_system/sgli_project/urls.py:39:    path('admin/', admin.site.urls),
+backups/backups_sgli/backup_seguro_20251021_234934/sgli_system/backups/sistema_funcional_completo_20251021_132705/urls.py:39:    path('admin/', admin.site.urls),
+backups/backups_sgli/backup_seguro_20251021_234934/sgli_system/sgli_project/urls.py:39:    path('admin/', admin.site.urls),
+backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/backups/sistema_funcional_completo_20251021_132705/urls.py:39:    path('admin/', admin.site.urls),
+backups/backups_sgli/pre_notificacoes_20251021_234123/sgli_system/sgli_project/urls.py:39:    path('admin/', admin.site.urls),
+backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/backups/sistema_funcional_completo_20251021_132705/urls.py:39:    path('admin/', admin.site.urls),
+backups/backups_sgli/pre_notificacoes_20251021_234024/sgli_system/sgli_project/urls.py:39:    path('admin/', admin.site.urls),
+backups/backups_sgli/backup_postgresql_20251021_235356/sgli_system/backups/sistema_funcional_completo_20251021_132705/urls.py:39:    path('admin/', admin.site.urls),
+backups/backups_sgli/backup_postgresql_20251021_235356/sgli_system/sgli_project/urls.py:39:    path('admin/', admin.site.urls),
+backups/pre_restauracao_20251101_230555/urls.py:12:    path('', admin_index, name='admin_custom_index'),
+backups/sistema_funcional_completo_20251021_132705/urls.py:39:    path('admin/', admin.site.urls),
+backups/dev20_v3_flat_20251201_161316/core/urls.py:24:#    path('admin/whatsapp/', 
+backups/dev20_v3_flat_20251201_161316/core/urls.py:28:#    path('admin/whatsapp/gerar-mensagem/<uuid:comanda_id>/', 
+backups_dashboard_20251124_231002/core/urls.py:48:#    path('admin/whatsapp/', 
+backups_dashboard_20251124_231002/core/urls.py:52:#    path('admin/whatsapp/gerar-mensagem/<uuid:comanda_id>/', 
+sgli_project/urls.py:71:#    path('admin/whatsapp/', painel_whatsapp, name='painel_whatsapp'),
+sgli_project/urls.py:72:#    path('admin/whatsapp/api/mensagem/<uuid:comanda_id>/', 
+sgli_project/urls.py:128:    path('admin/', admin.site.urls),
+urls.py:48:#    path('admin/whatsapp/', 
+urls.py:52:#    path('admin/whatsapp/gerar-mensagem/<uuid:comanda_id>/', 
+
+==========================================
+7️⃣ MODELS REGISTRADOS NO ADMIN
+==========================================
+[1;33m→ Models registrados (core/admin.py):[0m
+@admin.register(Usuario)
+@admin.register(Locador)
+@admin.register(Imovel)
+@admin.register(Locatario)
+@admin.register(Locacao)
+@admin.register(Comanda)
+@admin.register(LogGeracaoComandas)
+#@admin.register(Comanda)
+@admin.register(Pagamento)
+@admin.register(TemplateContrato)
+@admin.register(ConfiguracaoSistema)
+#@admin.register(LogGeracaoComandas)
+@admin.register(Fiador)
+@admin.register(RenovacaoContrato)
+# Os modelos já estão registrados com @admin.register no admin_inspection.py
+
+[1;33m→ Quantidade de ModelAdmin classes:[0m
+16
+
+==========================================
+8️⃣ VERIFICAÇÕES DE SEGURANÇA
+==========================================
+[1;33m→ Git status:[0m
+On branch main
+Your branch is up to date with 'origin/main'.
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	modified:   .env
+	modified:   .gitignore
+	modified:   docs/script comandas.odt
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	add_logging_to_method.py
+	apply_fallback_DEV21.8.9.sh
+	backup_credenciais_antigas.sh
+	configurar_lembrete_r2.sh
+	core/urls.py.corrompido_090120262214
+	correcao_final_admin.sh
+	corrigir_3_botoes_admin_VALIDADO.sh
+	corrigir_botao_email.sh
+	corrigir_ordem_rotas.sh
+	corrigir_template_comanda.sh
+	diag_bash.txt
+	diagnostic_django.py
+	diagnostico_geracao_links.sh
+	diagnostico_links.sh
+	diagnostico_r2_authorization.sh
+	diagnostico_vistorias_erros.sh
+	modificar_settings_brevo.sh
+	patch_logging_presigned.py
+	patch_pdf_melhorias.py
+	patch_view_mobile.py
+	railway_env_variables.txt
+	sendgrid_backup.env
+	test_whatsapp_message.py
+	testar_credenciais_r2.py
+	teste_presigned_local.py
+	teste_vistoria_completo.sh
+	validar_email_brevo_local.py
+	ver_metodo_completo_admin.sh
+	verificar_expiracao_r2.py
+
+no changes added to commit (use "git add" and/or "git commit -a")
+
+[1;33m→ Arquivos não commitados:[0m
+ M .env
+ M .gitignore
+ M "docs/script comandas.odt"
+?? add_logging_to_method.py
+?? apply_fallback_DEV21.8.9.sh
+?? backup_credenciais_antigas.sh
+?? configurar_lembrete_r2.sh
+?? core/urls.py.corrompido_090120262214
+?? correcao_final_admin.sh
+?? corrigir_3_botoes_admin_VALIDADO.sh
+?? corrigir_botao_email.sh
+?? corrigir_ordem_rotas.sh
+?? corrigir_template_comanda.sh
+?? diag_bash.txt
+?? diagnostic_django.py
+?? diagnostico_geracao_links.sh
+?? diagnostico_links.sh
+?? diagnostico_r2_authorization.sh
+?? diagnostico_vistorias_erros.sh
+?? modificar_settings_brevo.sh
+?? patch_logging_presigned.py
+?? patch_pdf_melhorias.py
+?? patch_view_mobile.py
+?? railway_env_variables.txt
+?? sendgrid_backup.env
+?? test_whatsapp_message.py
+?? testar_credenciais_r2.py
+?? teste_presigned_local.py
+?? teste_vistoria_completo.sh
+?? validar_email_brevo_local.py
+?? ver_metodo_completo_admin.sh
+?? verificar_expiracao_r2.py
+
+[1;33m→ Último commit:[0m
+dc497d6 DEV_25: Migração SendGrid → Brevo (Economia R$ 1.434,00/ano)
+
+==========================================
+9️⃣ VERIFICAÇÃO DE INTEGRIDADE DJANGO
+==========================================
+[1;33m→ Django check:[0m
+WARNING:root:No DATABASE_URL environment variable set, and so no databases setup
+/home/usuario/sgli_system/sgli_project/settings.py:236: UserWarning: DATABASE_URL não encontrada. Usando SQLite como fallback.
+  warnings.warn("DATABASE_URL não encontrada. Usando SQLite como fallback.")
+INFO 2026-01-19 00:17:21,686 apps ✅ Signals registrados com sucesso
+INFO 2026-01-19 00:17:21,686 apps ✅ Comanda extensions carregados
+INFO 2026-01-19 00:17:21,686 apps ℹ️  Scheduler não iniciado (comando de management ou teste)
+/home/usuario/sgli_system/venv/lib/python3.11/site-packages/docxcompose/properties.py:18: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources
+🔐 CSRF_TRUSTED_ORIGINS configurado: ['https://*.railway.app', 'https://*.up.railway.app', 'https://romantic-liberation-production.up.railway.app']
+⚠️  R2 não configurado - usando MEDIA local
+System check identified no issues (0 silenced).
+
+[1;33m→ Migrations pendentes:[0m
+✅ Nenhuma migration pendente
+
+==========================================
+🎨 CORES ATUAIS DO SISTEMA
+==========================================
+[1;33m→ Cores encontradas em CSS customizado:[0m
+        0 0 0 1px rgba(255, 255, 255, 0.2) inset;
+        0 20px 60px rgba(0, 0, 0, 0.3),
+    background: #1e3a8a !important;
+    background: #CBD5E0; 
+    background-color: #d1fae5 !important;
+    background-color: #f0f9ff !important;
+    background-color: #fee2e2 !important;
+    background-color: #fef3c7 !important;
+    background-color: #ffe6e6;
+    background-color: #fff7ed !important;
+    background-color: #fff9e6;
+    background-color: #ffffff !important;
+    background: #E9ECEF;
+    background: #f0f9ff !important;
+    background: #F8F9FA;
+    background: #FF8C00 !important;
+    background: linear-gradient(135deg, #4169E1 0%, #5B7FEA 100%);
+    background: linear-gradient(135deg, #4169E1 0%, #5B7FEA 100%) !important;
+    background: linear-gradient(135deg, #4169E1 0%, #5B7FEA 50%, #FF8C00 100%);
+    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%) !important;
+
+[1;33m→ Cores inline em templates:[0m
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+        h1 { color: #333; }
+        th { background: #f8f9fa; font-weight: bold; }
+            background: #007bff; 
+        .btn-download:hover { background: #0056b3; }
+        .tipo-contrato { color: #28a745; font-weight: bold; }
+        .tipo-recibo { color: #17a2b8; font-weight: bold; }
+        .stat-box { background: #e9ecef; padding: 15px; border-radius: 8px; text-align: center; }
+        .stat-box .number { font-size: 2em; font-weight: bold; color: #007bff; }
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+
+==========================================
+💾 RECOMENDAÇÃO DE BACKUP
+==========================================
+[0;32mAntes de prosseguir, execute:[0m
+
+# 1. Backup Git (se ainda não fez)
+git add -A
+git commit -m 'backup: antes de implementar menu hamburguer unfold'
+
+# 2. Backup manual (opcional)
+cp -r . ../habitat_pro_backup_$(date +%Y%m%d_%H%M%S)
+
+# 3. Exportar dependências atuais
+pip freeze > requirements_backup.txt
+
+==========================================
+✅ DIAGNÓSTICO COMPLETO!
+==========================================
+
+Por favor, envie TODA esta saída para análise.
+Aguardando autorização para prosseguir com implementação...
+

@@ -1,0 +1,169 @@
+WARNING:root:No DATABASE_URL environment variable set, and so no databases setup
+/home/usuario/sgli_system/sgli_project/settings.py:236: UserWarning: DATABASE_URL não encontrada. Usando SQLite como fallback.
+  warnings.warn("DATABASE_URL não encontrada. Usando SQLite como fallback.")
+INFO 2026-01-19 00:17:24,295 apps ✅ Signals registrados com sucesso
+INFO 2026-01-19 00:17:24,295 apps ✅ Comanda extensions carregados
+INFO 2026-01-19 00:17:24,296 apps ℹ️  Scheduler não iniciado (comando de management ou teste)
+🔐 CSRF_TRUSTED_ORIGINS configurado: ['https://romantic-liberation-production.up.railway.app', 'https://*.up.railway.app', 'https://*.railway.app']
+⚠️  R2 não configurado - usando MEDIA local
+============================================================
+🔍 HABITAT PRO - DIAGNÓSTICO DJANGO DETALHADO
+============================================================
+
+============================================================
+1️⃣ CONFIGURAÇÕES DO PROJETO
+============================================================
+
+→ Nome do projeto:
+   sgli_project.settings
+
+→ DEBUG mode:
+   True
+
+→ INSTALLED_APPS:
+    1. django_apscheduler
+    2. storages
+    3. core.apps.CoreConfig
+    4. django.contrib.admin
+    5. django.contrib.auth
+    6. django.contrib.contenttypes
+    7. django.contrib.sessions
+    8. django.contrib.messages
+    9. django.contrib.staticfiles
+   10. rest_framework
+   11. rest_framework.authtoken
+   12. corsheaders
+   13. django_filters
+
+→ MIDDLEWARE:
+    1. corsheaders.middleware.CorsMiddleware
+    2. django.middleware.security.SecurityMiddleware
+    3. whitenoise.middleware.WhiteNoiseMiddleware
+    4. django.contrib.sessions.middleware.SessionMiddleware
+    5. django.middleware.common.CommonMiddleware
+    6. django.middleware.csrf.CsrfViewMiddleware
+    7. django.contrib.auth.middleware.AuthenticationMiddleware
+    8. django.contrib.messages.middleware.MessageMiddleware
+    9. django.middleware.clickjacking.XFrameOptionsMiddleware
+   10. core.middleware.error_handler.ProductionErrorMiddleware
+
+============================================================
+2️⃣ CONFIGURAÇÕES DO ADMIN SITE
+============================================================
+
+→ Admin site class:
+   django.contrib.admin.sites.AdminSite
+
+→ Admin site title:
+   site_title: Site de administração do Django
+   site_header: Administração do Django
+   index_title: Administração do Site
+
+→ Templates customizados:
+   index_template: (padrão)
+   base_template: (padrão)
+
+============================================================
+3️⃣ MODELS REGISTRADOS NO ADMIN
+============================================================
+
+→ Total de models registrados: 19
+
+→ Lista de models:
+    1. core.configuracaosistema
+       Verbose: Configurações do Sistema
+       Admin: ConfiguracaoSistemaAdmin
+
+    2. core.fiador
+       Verbose: Fiadores
+       Admin: FiadorAdmin
+       Customizações: list_display (5 cols), list_filter (2 filters), search_fields (5 fields)
+
+    3. core.inspectionphoto
+       Verbose: Fotos de Vistoria
+       Admin: InspectionPhotoAdmin
+       Customizações: list_display (5 cols), list_filter (2 filters), search_fields (2 fields)
+
+    4. core.imovel
+       Verbose: Imóveis
+       Admin: ImovelAdmin
+       Customizações: list_display (8 cols), list_filter (6 filters), search_fields (5 fields)
+
+    5. core.locador
+       Verbose: Locadores
+       Admin: LocadorAdmin
+       Customizações: list_display (7 cols), list_filter (3 filters), search_fields (5 fields)
+
+    6. core.locatario
+       Verbose: Locatários
+       Admin: LocatarioAdmin
+       Customizações: list_display (7 cols), list_filter (2 filters), search_fields (6 fields)
+
+    7. core.locacao
+       Verbose: Locações
+       Admin: LocacaoAdmin
+       Customizações: list_display (7 cols), list_filter (3 filters), search_fields (3 fields)
+
+    8. core.loggeracaocomandas
+       Verbose: Logs de Geração de Comandas
+       Admin: LogGeracaoComandaAdmin
+       Customizações: list_display (7 cols), list_filter (4 filters), actions (1 custom)
+
+    9. core.inspectionpdf
+       Verbose: PDFs de Vistoria
+       Admin: InspectionPDFAdmin
+       Customizações: list_display (5 cols), list_filter (1 filters), search_fields (1 fields)
+
+   10. core.pagamento
+       Verbose: Pagamentos
+       Admin: PagamentoAdmin
+       Customizações: list_display (8 cols), list_filter (3 filters), search_fields (3 fields), actions (2 custom)
+
+   11. core.renovacaocontrato
+       Verbose: Renovações de Contratos
+       Admin: RenovacaoContratoAdmin
+       Customizações: list_display (6 cols), list_filter (4 filters), search_fields (3 fields), actions (7 custom)
+
+   12. core.templatecontrato
+       Verbose: Templates de Contratos
+       Admin: TemplateContratoAdmin
+       Customizações: list_display (5 cols), list_filter (3 filters), search_fields (2 fields)
+
+   13. core.usuario
+       Verbose: Usuários
+       Admin: UsuarioAdmin
+       Customizações: list_display (7 cols), list_filter (4 filters), search_fields (5 fields)
+
+   14. core.inspection
+       Verbose: Vistorias
+       Admin: InspectionAdmin
+       Customizações: list_display (9 cols), list_filter (2 filters), search_fields (4 fields), actions (3 custom), inlines (1)
+
+   15. core.comanda
+       Verbose: comandas
+       Admin: ComandaAdmin
+       Customizações: list_display (10 cols), list_filter (6 filters), search_fields (5 fields), actions (5 custom), inlines (1)
+
+   16. django_apscheduler.djangojobexecution
+       Verbose: django job executions
+       Admin: DjangoJobExecutionAdmin
+       Customizações: list_display (5 cols), list_filter (3 filters)
+
+   17. django_apscheduler.djangojob
+       Verbose: django jobs
+       Admin: DjangoJobAdmin
+       Customizações: list_display (3 cols), search_fields (1 fields)
+
+   18. auth.group
+       Verbose: grupos
+       Admin: GroupAdmin
+       Customizações: search_fields (1 fields)
+
+   19. authtoken.tokenproxy
+       Verbose: tokens
+       Admin: TokenAdmin
+Traceback (most recent call last):
+  File "/home/usuario/sgli_system/diagnostic_django.py", line 112, in <module>
+    if hasattr(model_admin, 'actions') and len(model_admin.actions) > 1:  # >1 porque delete é padrão
+                                           ^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: object of type 'NoneType' has no len()
