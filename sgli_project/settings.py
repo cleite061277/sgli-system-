@@ -16,6 +16,8 @@ DEBUG = config('DEBUG', default=False, cast=bool)
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost').split(',')
 
 INSTALLED_APPS = [
+    'unfold',  # Menu hamburguer moderno
+
     'django_apscheduler',
     'storages',  # django-storages (Cloudflare R2)
     'core.apps.CoreConfig',  # ← DEVE VIR PRIMEIRO para templates customizados
@@ -365,3 +367,225 @@ else:
     print("⚠️  R2 não configurado - usando MEDIA local")
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+# ==========================================
+# DJANGO-UNFOLD CONFIGURATION
+# ==========================================
+
+UNFOLD = {
+    # Identidade visual
+    "SITE_TITLE": "HABITAT PRO",
+    "SITE_HEADER": "Sistema de Gestão Imobiliária Inteligente",
+    "SITE_SYMBOL": "home",  # Ícone material (home = 🏠)
+    
+    # Tema
+    "THEME": "dark",  # Dark mode por padrão
+    
+    # Sidebar (Menu Lateral)
+    "SIDEBAR": {
+        "show_search": True,  # Busca global ativada
+        "show_all_applications": False,  # Usar navegação customizada
+        
+"navigation": [
+            # Dashboard
+            {
+                "title": "Dashboard",
+                "separator": False,
+                "items": [
+                    {
+                        "title": "Visão Geral",
+                        "icon": "dashboard",
+                        "link": "/admin/",
+                    },
+                    {
+                        "title": "Dashboard Financeiro",
+                        "icon": "monitoring",
+                        "link": "/relatorios/dashboard/",
+                    },
+                ],
+            },
+            
+            # Cadastros
+            {
+                "title": "Cadastros",
+                "separator": True,
+                "collapsible": True,
+                "items": [
+                    {
+                        "title": "Imóveis",
+                        "icon": "business",
+                        "link": "/admin/core/imovel/",
+                    },
+                    {
+                        "title": "Proprietários",
+                        "icon": "person",
+                        "link": "/admin/core/locador/",
+                    },
+                    {
+                        "title": "Locatários",
+                        "icon": "people",
+                        "link": "/admin/core/locatario/",
+                    },
+                    {
+                        "title": "Fiadores",
+                        "icon": "handshake",
+                        "link": "/admin/core/fiador/",
+                    },
+                ],
+            },
+            
+            # Contratos
+            {
+                "title": "Contratos",
+                "separator": True,
+                "collapsible": True,
+                "items": [
+                    {
+                        "title": "Locações",
+                        "icon": "description",
+                        "link": "/admin/core/locacao/",
+                    },
+                    {
+                        "title": "Templates",
+                        "icon": "article",
+                        "link": "/admin/core/templatecontrato/",
+                    },
+                    {
+                        "title": "Renovações",
+                        "icon": "autorenew",
+                        "link": "/admin/core/renovacaocontrato/",
+                    },
+                ],
+            },
+            
+            # Vistorias
+            {
+                "title": "Vistorias",
+                "separator": True,
+                "collapsible": True,
+                "items": [
+                    {
+                        "title": "Vistorias",
+                        "icon": "assignment",
+                        "link": "/admin/core/inspection/",
+                    },
+                    {
+                        "title": "Fotos",
+                        "icon": "photo_library",
+                        "link": "/admin/core/inspectionphoto/",
+                    },
+                    {
+                        "title": "PDFs",
+                        "icon": "picture_as_pdf",
+                        "link": "/admin/core/inspectionpdf/",
+                    },
+                ],
+            },
+            
+            # Financeiro
+            {
+                "title": "Financeiro",
+                "separator": True,
+                "collapsible": True,
+                "items": [
+                    {
+                        "title": "Pagamentos",
+                        "icon": "payments",
+                        "link": "/admin/core/pagamento/",
+                    },
+                    {
+                        "title": "Comandas",
+                        "icon": "receipt",
+                        "link": "/admin/core/comanda/",
+                    },
+                    {
+                        "title": "Logs",
+                        "icon": "history",
+                        "link": "/admin/core/loggeracaocomandas/",
+                    },
+                ],
+            },
+            
+            # Sistema
+            {
+                "title": "Sistema",
+                "separator": True,
+                "collapsible": True,
+                "items": [
+                    {
+                        "title": "Usuários",
+                        "icon": "group",
+                        "link": "/admin/core/usuario/",
+                    },
+                    {
+                        "title": "Configurações",
+                        "icon": "settings",
+                        "link": "/admin/core/configuracaosistema/",
+                    },
+                    {
+                        "title": "Grupos",
+                        "icon": "group_work",
+                        "link": "/admin/auth/group/",
+                    },
+                    {
+                        "title": "Tokens",
+                        "icon": "vpn_key",
+                        "link": "/admin/authtoken/tokenproxy/",
+                    },
+                ],
+            },
+            
+            # Agendador
+            {
+                "title": "Agendador",
+                "separator": True,
+                "collapsible": True,
+                "items": [
+                    {
+                        "title": "Jobs",
+                        "icon": "schedule",
+                        "link": "/admin/django_apscheduler/djangojob/",
+                    },
+                    {
+                        "title": "Execuções",
+                        "icon": "play_circle",
+                        "link": "/admin/django_apscheduler/djangojobexecution/",
+                    },
+                ],
+            },
+        ],  # Será configurado na FASE 3
+    },
+    
+    # Cores personalizadas (mantendo identidade #4361ee)
+    "COLORS": {
+        "primary": {
+            "50": "#eef2ff",
+            "100": "#e0e7ff",
+            "200": "#c7d2fe",
+            "300": "#a5b4fc",
+            "400": "#818cf8",
+            "500": "#4361ee",  # ← COR PRINCIPAL DO SISTEMA
+            "600": "#3f37c9",  # ← COR SECUNDÁRIA
+            "700": "#3730a3",
+            "800": "#312e81",
+            "900": "#1e1b4b",
+            "950": "#0f0d2e",
+        },
+    },
+    
+    # Ambiente
+    "ENVIRONMENT": "production" if not DEBUG else "development",
+    
+    # Extensions
+    "EXTENSIONS": {
+        "modeltranslation": {
+            "flags": {
+                "en": "🇬🇧",
+                "pt": "🇧🇷",
+            },
+        },
+    },
+    
+    # Tabs (abas superiores)
+    "TABS": [],
+}
