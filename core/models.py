@@ -1814,7 +1814,7 @@ class ConfiguracaoSistema(models.Model):
     
     class Meta:
         verbose_name = "Configuração do Sistema"
-        verbose_name_plural = "Configurações do Sistema"
+        verbose_name_plural = '⚙️ 5.2 Configurações do Sistema'
     
     def __str__(self):
         return f"Configurações (Vencimento: dia {self.dia_vencimento_padrao})"
@@ -1848,7 +1848,7 @@ class LogGeracaoComandas(models.Model):
     
     class Meta:
         verbose_name = "Log de Geração de Comandas"
-        verbose_name_plural = "Logs de Geração de Comandas"
+        verbose_name_plural = '📊 4.3 Logs de Geração'
         ordering = ['-data_execucao']
     
     def __str__(self):
@@ -2475,7 +2475,7 @@ class ContratoDownloadToken(BaseModel):
     class Meta:
         db_table = 'core_contrato_download_token'
         verbose_name = 'Token de Download de Contrato'
-        verbose_name_plural = 'Tokens de Download de Contratos'
+        verbose_name_plural = '🔄 2.3 Renovações de Contratos'
         ordering = ['-created_at']
         indexes = [
             models.Index(fields=['token']),
