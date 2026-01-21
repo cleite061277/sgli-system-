@@ -167,7 +167,7 @@ class Usuario(AbstractUser, BaseModel):
     
     class Meta:
         verbose_name = _('Usuário')
-        verbose_name_plural = '👥 5.1 Usuários'
+        verbose_name_plural = _('Usuários')
         db_table = 'core_usuario'
 
 
@@ -251,7 +251,7 @@ class Locador(BaseModel):
     
     class Meta:
         verbose_name = _('Locador')
-        verbose_name_plural = '👤 1.2 Proprietários'
+        verbose_name_plural = _('Locadores')
         db_table = 'core_locador'
 
 
@@ -422,7 +422,7 @@ class Imovel(BaseModel):
     
     class Meta:
         verbose_name = _('Imóvel')
-        verbose_name_plural = '🏢 1.1 Imóveis'
+        verbose_name_plural = _('Imóveis')
         db_table = 'core_imovel'
 
 # ===========================================================================
@@ -568,7 +568,7 @@ class Fiador(BaseModel):
     
     class Meta:
         verbose_name = _('Fiador')
-        verbose_name_plural = '🤝 1.4 Fiadores'
+        verbose_name_plural = _('Fiadores')
         db_table = 'core_fiador'
         ordering = ['nome_completo']
 
@@ -724,7 +724,7 @@ class Locatario(BaseModel):
     
     class Meta:
         verbose_name = _('Locatário')
-        verbose_name_plural = '🧑‍💼 1.3 Locatários'
+        verbose_name_plural = _('Locatários')
         db_table = 'core_locatario'
 
 # ============================================================================
@@ -997,7 +997,7 @@ class Locacao(BaseModel):
 
     class Meta:
         verbose_name = _('Locação')
-        verbose_name_plural = '📄 2.1 Locações'
+        verbose_name_plural = _('Locações')
         db_table = 'core_locacao'
 
 
@@ -1506,7 +1506,7 @@ class Comanda(BaseModel):
         
 class Meta:
         verbose_name = _('Comanda')
-        verbose_name_plural = '🧾 4.2 Comandas'
+        verbose_name_plural = _('Comandas')
         db_table = 'core_comanda'
         unique_together = ['locacao', 'mes_referencia', 'ano_referencia']
         ordering = ['-ano_referencia', '-mes_referencia']
@@ -1668,7 +1668,7 @@ class Pagamento(BaseModel):
 
     class Meta:
         verbose_name = _('Pagamento')
-        verbose_name_plural = '💰 4.1 Pagamentos'
+        verbose_name_plural = _('Pagamentos')
         ordering = ['-data_pagamento', '-created_at']
         db_table = 'core_pagamento'
 
@@ -1760,7 +1760,7 @@ class TemplateContrato(BaseModel):
     
     class Meta:
         verbose_name = _('Template de Contrato')
-        verbose_name_plural = '📋 2.2 Templates de Contratos'
+        verbose_name_plural = _('Templates de Contratos')
         ordering = ['-is_default', 'nome']
         db_table = 'core_template_contrato'
     
@@ -1814,7 +1814,7 @@ class ConfiguracaoSistema(models.Model):
     
     class Meta:
         verbose_name = "Configuração do Sistema"
-        verbose_name_plural = '⚙️ 5.2 Configurações do Sistema'
+        verbose_name_plural = _('Configurações do Sistema')
     
     def __str__(self):
         return f"Configurações (Vencimento: dia {self.dia_vencimento_padrao})"
@@ -1848,7 +1848,7 @@ class LogGeracaoComandas(models.Model):
     
     class Meta:
         verbose_name = "Log de Geração de Comandas"
-        verbose_name_plural = '📊 4.3 Logs de Geração'
+        verbose_name_plural = _('Logs de Geração de Comandas')
         ordering = ['-data_execucao']
     
     def __str__(self):
@@ -2286,7 +2286,7 @@ class RenovacaoContrato(BaseModel):
     
     class Meta:
         verbose_name = _('Renovação de Contrato')
-        verbose_name_plural = '🔄 2.3 Renovações de Contratos'
+        verbose_name_plural = _('Renovações de Contratos')
         ordering = ['-data_proposta']
         indexes = [
             models.Index(fields=['status']),
