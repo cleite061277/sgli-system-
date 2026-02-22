@@ -2052,7 +2052,7 @@ def atualizar_status_comanda(sender, instance, **kwargs):
             status='confirmado'
         ).aggregate(total=Sum('valor_pago'))['total'] or Decimal('0.00')
 
-        valor_comanda = comanda.valor_total
+        valor_comanda = comanda.valor_total  # HOTFIX: Comanda usa valor_total_total
 
         if total_pago >= valor_comanda and valor_comanda > 0:
             comanda.status = Comanda.StatusComanda.PAGA
