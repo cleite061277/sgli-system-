@@ -774,6 +774,7 @@ class Locacao(BaseModel):
         INATIVA = 'INACTIVE', _('Inativa')
         PENDENTE = 'PENDING', _('Pendente')
         VENCIDA = 'EXPIRED', _('Vencida')
+        RESCINDIDA = 'RESCINDED', _('Rescindido')
     
     imovel = models.ForeignKey(
         Imovel,
@@ -815,6 +816,13 @@ class Locacao(BaseModel):
         verbose_name=_('Data de Fim'),
         help_text=_('Data de término da locação')
     )
+    
+    data_rescisao = models.DateField(
+    null=True,
+    blank=True,
+    verbose_name=_('Data de Rescisão'),
+    help_text=_('Data efetiva da rescisão do contrato')
+)
     
     valor_aluguel = models.DecimalField(
         max_digits=10,
@@ -1534,7 +1542,9 @@ class Pagamento(BaseModel):
         'Comanda',
         on_delete=models.CASCADE,
         related_name='pagamentos',
-        verbose_name=_('Comanda')
+        verbose_name=_('Comanda'),
+        null=True,   # Backwards compatibility - mantido para comandas de aluguel
+        blank=True
     )
     
     usuario_registro = models.ForeignKey(
@@ -1543,6 +1553,30 @@ class Pagamento(BaseModel):
         related_name='pagamentos_registrados',
         verbose_name=_('Usuário que Registrou')
     )
+
+    # ═══════════════════════════════════════════════════════════
+    # POLIMORFISMO - GenericForeignKey
+    # Permite que Pagamento sirva para Comanda E ComandaRescisao
+    # ═══════════════════════════════════════════════════════════
+    content_type = models.ForeignKey(
+        ContentType,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        verbose_name=_('Tipo de Comanda'),
+        help_text=_('Tipo de comanda (Comanda ou ComandaRescisao)')
+    )
+
+    object_id = models.UUIDField(
+        null=True,
+        blank=True,
+        verbose_name=_('ID da Comanda'),
+        help_text=_('ID genérico da comanda associada')
+    )
+
+    comanda_ref = GenericForeignKey('content_type', 'object_id')
+
+    
     
     # Identificação
     numero_pagamento = models.CharField(max_length=50,
@@ -1618,15 +1652,31 @@ class Pagamento(BaseModel):
         return f"{prefixo}{novo_numero:04d}"
     
     def _atualizar_comanda(self):
-        """Update comanda's paid value based on confirmed payments."""
-        total_pago = self.comanda.pagamentos.filter(
-            status="confirmado"
-        ).aggregate(
-            total=models.Sum('valor_pago')
-        )['total'] or Decimal('0.00')
+        """
+        Atualiza valor pago da comanda associada.
+        Suporta Comanda (aluguel) e ComandaRescisao (polimórfico).
+        """
+        # Atualizar comanda de aluguel (FK direta - backwards compatible)
+        if self.comanda_id:
+            total_pago = self.comanda.pagamentos.filter(
+                status="confirmado"
+            ).aggregate(
+                total=models.Sum('valor_pago')
+            )['total'] or Decimal('0.00')
+            self.comanda.valor_pago = total_pago
+            self.comanda.save(update_fields=['valor_pago'])
         
-        self.comanda.valor_pago = total_pago
-        self.comanda.save(update_fields=['valor_pago'])
+        # Atualizar comanda de rescisão (GenericFK)
+        elif self.comanda_ref and hasattr(self.comanda_ref, 'valor_pago'):
+            total_pago = Pagamento.objects.filter(
+                content_type=self.content_type,
+                object_id=self.object_id,
+                status="confirmado"
+            ).aggregate(
+                total=models.Sum('valor_pago')
+            )['total'] or Decimal('0.00')
+            self.comanda_ref.valor_pago = total_pago
+            self.comanda_ref.save(update_fields=['valor_pago'])
     
 
     # ═══════════════════════════════════════════════════════════
@@ -1670,6 +1720,9 @@ class Pagamento(BaseModel):
         verbose_name = _('Pagamento')
         verbose_name_plural = _('Pagamentos')
         ordering = ['-data_pagamento', '-created_at']
+        indexes = [
+            models.Index(fields=['content_type', 'object_id']),
+        ]
         db_table = 'core_pagamento'
 
 
@@ -1981,38 +2034,96 @@ from core.utils.token_publico import gerar_dados_token
 @receiver([post_save, post_delete], sender=Pagamento)
 def atualizar_status_comanda(sender, instance, **kwargs):
     """
-    Atualiza automaticamente o status e data_pagamento da Comanda
+    Atualiza automaticamente o status da Comanda ou ComandaRescisao
     quando um Pagamento é criado, atualizado ou deletado.
+
+    POLIMORFISMO:
+    - instance.comanda_id preenchido → Pagamento de aluguel (Comanda)
+    - instance.content_type_id preenchido → Pagamento de rescisão (ComandaRescisao)
+    - Nenhum dos dois → ignorar silenciosamente
     """
-    comanda = instance.comanda
-    
-    # Calcular total pago confirmado
-    total_pago = comanda.pagamentos.filter(
-        status='confirmado'
-    ).aggregate(total=Sum('valor_pago'))['total'] or Decimal('0.00')
-    
-    # Calcular valor total da comanda
-    valor_comanda = comanda.valor_total
-    
-    
-    # Atualizar status baseado no total pago
-    if total_pago >= valor_comanda and valor_comanda > 0:
-        comanda.status = Comanda.StatusComanda.PAGA
-        # Atualizar data_pagamento com data do último pagamento confirmado
-        ultimo_pag = comanda.pagamentos.filter(
+    # ── CASO 1: Pagamento de aluguel (FK comanda preenchida) ──────────────
+    if instance.comanda_id:
+        comanda = instance.comanda
+        if comanda is None:
+            return  # Guard extra por segurança
+
+        total_pago = comanda.pagamentos.filter(
             status='confirmado'
-        ).order_by('-data_pagamento').first()
-        if ultimo_pag:
-            comanda.data_pagamento = ultimo_pag.data_pagamento
-    elif total_pago > 0:
-        comanda.status = Comanda.StatusComanda.PARCIALMENTE_PAGA
-        comanda.data_pagamento = None
-    else:
-        comanda.status = Comanda.StatusComanda.PENDENTE
-        comanda.data_pagamento = None
-    
-    # Salvar alterações
-    comanda.save(update_fields=['status', 'data_pagamento', 'updated_at'])
+        ).aggregate(total=Sum('valor_pago'))['total'] or Decimal('0.00')
+
+        valor_comanda = comanda.valor_total
+
+        if total_pago >= valor_comanda and valor_comanda > 0:
+            comanda.status = Comanda.StatusComanda.PAGA
+            ultimo_pag = comanda.pagamentos.filter(
+                status='confirmado'
+            ).order_by('-data_pagamento').first()
+            if ultimo_pag:
+                comanda.data_pagamento = ultimo_pag.data_pagamento
+        elif total_pago > 0:
+            comanda.status = Comanda.StatusComanda.PARCIALMENTE_PAGA
+            comanda.data_pagamento = None
+        else:
+            comanda.status = Comanda.StatusComanda.PENDENTE
+            comanda.data_pagamento = None
+
+        comanda.save(update_fields=['status', 'data_pagamento', 'updated_at'])
+
+    # ── CASO 2: Pagamento de rescisão (GenericFK preenchida) ─────────────
+    elif instance.content_type_id and instance.object_id:
+        comanda_rescisao = instance.comanda_ref
+        if comanda_rescisao is None:
+            return  # Objeto pode ter sido deletado
+
+        # Calcular total pago
+        total_pago = Pagamento.objects.filter(
+            content_type_id=instance.content_type_id,
+            object_id=instance.object_id,
+            status='confirmado'
+        ).aggregate(total=Sum('valor_pago'))['total'] or Decimal('0.00')
+
+        valor_comanda = comanda_rescisao.valor
+
+        # ✅ REPLICAR LÓGICA DE ALUGUEL: Atualizar status baseado no valor pago
+        if total_pago >= valor_comanda and valor_comanda > 0:
+            # Totalmente pago
+            comanda_rescisao.status = 'PAGO'
+            
+            # Pegar data do último pagamento confirmado
+            ultimo_pag = Pagamento.objects.filter(
+                content_type_id=instance.content_type_id,
+                object_id=instance.object_id,
+                status='confirmado'
+            ).order_by('-data_pagamento').first()
+            
+            if ultimo_pag:
+                comanda_rescisao.data_pagamento = ultimo_pag.data_pagamento
+        
+        elif total_pago > 0:
+            # Parcialmente pago (rescisão não tem status específico, mantém PENDENTE)
+            # Mas registra a data do pagamento parcial
+            comanda_rescisao.status = 'PENDENTE'
+            
+            ultimo_pag = Pagamento.objects.filter(
+                content_type_id=instance.content_type_id,
+                object_id=instance.object_id,
+                status='confirmado'
+            ).order_by('-data_pagamento').first()
+            
+            if ultimo_pag:
+                comanda_rescisao.data_pagamento = ultimo_pag.data_pagamento
+        
+        else:
+            # Sem pagamento ou pagamento cancelado
+            comanda_rescisao.status = 'PENDENTE'
+            comanda_rescisao.data_pagamento = None
+
+        # Salvar alterações
+        comanda_rescisao.save(update_fields=['status', 'data_pagamento', 'updated_at'])
+
+    # ── CASO 3: Sem FK nem GenericFK — ignorar ───────────────────────────
+    # (não deve acontecer, mas evita crash se acontecer)
 
 # ════════════════════════════════════════════════════════════════════════════
 # MODELO DE RENOVAÇÃO DE CONTRATOS - DEV_21
@@ -2555,3 +2666,9 @@ from .models_inspection import (
     InspectionPhoto,
     InspectionPDF
 )
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# MODELS DE RESCISÃO (Módulo Isolado)
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+from .models_rescisao import RescisaoContrato, ComandaRescisao
+

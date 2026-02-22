@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <meta http-equiv="X-Robots-Tag" content="noindex, nofollow">
+    <title>Recibo {{ pagamento.numero_pagamento }}</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            background: white;
+            max-width: 600px;
+            width: 100%;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 { font-size: 24px; margin-bottom: 5px; }
+        .header p { font-size: 14px; opacity: 0.9; }
+        .content { padding: 30px; }
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .info-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        .info-label {
+            font-size: 12px;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 5px;
+        }
+        .info-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: #212529;
+        }
+        .valor-destaque {
+            grid-column: span 2;
+            background: #e7f5ff;
+            border-left-color: #1971c2;
+            text-align: center;
+            padding: 25px;
+        }
+        .valor-destaque .info-label { color: #1971c2; }
+        .valor-destaque .info-value { font-size: 32px; color: #1971c2; }
+        .footer {
+            background: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            color: #6c757d;
+            font-size: 12px;
+            border-top: 1px solid #dee2e6;
+        }
+        .btn-pdf {
+            display: inline-block;
+            margin: 20px auto;
+            padding: 12px 24px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .btn-pdf:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+        }
+        @media print {
+            body { background: white; padding: 0; }
+            .container { box-shadow: none; max-width: 100%; }
+            .btn-pdf { display: none; }
+        }
+        @media (max-width: 600px) {
+            .info-grid { grid-template-columns: 1fr; }
+            .valor-destaque { grid-column: span 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧾 RECIBO DE PAGAMENTO</h1>
+            <p>{{ pagamento.numero_pagamento }}</p>
+        </div>
+        
+        <div class="content">
+            <div style="text-align: center;">
+                <a href="/recibo/{{ pagamento.token }}/pdf/" class="btn-pdf">
+                    📥 Baixar PDF
+                </a>
+            </div>
+            
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">👤 Locatário</div>
+                    <div class="info-value">
+                        {% if locatario %}{{ locatario.nome_razao_social }}{% else %}—{% endif %}
+                    </div>
+                </div>
+                
+                <div class="info-item">
+                    <div class="info-label">🏠 Imóvel</div>
+                    <div class="info-value">
+                        {% if imovel %}{{ imovel.endereco }}, {{ imovel.numero }}{% else %}—{% endif %}
+                    </div>
+                </div>
+                
+                <div class="info-item">
+                    <div class="info-label">📅 Data</div>
+                    <div class="info-value">{{ data_br }}</div>
+                </div>
+                
+                <div class="info-item">
+                    <div class="info-label">💳 Forma</div>
+                    <div class="info-value">{{ pagamento.get_forma_pagamento_display }}</div>
+                </div>
+                
+                <div class="info-item" style="grid-column: span 2;">
+                    <div class="info-label">📋 Referente a</div>
+                    <div class="info-value">{{ ref_label }}</div>
+                </div>
+                
+                <div class="valor-destaque">
+                    <div class="info-label">💰 Valor Pago</div>
+                    <div class="info-value">R$ {{ pagamento.valor_pago|floatformat:2 }}</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>© 2026 HABITAT PRO — Sistema de Gestão Imobiliária</p>
+            <p>Desenvolvido por A&C Imóveis e Sistemas Imobiliários</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirmar Rescisão de Contrato</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 16px;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .info-box {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        
+        .info-box h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .info-row:last-child {
+            border-bottom: none;
+        }
+        
+        .info-label {
+            font-weight: 600;
+            color: #555;
+        }
+        
+        .info-value {
+            color: #333;
+        }
+        
+        .valores-destaque {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        
+        .valores-destaque h3 {
+            color: #856404;
+            margin-bottom: 15px;
+        }
+        
+        .valor-total {
+            font-size: 32px;
+            font-weight: bold;
+            color: #dc3545;
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .checkbox-container {
+            background: #e7f3ff;
+            border: 2px solid #007bff;
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 10px;
+        }
+        
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        .checkbox-label input {
+            width: 20px;
+            height: 20px;
+            margin-right: 15px;
+            cursor: pointer;
+        }
+        
+        .btn-container {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 15px 30px;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: #28a745;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+        }
+        
+        .btn-primary:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+        
+        .alert {
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        
+        .alert-warning {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            color: #856404;
+        }
+        
+        .footer {
+            background: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+        }
+        
+        @media (max-width: 600px) {
+            .content {
+                padding: 20px;
+            }
+            
+            .btn-container {
+                flex-direction: column;
+            }
+            
+            .valor-total {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏠 Confirmação de Rescisão de Contrato</h1>
+            <p>Por favor, revise as informações e confirme sua decisão</p>
+        </div>
+        
+        <div class="content">
+            <div class="info-box">
+                <h3>📋 Dados do Contrato</h3>
+                <div class="info-row">
+                    <span class="info-label">Número do Contrato:</span>
+                    <span class="info-value">{{ locacao.numero_contrato }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Imóvel:</span>
+                    <span class="info-value">{{ imovel.endereco }}, {{ imovel.numero }} - {{ imovel.bairro }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Locatário:</span>
+                    <span class="info-value">{{ locatario.nome_razao_social }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Data de Desocupação:</span>
+                    <span class="info-value">{{ rescisao.data_desocupacao|date:"d/m/Y" }}</span>
+                </div>
+            </div>
+            
+            <div class="valores-destaque">
+                <h3>💰 Valores da Rescisão</h3>
+                
+                {% if valores.multa > 0 %}
+                <div class="info-row">
+                    <span class="info-label">Multa Rescisória:</span>
+                    <span class="info-value">R$ {{ valores.multa|floatformat:2 }}</span>
+                </div>
+                {% endif %}
+                
+                {% if valores.agua > 0 %}
+                <div class="info-row">
+                    <span class="info-label">Conta de Água:</span>
+                    <span class="info-value">R$ {{ valores.agua|floatformat:2 }}</span>
+                </div>
+                {% endif %}
+                
+                {% if valores.luz > 0 %}
+                <div class="info-row">
+                    <span class="info-label">Conta de Luz:</span>
+                    <span class="info-value">R$ {{ valores.luz|floatformat:2 }}</span>
+                </div>
+                {% endif %}
+                
+                {% if valores.condominio > 0 %}
+                <div class="info-row">
+                    <span class="info-label">Condomínio:</span>
+                    <span class="info-value">R$ {{ valores.condominio|floatformat:2 }}</span>
+                </div>
+                {% endif %}
+                
+                {% if valores.reparos > 0 %}
+                <div class="info-row">
+                    <span class="info-label">Custos de Reparos:</span>
+                    <span class="info-value">R$ {{ valores.reparos|floatformat:2 }}</span>
+                </div>
+                {% endif %}
+                
+                {% if valores.caucao > 0 %}
+                <div class="info-row">
+                    <span class="info-label">Caução (deduzir):</span>
+                    <span class="info-value" style="color: green;">- R$ {{ valores.caucao|floatformat:2 }}</span>
+                </div>
+                {% endif %}
+            </div>
+            
+            <div class="valor-total">
+                TOTAL: R$ {{ valores.total|floatformat:2 }}
+            </div>
+            
+            <div class="info-box">
+                <h3>💳 Parcelamento</h3>
+                <div class="info-row">
+                    <span class="info-label">Quantidade de Parcelas:</span>
+                    <span class="info-value">{{ valores.parcelas }}x</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Valor de Cada Parcela:</span>
+                    <span class="info-value" style="font-weight: bold; color: #dc3545;">R$ {{ valores.valor_parcela|floatformat:2 }}</span>
+                </div>
+            </div>
+            
+            <div class="alert alert-warning">
+                <strong>⚠️ ATENÇÃO:</strong> O atraso no pagamento das parcelas incidirá multa de 10% + correção monetária mensal pelo índice IPCA, conforme cláusulas contratuais, além de sujeitar o débito a ajuizamento de cobrança.
+            </div>
+            
+            <form method="POST">
+                {% csrf_token %}
+                
+                <div class="checkbox-container">
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="aceite_termos" value="sim" id="aceite" required>
+                        <span>
+                            Declaro que li e estou ciente de todos os valores e condições apresentados. 
+                            Confirmo a rescisão do contrato e assumo o compromisso de quitação dos valores 
+                            conforme acordado.
+                        </span>
+                    </label>
+                </div>
+                
+                <div class="btn-container">
+                    <button type="button" class="btn btn-secondary" onclick="window.history.back()">
+                        ❌ Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-primary" id="btnConfirmar" disabled>
+                        ✅ Confirmar Rescisão
+                    </button>
+                </div>
+            </form>
+        </div>
+        
+        <div class="footer">
+            <p>Policorp Sistemas e Tecnologia da Informação</p>
+            <p>Paranaguá - PR | Em caso de dúvidas, entre em contato conosco</p>
+        </div>
+    </div>
+    
+    <script>
+        // Habilitar botão somente quando checkbox marcado
+        document.getElementById('aceite').addEventListener('change', function() {
+            document.getElementById('btnConfirmar').disabled = !this.checked;
+        });
+    </script>
+</body>
+</html>

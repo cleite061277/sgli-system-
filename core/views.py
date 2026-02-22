@@ -94,52 +94,50 @@ import mimetypes
 @staff_member_required
 def download_recibo_pagamento(request, pagamento_id):
     """
-    Download seguro de recibo de pagamento.
-    Requer autenticação de staff e gera/serve o arquivo sem expor filesystem.
+    Download seguro de recibo (Word).
+    POLIMÓRFICO: suporta aluguel e rescisão.
     """
-    # Buscar pagamento
+    import logging
+    logger = logging.getLogger(__name__)
+    
     pagamento = get_object_or_404(Pagamento, id=pagamento_id)
     
-    # Verificar permissão
     if not request.user.has_perm('core.view_pagamento'):
         raise Http404("Permissão negada")
     
     try:
-        # Gerar recibo (ou pegar existente)
         generator = DocumentGenerator()
-        filename = generator.gerar_recibo_pagamento(pagamento.id)
         
-        # Caminho completo do arquivo
+        # Guard: verificar se DocumentGenerator tem método polimórfico
+        # Se não tiver, fallback para método original (só funciona para aluguel)
+        if hasattr(generator, 'gerar_recibo_polimorfico'):
+            filename = generator.gerar_recibo_polimorfico(pagamento)
+        else:
+            # Método original (só aluguel) — rescisão falhará aqui
+            if not pagamento.comanda_id:
+                raise Exception("Recibo de rescisão requer DocumentGenerator atualizado")
+            filename = generator.gerar_recibo_pagamento(pagamento.id)
+        
         file_path = os.path.join(generator.output_dir, filename)
         
-        # Verificar se existe
         if not os.path.exists(file_path):
             raise Http404("Recibo não encontrado")
         
-        # Detectar tipo MIME
         content_type, _ = mimetypes.guess_type(file_path)
         if content_type is None:
             content_type = 'application/octet-stream'
         
-        # Abrir arquivo
         with open(file_path, 'rb') as f:
             response = HttpResponse(f.read(), content_type=content_type)
             response['Content-Disposition'] = f'attachment; filename="{filename}"'
-            
-            # Log de auditoria (opcional)
-            import logging
-            logger = logging.getLogger(__name__)
             logger.info(
                 f"Recibo baixado: {filename} por {request.user.username} "
                 f"(Pagamento: {pagamento.numero_pagamento})"
             )
-            
             return response
-            
+    
     except Exception as e:
-        import logging
-        logger = logging.getLogger(__name__)
-        logger.error(f"Erro ao gerar recibo para pagamento {pagamento_id}: {e}")
+        logger.error(f"Erro ao gerar recibo {pagamento_id}: {e}")
         raise Http404(f"Erro ao gerar recibo: {str(e)}")
 
 
@@ -159,12 +157,34 @@ def pagina_recibo_pagamento(request, pagamento_id):
     if not request.user.has_perm('core.view_pagamento'):
         raise Http404("Permissão negada")
     
-    # Buscar dados relacionados (ANTES do POST)
-    comanda = pagamento.comanda
-    locacao = comanda.locacao if comanda else None
-    locatario = locacao.locatario if locacao else None
-    imovel = locacao.imovel if locacao else None
-    
+    # Resolver contexto — polimórfico: aluguel (FK) ou rescisão (GenericFK)
+    if pagamento.comanda_id:
+        comanda   = pagamento.comanda
+        locacao   = comanda.locacao   if comanda else None
+        locatario = locacao.locatario if locacao else None
+        imovel    = locacao.imovel    if locacao else None
+        if comanda and locacao:
+            ref_label = ('Comanda ' + comanda.numero_comanda
+                         + ' | Vcto ' + comanda.data_vencimento.strftime('%d/%m/%Y'))
+        else:
+            ref_label = 'Aluguel'
+    elif pagamento.content_type_id and pagamento.object_id:
+        comanda   = None
+        _ref      = pagamento.comanda_ref
+        _rs       = _ref.rescisao if (_ref and hasattr(_ref, 'rescisao')) else None
+        locacao   = _rs.locacao   if _rs else None
+        locatario = locacao.locatario if locacao else None
+        imovel    = locacao.imovel    if locacao else None
+        if _ref and _rs:
+            ref_label = ('Rescisão | Parcela ' + str(_ref.numero_parcela)
+                         + ' de ' + str(_rs.quantidade_parcelas)
+                         + ' | Vcto ' + _ref.data_vencimento.strftime('%d/%m/%Y'))
+        else:
+            ref_label = 'Rescisão'
+    else:
+        comanda = locacao = locatario = imovel = None
+        ref_label = '—'
+
     # Dados para o template
     context = {
         'pagamento': pagamento,
@@ -172,7 +192,8 @@ def pagina_recibo_pagamento(request, pagamento_id):
         'locacao': locacao,
         'locatario': locatario,
         'imovel': imovel,
-        'title': f'Recibo {pagamento.numero_pagamento}',
+        'ref_label': ref_label,
+        'title': 'Recibo ' + pagamento.numero_pagamento,
     }
     
     # Se for requisição POST (envio de email/whatsapp)
@@ -190,9 +211,16 @@ def pagina_recibo_pagamento(request, pagamento_id):
                 from django.conf import settings
                 from .document_generator import DocumentGenerator
                 
-                # Gerar recibo
+                # Gerar recibo (guard para rescisão)
                 generator = DocumentGenerator()
-                filename = generator.gerar_recibo_pagamento(pagamento.id)
+                
+                # Gerar recibo (polimórfico: aluguel ou rescisão)
+                if hasattr(generator, 'gerar_recibo_polimorfico'):
+                    filename = generator.gerar_recibo_polimorfico(pagamento.id)
+                else:
+                    # Fallback para método antigo (só aluguel)
+                    filename = generator.gerar_recibo_pagamento(pagamento.id)
+                
                 file_path = os.path.join(generator.output_dir, filename)
                 
                 # Preparar email
@@ -203,33 +231,33 @@ def pagina_recibo_pagamento(request, pagamento_id):
                 else:
                     assunto = f'Recibo de Pagamento - {pagamento.numero_pagamento}'
                     
-                    # ✅ CORREÇÃO #4: Email detalhado do recibo
-                    corpo = f'''
-Prezado(a) {locatario.nome_razao_social},
-
-Segue em anexo o recibo de pagamento referente ao imóvel:
-📍 {imovel.endereco}, {imovel.numero}
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-💰 DETALHAMENTO DO PAGAMENTO
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Recibo Nº: {pagamento.numero_pagamento}
-Data: {pagamento.data_pagamento.strftime('%d/%m/%Y')}
-Forma: {pagamento.get_forma_pagamento_display()}
-
-Valor Pago: R$ {pagamento.valor_pago:,.2f}
-
-Referente à:
-- Comanda: {comanda.numero_comanda}
-- Vencimento: {comanda.data_vencimento.strftime('%d/%m/%Y')}
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Atenciosamente,
-HABITAT PRO v1.0
-Sistema de Gestão Imobiliária
-'''
+                    # Corpo email — polimórfico (aluguel e rescisão)
+                    _nome = getattr(locatario, 'nome_razao_social', '—')
+                    _end  = (imovel.endereco + ', ' + imovel.numero) if imovel else '—'
+                    _sep  = '━' * 35
+                    corpo = '\n'.join([
+                        'Prezado(a) ' + _nome + ',',
+                        '',
+                        'Segue o recibo de pagamento referente ao imóvel:',
+                        'Endereço: ' + _end,
+                        '',
+                        _sep,
+                        'DETALHAMENTO DO PAGAMENTO',
+                        _sep,
+                        '',
+                        'Recibo Nº: ' + pagamento.numero_pagamento,
+                        'Data: ' + pagamento.data_pagamento.strftime('%d/%m/%Y'),
+                        'Forma: ' + pagamento.get_forma_pagamento_display(),
+                        'Valor Pago: R$ ' + '{:,.2f}'.format(pagamento.valor_pago),
+                        '',
+                        'Referente a: ' + context.get('ref_label', '—'),
+                        '',
+                        _sep,
+                        '',
+                        'Atenciosamente,',
+                        'HABITAT PRO',
+                        'Sistema de Gestão Imobiliária',
+                    ])
                     
                     email = EmailMessage(
                         subject=assunto,
@@ -250,6 +278,8 @@ Sistema de Gestão Imobiliária
                 import logging
                 logger = logging.getLogger(__name__)
                 logger.error(f'Erro ao enviar email: {e}')
+                import traceback
+                traceback.print_exc()
                 messages.error(request, f'❌ Erro ao enviar email: {str(e)}')
         
         elif action == 'whatsapp':
@@ -270,43 +300,53 @@ Sistema de Gestão Imobiliária
                     if not telefone_limpo.startswith('55'):
                         telefone_limpo = '55' + telefone_limpo
                     
-                    # Gerar URL da página do recibo
+                    # Gerar URL PÚBLICA do recibo (sem senha)
+                    if not pagamento.token:
+                        # Gerar token se não existir
+                        import uuid
+                        from django.utils import timezone
+                        from datetime import timedelta
+                        pagamento.token = uuid.uuid4()
+                        pagamento.token_expira_em = timezone.now() + timedelta(days=30)
+                        pagamento.save()
+                    
                     recibo_url = request.build_absolute_uri(
-                        f'/pagamento/{pagamento.id}/recibo/'
+                        f'/recibo/{pagamento.token}/'
                     )
                     
-                    # ✅ CORREÇÃO #5: Mensagem WhatsApp detalhada do recibo
-                    mensagem = f'''🧾 *RECIBO DE PAGAMENTO*
-
-Olá *{locatario.nome_razao_social}*!
-
-Confirmamos o recebimento do seu pagamento:
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━
-📋 *DADOS DO PAGAMENTO*
-━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-🔢 Recibo: *{pagamento.numero_pagamento}*
-📅 Data: *{pagamento.data_pagamento.strftime('%d/%m/%Y')}*
-💳 Forma: *{pagamento.get_forma_pagamento_display()}*
-
-💰 Valor Pago: *R$ {pagamento.valor_pago:,.2f}*
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━
-📍 *REFERENTE A:*
-━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-🏠 Imóvel: {imovel.endereco}, {imovel.numero}
-📋 Comanda: {comanda.numero_comanda}
-📆 Vencimento: {comanda.data_vencimento.strftime('%d/%m/%Y')}
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-🔗 Ver recibo completo:
-{recibo_url}
-
-_Documento gerado via HABITAT PRO v1.0_
-'''
+                    # Mensagem WhatsApp — polimórfica (aluguel e rescisão)
+                    _nome = getattr(locatario, 'nome_razao_social', '—')
+                    _end  = (imovel.endereco + ', ' + imovel.numero) if imovel else '—'
+                    _sep  = '━' * 26
+                    mensagem = '\n'.join([
+                        '🧾 *RECIBO DE PAGAMENTO*',
+                        '',
+                        'Olá *' + _nome + '*!',
+                        'Confirmamos o recebimento do seu pagamento:',
+                        '',
+                        _sep,
+                        '📋 *DADOS DO PAGAMENTO*',
+                        _sep,
+                        '',
+                        '🔢 Recibo: *' + pagamento.numero_pagamento + '*',
+                        '📅 Data: *' + pagamento.data_pagamento.strftime('%d/%m/%Y') + '*',
+                        '💳 Forma: *' + pagamento.get_forma_pagamento_display() + '*',
+                        '💰 Valor: *R$ ' + '{:,.2f}'.format(pagamento.valor_pago) + '*',
+                        '',
+                        _sep,
+                        '📍 *REFERENTE A:*',
+                        _sep,
+                        '',
+                        '🏠 Imóvel: ' + _end,
+                        '📋 ' + context.get('ref_label', '—'),
+                        '',
+                        _sep,
+                        '',
+                        '🔗 Ver recibo:',
+                        recibo_url,
+                        '',
+                        '_Documento gerado via HABITAT PRO_',
+                    ])
                     
                     # URL WhatsApp
                     mensagem_encoded = urllib.parse.quote(mensagem)
@@ -573,3 +613,211 @@ Sistema de Gestão Imobiliária
         socket.setdefaulttimeout(None)
 
     return redirect('admin:core_comanda_changelist')
+
+
+# ══════════════════════════════════════════════════════════════════
+# RECIBO PÚBLICO — Link seguro via token UUID (válido 30 dias)
+# Isolado: sem links para admin, Railway ou sistema
+# ══════════════════════════════════════════════════════════════════
+
+def recibo_publico(request, token):
+    """
+    Página pública do recibo via token UUID.
+    SEGURANÇA: isolada, sem acesso ao sistema.
+    """
+    from django.shortcuts import render
+    from django.utils import timezone
+    from django.http import Http404
+    import logging
+    
+    logger = logging.getLogger(__name__)
+    
+    try:
+        # Validar UUID antes de query
+        import uuid as uuid_lib
+        try:
+            uuid_lib.UUID(str(token))
+        except ValueError:
+            logger.warning(f'Token inválido (não UUID): {token}')
+            raise Http404("Link inválido")
+        
+        # Buscar pagamento
+        pagamento = get_object_or_404(Pagamento, token=token)
+        
+        # Verificar expiração
+        if not pagamento.token_expira_em or pagamento.token_expira_em < timezone.now():
+            return render(request, 'recibo_expirado.html', {
+                'numero_pagamento': pagamento.numero_pagamento,
+            })
+        
+        # Resolver contexto polimórfico
+        if pagamento.comanda_id:
+            comanda   = pagamento.comanda
+            locacao   = comanda.locacao   if comanda else None
+            locatario = locacao.locatario if locacao else None
+            imovel    = locacao.imovel    if locacao else None
+            if comanda and locacao:
+                ref_label = ('Comanda ' + comanda.numero_comanda
+                             + ' | Vcto ' + comanda.data_vencimento.strftime('%d/%m/%Y'))
+            else:
+                ref_label = 'Aluguel'
+        elif pagamento.content_type_id and pagamento.object_id:
+            comanda   = None
+            _ref      = pagamento.comanda_ref
+            _rs       = _ref.rescisao if (_ref and hasattr(_ref, 'rescisao')) else None
+            locacao   = _rs.locacao   if _rs else None
+            locatario = locacao.locatario if locacao else None
+            imovel    = locacao.imovel    if locacao else None
+            if _ref and _rs:
+                ref_label = ('Rescisão | Parcela ' + str(_ref.numero_parcela)
+                             + ' de ' + str(_rs.quantidade_parcelas)
+                             + ' | Vcto ' + _ref.data_vencimento.strftime('%d/%m/%Y'))
+            else:
+                ref_label = 'Rescisão'
+        else:
+            comanda = locacao = locatario = imovel = None
+            ref_label = '—'
+        
+        context = {
+            'pagamento': pagamento,
+            'locatario': locatario,
+            'imovel': imovel,
+            'ref_label': ref_label,
+            'data_br': pagamento.data_pagamento.strftime('%d/%m/%Y') if pagamento.data_pagamento else '—',
+        }
+        
+        # Log acesso (auditoria)
+        logger.info(f'Recibo público acessado: {pagamento.numero_pagamento} | Token: {token}')
+        
+        return render(request, 'recibo_publico.html', context)
+    
+    except Exception as e:
+        logger.error(f'Erro recibo público token {token}: {e}')
+        raise Http404("Recibo não encontrado")
+
+
+def recibo_publico_pdf(request, token):
+    """
+    PDF do recibo via token UUID.
+    Gera PDF nativo (WeasyPrint) em memória e retorna diretamente.
+    """
+    from django.shortcuts import render
+    from django.template.loader import render_to_string
+    from django.http import HttpResponse, Http404
+    from django.utils import timezone
+    import logging
+    
+    logger = logging.getLogger(__name__)
+    
+    try:
+        # Validar UUID
+        import uuid as uuid_lib
+        try:
+            uuid_lib.UUID(str(token))
+        except ValueError:
+            raise Http404("Link inválido")
+        
+        pagamento = get_object_or_404(Pagamento, token=token)
+        
+        # Verificar expiração
+        if not pagamento.token_expira_em or pagamento.token_expira_em < timezone.now():
+            raise Http404("Link expirado")
+        
+        # Resolver contexto (mesmo código de recibo_publico)
+        if pagamento.comanda_id:
+            comanda   = pagamento.comanda
+            locacao   = comanda.locacao   if comanda else None
+            locatario = locacao.locatario if locacao else None
+            imovel    = locacao.imovel    if locacao else None
+            if comanda and locacao:
+                ref_label = ('Comanda ' + comanda.numero_comanda
+                             + ' | Vcto ' + comanda.data_vencimento.strftime('%d/%m/%Y'))
+            else:
+                ref_label = 'Aluguel'
+        elif pagamento.content_type_id and pagamento.object_id:
+            comanda   = None
+            _ref      = pagamento.comanda_ref
+            _rs       = _ref.rescisao if (_ref and hasattr(_ref, 'rescisao')) else None
+            locacao   = _rs.locacao   if _rs else None
+            locatario = locacao.locatario if locacao else None
+            imovel    = locacao.imovel    if locacao else None
+            if _ref and _rs:
+                ref_label = ('Rescisão | Parcela ' + str(_ref.numero_parcela)
+                             + ' de ' + str(_rs.quantidade_parcelas)
+                             + ' | Vcto ' + _ref.data_vencimento.strftime('%d/%m/%Y'))
+            else:
+                ref_label = 'Rescisão'
+        else:
+            locacao = locatario = imovel = None
+            ref_label = '—'
+        
+        context = {
+            'pagamento': pagamento,
+            'locatario': locatario,
+            'imovel': imovel,
+            'ref_label': ref_label,
+            'data_br': pagamento.data_pagamento.strftime('%d/%m/%Y') if pagamento.data_pagamento else '—',
+        }
+        
+        # Gerar DOCX polimórfico via DocumentGenerator
+        from .document_generator import DocumentGenerator
+        import tempfile
+        import subprocess
+        
+        generator = DocumentGenerator()
+        
+        try:
+            # Gerar DOCX
+            if hasattr(generator, 'gerar_recibo_polimorfico'):
+                docx_filename = generator.gerar_recibo_polimorfico(pagamento.id)
+            else:
+                docx_filename = generator.gerar_recibo_pagamento(pagamento.id)
+            
+            docx_path = os.path.join(generator.output_dir, docx_filename)
+            
+            # Converter DOCX → PDF via LibreOffice (estratégia dos contratos)
+            with tempfile.TemporaryDirectory() as tmpdir:
+                try:
+                    # LibreOffice headless
+                    subprocess.run([
+                        'libreoffice',
+                        '--headless',
+                        '--convert-to', 'pdf',
+                        '--outdir', tmpdir,
+                        docx_path
+                    ], check=True, capture_output=True, timeout=30)
+                    
+                    # Ler PDF gerado
+                    pdf_filename = docx_filename.replace('.docx', '.pdf')
+                    pdf_path = os.path.join(tmpdir, pdf_filename)
+                    
+                    with open(pdf_path, 'rb') as f:
+                        pdf_data = f.read()
+                    
+                    response = HttpResponse(pdf_data, content_type='application/pdf')
+                    response['Content-Disposition'] = f'attachment; filename="recibo_{pagamento.numero_pagamento}.pdf"'
+                    
+                    logger.info(f'PDF gerado (LibreOffice): {pagamento.numero_pagamento} | Token: {token}')
+                    return response
+                
+                except (FileNotFoundError, subprocess.CalledProcessError):
+                    # LibreOffice não disponível → fallback DOCX
+                    logger.warning('LibreOffice não disponível. Retornando DOCX.')
+                    
+                    with open(docx_path, 'rb') as f:
+                        docx_data = f.read()
+                    
+                    response = HttpResponse(
+                        docx_data,
+                        content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+                    )
+                    response['Content-Disposition'] = f'attachment; filename="recibo_{pagamento.numero_pagamento}.docx"'
+                    return response
+        
+        except Exception as e:
+            logger.error(f'Erro geração documento: {e}')
+            raise Http404("Erro ao gerar documento")
+    
+    except Exception as e:
+        logger.error(f'Erro PDF público token {token}: {e}')
+        raise Http404("Erro ao gerar PDF")

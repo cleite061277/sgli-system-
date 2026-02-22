@@ -15,14 +15,7 @@
 </p>
 {% endblock %}
 
-{% block extrahead %}
-{{ block.super }}
-<script src="{% static 'admin/js/menu_collapse.js' %}" defer></script>
-{% endblock %}
-
 {% block extrastyle %}
-{{ block.super }}
-<link rel="stylesheet" type="text/css" href="{% static 'admin/css/menu_habitat_pro.css' %}">
 {{ block.super }}
 <link rel="stylesheet" type="text/css" href="{% static 'admin/css/custom_admin.css' %}">
 {% endblock %}

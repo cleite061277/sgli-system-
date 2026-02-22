@@ -14,6 +14,7 @@ from datetime import datetime, timedelta
 from django.conf import settings
 from decimal import Decimal
 from .models import Imovel, Locacao, Locatario, Comanda, Pagamento, RenovacaoContrato
+from .models_rescisao import ComandaRescisao
 
 
 @staff_member_required
@@ -130,41 +131,95 @@ def dashboard_financeiro(request):
         )
     
     # ========================================
+    # QUERY DE COMANDAS DE RESCISÃO
+    # ========================================
+    comandas_rescisao_query = ComandaRescisao.objects.filter(
+        data_vencimento__gte=data_inicio,
+        data_vencimento__lte=data_fim,
+        is_active=True
+    ).select_related('rescisao', 'rescisao__locacao', 'rescisao__locacao__imovel', 'rescisao__locacao__locatario')
+    
+    # Filtro por imóvel (rescisão)
+    if imovel_id != 'todos':
+        comandas_rescisao_query = comandas_rescisao_query.filter(rescisao__locacao__imovel_id=imovel_id)
+    
+    # Filtro por status (rescisão)
+    if status_filtro == 'pago':
+        comandas_rescisao_query = comandas_rescisao_query.filter(status='PAGO')
+    elif status_filtro == 'pendente':
+        comandas_rescisao_query = comandas_rescisao_query.filter(status='PENDENTE')
+    elif status_filtro == 'atrasado':
+        comandas_rescisao_query = comandas_rescisao_query.filter(
+            status__in=['ATRASADO', 'PENDENTE'],
+            data_vencimento__lt=hoje
+        )
+    
+    # ========================================
     # CÁLCULO DE KPIs
     # ========================================
     
-    # Receita Prevista (soma de todas comandas do período)
-    receita_prevista = comandas_query.aggregate(
+    # Receita Prevista — ALUGUEL (soma de todas comandas do período)
+    receita_prevista_aluguel = comandas_query.aggregate(
         total=Sum('_valor_aluguel_historico')
     )['total'] or Decimal('0.00')
     
-    receita_prevista += comandas_query.aggregate(
+    receita_prevista_aluguel += comandas_query.aggregate(
         total=Sum('valor_condominio')
     )['total'] or Decimal('0.00')
     
-    receita_prevista += comandas_query.aggregate(
+    receita_prevista_aluguel += comandas_query.aggregate(
         total=Sum('valor_iptu')
     )['total'] or Decimal('0.00')
     
-    # Receita Realizada (soma de pagamentos confirmados)
-    receita_realizada = Pagamento.objects.filter(
+    # Receita Prevista — RESCISÃO
+    receita_prevista_rescisao = comandas_rescisao_query.aggregate(
+        total=Sum('valor')
+    )['total'] or Decimal('0.00')
+    
+    # TOTAL PREVISTO (Aluguel + Rescisão)
+    receita_prevista = receita_prevista_aluguel + receita_prevista_rescisao
+    
+    # Receita Realizada — ALUGUEL (FK comanda)
+    receita_realizada_aluguel = Pagamento.objects.filter(
         comanda__in=comandas_query,
         status='confirmado',
         data_pagamento__gte=data_inicio,
         data_pagamento__lte=data_fim
     ).aggregate(total=Sum('valor_pago'))['total'] or Decimal('0.00')
     
+    # Receita Realizada — RESCISÃO (GenericFK content_type)
+    receita_realizada_rescisao = Pagamento.objects.filter(
+        content_type__isnull=False,  # Tem GenericFK
+        status='confirmado',
+        data_pagamento__gte=data_inicio,
+        data_pagamento__lte=data_fim
+    ).aggregate(total=Sum('valor_pago'))['total'] or Decimal('0.00')
+    
+    # TOTAL REALIZADO (Aluguel + Rescisão)
+    receita_realizada = receita_realizada_aluguel + receita_realizada_rescisao
+    
     # Taxa de Recebimento
     taxa_recebimento = (receita_realizada / receita_prevista * 100) if receita_prevista > 0 else Decimal('0.00')
     
-    # Comandas em Atraso
-    comandas_atrasadas = comandas_query.filter(
+    # Comandas em Atraso — ALUGUEL (TODAS, não apenas do período)
+    comandas_aluguel_atrasadas = Comanda.objects.filter(
         data_vencimento__lt=hoje,
-        status__in=['PENDING', 'OVERDUE', 'PARTIAL']
+        status__in=['PENDING', 'OVERDUE', 'PARTIAL'],
+        is_active=True
     ).count()
     
+    # Comandas em Atraso — RESCISÃO (TODAS, não apenas do período)
+    comandas_rescisao_atrasadas = ComandaRescisao.objects.filter(
+        data_vencimento__lt=hoje,
+        status__in=['PENDENTE', 'ATRASADO'],
+        is_active=True
+    ).count()
+    
+    # TOTAL ATRASADAS (Aluguel + Rescisão)
+    comandas_atrasadas = comandas_aluguel_atrasadas + comandas_rescisao_atrasadas
+    
     # Taxa de Inadimplência
-    total_comandas = comandas_query.count()
+    total_comandas = comandas_query.count() + comandas_rescisao_query.count()
     taxa_inadimplencia = (comandas_atrasadas / total_comandas * 100) if total_comandas > 0 else Decimal('0.00')
     
     # Receita Pendente
@@ -187,7 +242,9 @@ def dashboard_financeiro(request):
         
         mes_ref = datetime(ano_ref, mes_ref_num, 1).date()
         
-        # Comandas do mês
+        # ========================================
+        # COMANDAS DO MÊS — ALUGUEL
+        # ========================================
         comandas_mes = Comanda.objects.filter(
             mes_referencia__year=mes_ref.year,
             mes_referencia__month=mes_ref.month,
@@ -197,13 +254,42 @@ def dashboard_financeiro(request):
         if imovel_id != 'todos':
             comandas_mes = comandas_mes.filter(locacao__imovel_id=imovel_id)
         
-        # Previsto = Soma de valores das comandas
-        previsto_mes = 0
+        # Previsto Aluguel
+        previsto_aluguel = 0
         for cmd in comandas_mes:
-            previsto_mes += float(cmd.valor_total)
+            previsto_aluguel += float(cmd.valor_total)
         
-        # Realizado = Soma de pagamentos confirmados
-        realizado_mes = float(
+        # ========================================
+        # COMANDAS DO MÊS — RESCISÃO
+        # ========================================
+        mes_inicio = datetime(mes_ref.year, mes_ref.month, 1).date()
+        if mes_ref.month == 12:
+            mes_fim = datetime(mes_ref.year + 1, 1, 1).date()
+        else:
+            mes_fim = datetime(mes_ref.year, mes_ref.month + 1, 1).date()
+        
+        comandas_rescisao_mes = ComandaRescisao.objects.filter(
+            data_vencimento__gte=mes_inicio,
+            data_vencimento__lt=mes_fim,
+            is_active=True
+        )
+        
+        if imovel_id != 'todos':
+            comandas_rescisao_mes = comandas_rescisao_mes.filter(rescisao__locacao__imovel_id=imovel_id)
+        
+        # Previsto Rescisão
+        previsto_rescisao = float(
+            comandas_rescisao_mes.aggregate(total=Sum('valor'))['total'] or 0
+        )
+        
+        # PREVISTO TOTAL
+        previsto_mes = previsto_aluguel + previsto_rescisao
+        
+        # ========================================
+        # REALIZADO — ALUGUEL + RESCISÃO
+        # ========================================
+        # Realizado Aluguel (FK comanda)
+        realizado_aluguel = float(
             Pagamento.objects.filter(
                 comanda__mes_referencia__year=mes_ref.year,
                 comanda__mes_referencia__month=mes_ref.month,
@@ -211,12 +297,35 @@ def dashboard_financeiro(request):
             ).aggregate(total=Sum('valor_pago'))['total'] or 0
         )
         
-        # Inadimplência do mês
-        total_mes = comandas_mes.count()
-        atrasadas_mes = comandas_mes.filter(
+        # Realizado Rescisão (GenericFK)
+        realizado_rescisao = float(
+            Pagamento.objects.filter(
+                content_type__isnull=False,
+                data_pagamento__gte=mes_inicio,
+                data_pagamento__lt=mes_fim,
+                status='confirmado'
+            ).aggregate(total=Sum('valor_pago'))['total'] or 0
+        )
+        
+        # REALIZADO TOTAL
+        realizado_mes = realizado_aluguel + realizado_rescisao
+        
+        # ========================================
+        # INADIMPLÊNCIA DO MÊS
+        # ========================================
+        total_mes = comandas_mes.count() + comandas_rescisao_mes.count()
+        
+        atrasadas_aluguel = comandas_mes.filter(
             status__in=['OVERDUE', 'PENDING'],
             data_vencimento__lt=hoje
         ).count()
+        
+        atrasadas_rescisao = comandas_rescisao_mes.filter(
+            status__in=['PENDENTE', 'ATRASADO'],
+            data_vencimento__lt=hoje
+        ).count()
+        
+        atrasadas_mes = atrasadas_aluguel + atrasadas_rescisao
         inadimplencia_mes = (atrasadas_mes / total_mes * 100) if total_mes > 0 else 0
         
         dados_mensais.append({
@@ -269,12 +378,37 @@ def dashboard_financeiro(request):
     ).order_by('-data_pagamento')[:20]
     
     for pag in pagamentos_recentes:
+        # 🔄 Resolver contexto polimórfico (aluguel ou rescisão)
+        if pag.comanda_id:
+            # Aluguel (FK)
+            comanda = pag.comanda
+            locacao = comanda.locacao if comanda else None
+            locatario = locacao.locatario if locacao else None
+            imovel = locacao.imovel if locacao else None
+            numero_ref = comanda.numero_comanda if comanda else '—'
+            comanda_link = f"/admin/core/comanda/{comanda.id}/change/" if comanda else None
+        elif hasattr(pag, 'content_type_id') and pag.content_type_id and pag.object_id:
+            # Rescisão (GenericFK)
+            comanda = None
+            _ref = pag.comanda_ref if hasattr(pag, 'comanda_ref') else None
+            _rs = _ref.rescisao if (_ref and hasattr(_ref, 'rescisao')) else None
+            locacao = _rs.locacao if _rs else None
+            locatario = locacao.locatario if locacao else None
+            imovel = locacao.imovel if locacao else None
+            numero_ref = f"Rescisão-{_ref.numero_parcela}/{_rs.quantidade_parcelas}" if (_ref and _rs) else 'Rescisão'
+            comanda_link = f"/admin/core/comandarescisao/{_ref.id}/change/" if _ref else None
+        else:
+            # Fallback
+            locatario = imovel = None
+            numero_ref = pag.numero_pagamento if hasattr(pag, 'numero_pagamento') else 'Pagamento'
+            comanda_link = None
+        
         ultimos_pagamentos.append({
-            'numero_comanda': pag.comanda.numero_comanda,
-            'comanda_id': pag.comanda.id,  # ✅ NOVO: ID para link
-            'numero_comanda_link': f"/admin/core/comanda/{pag.comanda.id}/change/",
-            'inquilino': pag.comanda.locacao.locatario.nome_razao_social,
-            'imovel': f"{pag.comanda.locacao.imovel.endereco}, {pag.comanda.locacao.imovel.numero}",
+            'numero_comanda': numero_ref,
+            'comanda_id': comanda.id if comanda else None,
+            'numero_comanda_link': comanda_link,
+            'inquilino': locatario.nome_razao_social if locatario else '—',
+            'imovel': f"{imovel.endereco}, {imovel.numero}" if imovel else '—',
             'valor': float(pag.valor_pago),
             'data': pag.data_pagamento.strftime('%d/%m/%Y')
         })
@@ -284,22 +418,33 @@ def dashboard_financeiro(request):
     # ========================================
     alertas = []
     
+    # Alerta de Alta Inadimplência (geral)
     if taxa_inadimplencia > 5:
         alertas.append({
             'tipo': 'warning',
             'titulo': 'Alta Inadimplência',
             'mensagem': f'Taxa de inadimplência em {taxa_inadimplencia:.1f}% (meta: < 3%)',
-            'acao': 'Ver Comandas Atrasadas',
-            'link': '/admin/core/comanda/?status=OVERDUE'
+            'acao': None,  # Sem ação específica (alertas abaixo têm links)
+            'link': None
         })
     
-    if comandas_atrasadas > 0:
+    # Alertas separados por tipo (ALUGUEL e RESCISÃO)
+    if comandas_aluguel_atrasadas > 0:
         alertas.append({
             'tipo': 'warning',
-            'titulo': f'{comandas_atrasadas} Comandas em Atraso',
+            'titulo': f'{comandas_aluguel_atrasadas} Comanda(s) de Aluguel em Atraso',
             'mensagem': 'Ações de cobrança podem ser necessárias',
-            'acao': 'Ver Detalhes',
-            'link': '/admin/core/comanda/?status=OVERDUE'
+            'acao': 'Ver Comandas Aluguel →',
+            'link': '/admin/core/comanda/?status=PENDING'
+        })
+    
+    if comandas_rescisao_atrasadas > 0:
+        alertas.append({
+            'tipo': 'warning',
+            'titulo': f'{comandas_rescisao_atrasadas} Comanda(s) de Rescisão em Atraso',
+            'mensagem': 'Ações de cobrança podem ser necessárias',
+            'acao': 'Ver Comandas Rescisão →',
+            'link': '/admin/core/comandarescisao/?status=PENDENTE'
         })
     
     # ✅ NOVO: Lista de anos disponíveis
@@ -307,6 +452,11 @@ def dashboard_financeiro(request):
     anos_lista = sorted(set([d.year for d in anos_disponiveis]), reverse=True)
     if not anos_lista:
         anos_lista = [ano_atual]
+    
+    # ========================================
+    # CONTRATOS ATIVOS (Locações)
+    # ========================================
+    contratos_ativos = Locacao.objects.filter(status='ACTIVE', is_active=True).count()
     
     # ========================================
     # CONTEXT
@@ -335,6 +485,7 @@ def dashboard_financeiro(request):
             'comandas_atrasadas': comandas_atrasadas,
             'taxa_inadimplencia': float(taxa_inadimplencia),
             'total_comandas': total_comandas,
+            'contratos_ativos': contratos_ativos,  # ✅ CORRIGIDO
             'receita_prevista_alerta': taxa_recebimento < 80,
             'inadimplencia_alerta': taxa_inadimplencia > 3,
         },
@@ -366,7 +517,7 @@ def dashboard_financeiro(request):
 @staff_member_required
 def exportar_dashboard_excel(request):
     """Exporta dashboard para Excel"""
-    # TODO: Implementar exportação Excel
+    # FUTURE: Implementar exportação Excel
     messages.info(request, '📊 Exportação Excel em desenvolvimento')
     return redirect('dashboard_financeiro')
 
@@ -374,7 +525,7 @@ def exportar_dashboard_excel(request):
 @staff_member_required
 def exportar_dashboard_pdf(request):
     """Exporta dashboard para PDF"""
-    # TODO: Implementar exportação PDF
+    # FUTURE: Implementar exportação PDF
     messages.info(request, '📄 Exportação PDF em desenvolvimento')
     return redirect('dashboard_financeiro')
 
@@ -382,7 +533,7 @@ def exportar_dashboard_pdf(request):
 @staff_member_required
 def enviar_relatorio_email(request):
     """Envia relatório do dashboard por email"""
-    # TODO: Implementar envio de email
+    # FUTURE: Implementar envio de email
     
     if request.method == 'POST':
         email = request.POST.get('email', '')

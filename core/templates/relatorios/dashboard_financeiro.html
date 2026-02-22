@@ -102,9 +102,9 @@
                     <p class="font-semibold text-{% if alerta.tipo == 'warning' %}red{% else %}blue{% endif %}-800">{{ alerta.titulo }}</p>
                     <p class="text-sm text-{% if alerta.tipo == 'warning' %}red{% else %}blue{% endif %}-700">{{ alerta.mensagem }}</p>
                 </div>
-                <a href="{{ alerta.link }}" class="text-{% if alerta.tipo == 'warning' %}red{% else %}blue{% endif %}-600 hover:text-{% if alerta.tipo == 'warning' %}red{% else %}blue{% endif %}-800 font-semibold text-sm">
+                {% if alerta.link and alerta.acao %}<a href="{{ alerta.link }}" class="text-{% if alerta.tipo == 'warning' %}red{% else %}blue{% endif %}-600 hover:text-{% if alerta.tipo == 'warning' %}red{% else %}blue{% endif %}-800 font-semibold text-sm">
                     {{ alerta.acao }} →
-                </a>
+                </a>{% endif %}
             </div>
         </div>
         {% endfor %}
@@ -222,8 +222,8 @@
                     </svg>
                 </div>
                 <p class="text-sm text-gray-600 mb-1">Contratos Ativos</p>
-                <p class="text-2xl font-bold text-gray-900">{{ kpis.total_comandas }}</p>
-                <p class="text-xs text-gray-500 mt-2">Comandas no período</p>
+                <p class="text-2xl font-bold text-gray-900">{{ kpis.contratos_ativos }}</p>
+                <p class="text-xs text-gray-500 mt-2">Locações ativas</p>
             </div>
 
             <!-- Taxa de Inadimplência -->
@@ -323,9 +323,9 @@
                     <div class="bg-red-50 border-l-4 border-red-500 p-3 rounded">
                         <p class="font-semibold text-red-800 text-sm">{{ alerta.titulo }}</p>
                         <p class="text-xs text-red-700 mt-1">{{ alerta.mensagem }}</p>
-                        <a href="{{ alerta.link }}" class="text-red-600 hover:text-red-800 font-semibold text-xs mt-2 inline-block">
+                        {% if alerta.link and alerta.acao %}<a href="{{ alerta.link }}" class="text-red-600 hover:text-red-800 font-semibold text-xs mt-2 inline-block">
                             {{ alerta.acao }} →
-                        </a>
+                        </a>{% endif %}
                     </div>
                     {% endfor %}
                 </div>

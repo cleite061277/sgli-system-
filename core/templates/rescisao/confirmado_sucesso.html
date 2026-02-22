@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rescisão Confirmada</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 600px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+            text-align: center;
+        }
+        
+        .success-icon {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            padding: 40px;
+        }
+        
+        .success-icon svg {
+            width: 100px;
+            height: 100px;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        h1 {
+            color: #11998e;
+            margin-bottom: 20px;
+            font-size: 28px;
+        }
+        
+        .success-message {
+            color: #666;
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+        
+        .info-box {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: left;
+        }
+        
+        .info-row {
+            padding: 10px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .info-row:last-child {
+            border-bottom: none;
+        }
+        
+        .info-label {
+            font-weight: 600;
+            color: #555;
+            display: block;
+            font-size: 14px;
+        }
+        
+        .info-value {
+            color: #333;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        
+        .hash-box {
+            background: #e7f3ff;
+            border: 2px dashed #007bff;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            word-break: break-all;
+            color: #666;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 15px 40px;
+            background: #11998e;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            margin-top: 20px;
+            transition: all 0.3s;
+        }
+        
+        .btn:hover {
+            background: #0d7d70;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(17, 153, 142, 0.3);
+        }
+        
+        .footer {
+            background: #f8f9fa;
+            padding: 20px;
+            color: #666;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="success-icon">
+            <svg fill="none" stroke="white" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+        </div>
+        
+        <div class="content">
+            <h1>✅ Rescisão Confirmada com Sucesso!</h1>
+            
+            <p class="success-message">
+                Sua confirmação foi registrada em nosso sistema. 
+                Você receberá um email com os detalhes das parcelas e instruções de pagamento.
+            </p>
+            
+            <div class="info-box">
+                <div class="info-row">
+                    <span class="info-label">Contrato:</span>
+                    <span class="info-value">{{ rescisao.locacao.numero_contrato }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Data de Confirmação:</span>
+                    <span class="info-value">{{ rescisao.data_confirmacao_inquilino|date:"d/m/Y H:i" }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Valor Total:</span>
+                    <span class="info-value" style="font-weight: bold; color: #dc3545;">
+                        R$ {{ rescisao.valor_total_devido|floatformat:2 }}
+                    </span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Parcelas:</span>
+                    <span class="info-value">{{ rescisao.quantidade_parcelas }}x de R$ {{ rescisao.valor_parcela|floatformat:2 }}</span>
+                </div>
+            </div>
+            
+            <div class="hash-box">
+                <strong>Hash de Segurança (Prova Digital):</strong><br>
+                {{ hash_confirmacao }}
+            </div>
+            
+            <p style="color: #666; font-size: 14px; margin-top: 20px;">
+                📧 Você receberá emails com as comandas de pagamento contendo instruções detalhadas.
+            </p>
+            
+            <p style="color: #666; font-size: 14px; margin-top: 10px;">
+                💬 Em caso de dúvidas, entre em contato conosco.
+            </p>
+        </div>
+        
+        <div class="footer">
+            <p><strong>Policorp Sistemas e Tecnologia da Informação</strong></p>
+            <p>Paranaguá - PR</p>
+        </div>
+    </div>
+</body>
+</html>

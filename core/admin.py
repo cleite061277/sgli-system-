@@ -1,5 +1,6 @@
 
 from django.contrib import admin
+from django.contrib.contenttypes.admin import GenericTabularInline
 from .dashboard_tokens import gerar_contexto_dashboard
 from .admin_actions_tokens import (
     action_renovar_token_renovacao,
@@ -510,6 +511,7 @@ Data: 06/10/2025
 """
 
 from django.contrib import admin
+from django.contrib.contenttypes.admin import GenericTabularInline
 from .dashboard_tokens import gerar_contexto_dashboard
 from .admin_actions_tokens import (
     action_renovar_token_renovacao,
@@ -528,9 +530,11 @@ from .models import Comanda, Pagamento
 from core.views_comanda_web import gerar_token_comanda
 
 
-class PagamentoInline(admin.TabularInline):
+class PagamentoInline(GenericTabularInline):
     """Inline para ver/adicionar pagamentos direto na comanda"""
     model = Pagamento
+    ct_field = "content_type"
+    ct_fk_field = "object_id"
     extra = 0
     fields = ['data_pagamento', 'valor_pago', 'forma_pagamento', 'status', 'comprovante']
     readonly_fields = ['numero_pagamento', 'created_at']
@@ -1452,7 +1456,7 @@ class PagamentoAdmin(admin.ModelAdmin):
             self.message_user(request, f'{len(recibos_gerados)} recibo(s) gerado(s) com sucesso!')
     
     gerar_recibo.short_description = "Gerar recibos Word"
-    list_display = ('numero_pagamento', 'comanda', 'locatario_nome', 'valor_pago', 'data_pagamento', 'forma_pagamento', 'status', 'botao_recibo')
+    list_display = ('numero_pagamento', 'tipo_pagamento', 'locatario_nome', 'valor_pago', 'data_pagamento_br', 'forma_pagamento', 'status', 'botao_recibo')
     list_filter = ('status', 'forma_pagamento', 'data_pagamento')
     search_fields = ('numero_pagamento', 'comanda__numero_comanda', 'comanda__locacao__locatario__nome_razao_social')
     readonly_fields = ('numero_pagamento', 'data_confirmacao', 'created_at', 'updated_at')
@@ -1479,10 +1483,50 @@ class PagamentoAdmin(admin.ModelAdmin):
         })
     )
     
+    def tipo_pagamento(self, obj):
+        """Identifica se o pagamento é de aluguel ou rescisão."""
+        from django.utils.html import format_html
+        if obj.comanda_id:
+            return format_html(
+                '<span style="background:#d1ecf1;color:#0c5460;padding:2px 8px;'
+                'border-radius:4px;font-size:11px;font-weight:bold;">🏠 ALUGUEL</span>'
+            )
+        elif obj.content_type_id:
+            return format_html(
+                '<span style="background:#f8d7da;color:#721c24;padding:2px 8px;'
+                'border-radius:4px;font-size:11px;font-weight:bold;">📄 RESCISÃO</span>'
+            )
+        return '—'
+    tipo_pagamento.short_description = 'Tipo'
+
     def locatario_nome(self, obj):
-        """Display tenant name in list."""
-        return obj.comanda.locacao.locatario.nome_razao_social
+        """
+        Retorna nome do locatário independente do tipo de pagamento.
+        Aluguel: via FK comanda → locacao → locatario
+        Rescisão: via GenericFK comanda_ref → rescisao → locacao → locatario
+        """
+        try:
+            # CASO 1: Pagamento de aluguel
+            if obj.comanda_id:
+                return obj.comanda.locacao.locatario.nome_razao_social
+            # CASO 2: Pagamento de rescisão
+            if obj.content_type_id and obj.object_id:
+                ref = obj.comanda_ref
+                if ref and hasattr(ref, 'rescisao'):
+                    return ref.rescisao.locacao.locatario.nome_razao_social
+            return '—'
+        except Exception:
+            return '—'
     locatario_nome.short_description = 'Locatário'
+
+    def data_pagamento_br(self, obj):
+        """Data no padrão brasileiro dd/mm/aaaa."""
+        if obj.data_pagamento:
+            return obj.data_pagamento.strftime('%d/%m/%Y')
+        return '—'
+    data_pagamento_br.short_description = 'Data'
+    data_pagamento_br.admin_order_field = 'data_pagamento'
+
     @admin.display(description='🧾 Recibo')
     def botao_recibo(self, obj):
         """Botão para visualizar/enviar recibo"""
@@ -1503,33 +1547,67 @@ class PagamentoAdmin(admin.ModelAdmin):
 
     
     def info_contrato(self, obj):
-        """Display clickable contract information."""
+        """
+        Exibe informações do contrato vinculado.
+        Suporta Comanda (aluguel) e ComandaRescisao (rescisão).
+        """
         from django.utils.html import format_html
         from django.urls import reverse
-        
-        locacao = obj.comanda.locacao
-        locatario = locacao.locatario
-        imovel = locacao.imovel
-        
-        # URL para locação
-        url_locacao = reverse('admin:core_locacao_change', args=[locacao.id])
-        # URL para locatário
-        url_locatario = reverse('admin:core_locatario_change', args=[locatario.id])
-        
-        return format_html(
-            '<div style="padding: 10px; background: #f8f9fa; border-radius: 5px;">'
-            '<strong>Contrato:</strong> <a href="{}" target="_blank" style="color: #007bff;">{}</a><br>'
-            '<strong>Locatário:</strong> <a href="{}" target="_blank" style="color: #007bff;">{}</a><br>'
-            '<strong>Imóvel:</strong> {}<br>'
-            '<strong>Valor Aluguel:</strong> R$ {:.2f}'
-            '</div>',
-            url_locacao,
-            locacao.numero_contrato,
-            url_locatario,
-            locatario.nome_razao_social,
-            imovel.endereco_completo,
-            locacao.valor_aluguel
-        )
+
+        try:
+            # ── CASO 1: Pagamento de aluguel ──────────────────────
+            if obj.comanda_id:
+                locacao   = obj.comanda.locacao
+                locatario = locacao.locatario
+                imovel    = locacao.imovel
+                url_locacao   = reverse('admin:core_locacao_change', args=[locacao.id])
+                url_locatario = reverse('admin:core_locatario_change', args=[locatario.id])
+                return format_html(
+                    '<div style="padding:10px;background:#f8f9fa;border-radius:5px;">'
+                    '🏠 <strong>ALUGUEL</strong><br>'
+                    '<strong>Contrato:</strong> <a href="{}" target="_blank" style="color:#007bff;">{}</a><br>'
+                    '<strong>Locatário:</strong> <a href="{}" target="_blank" style="color:#007bff;">{}</a><br>'
+                    '<strong>Imóvel:</strong> {}<br>'
+                    '<strong>Valor Aluguel:</strong> R$ {:.2f}'
+                    '</div>',
+                    url_locacao, locacao.numero_contrato,
+                    url_locatario, locatario.nome_razao_social,
+                    imovel.endereco_completo, locacao.valor_aluguel
+                )
+
+            # ── CASO 2: Pagamento de rescisão ─────────────────────
+            if obj.content_type_id and obj.object_id:
+                ref = obj.comanda_ref
+                if ref and hasattr(ref, 'rescisao'):
+                    rescisao  = ref.rescisao
+                    locacao   = rescisao.locacao
+                    locatario = locacao.locatario
+                    imovel    = locacao.imovel
+                    url_locacao   = reverse('admin:core_locacao_change', args=[locacao.id])
+                    url_locatario = reverse('admin:core_locatario_change', args=[locatario.id])
+                    return format_html(
+                        '<div style="padding:10px;background:#fff3f3;border-radius:5px;">'
+                        '📄 <strong>RESCISÃO</strong><br>'
+                        '<strong>Contrato:</strong> <a href="{}" target="_blank" style="color:#007bff;">{}</a><br>'
+                        '<strong>Locatário:</strong> <a href="{}" target="_blank" style="color:#007bff;">{}</a><br>'
+                        '<strong>Imóvel:</strong> {}<br>'
+                        '<strong>Parcela:</strong> {}ª de {} | R$ {:.2f}'
+                        '</div>',
+                        url_locacao, locacao.numero_contrato,
+                        url_locatario, locatario.nome_razao_social,
+                        imovel.endereco_completo,
+                        ref.numero_parcela,
+                        rescisao.quantidade_parcelas,
+                        float(ref.valor)
+                    )
+
+        except Exception as e:
+            return format_html(
+                '<span style="color:#999;font-size:11px;">⚠️ Erro ao carregar: {}</span>',
+                str(e)
+            )
+
+        return '—'
     info_contrato.short_description = 'Informações do Contrato'
     
     def save_model(self, request, obj, form, change):
@@ -2734,3 +2812,8 @@ from core.admin_inspection import (
     InspectionPDFAdmin
 )
 # Os modelos já estão registrados com @admin.register no admin_inspection.py
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# ADMIN DE RESCISÃO (Módulo Isolado)
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+from core.admin_rescisao import RescisaoContratoAdmin, ComandaRescisaoAdmin

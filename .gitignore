@@ -171,3 +171,5 @@ backup_*.tar.gz
 *.bkp_*
 *.backup
 **/settings.py.bkp_*
+.env
+.env.*

@@ -227,12 +227,8 @@ class EmailService:
         logger = logging.getLogger(__name__)
         
         try:
-            logger.info("🔍 DEBUG 1: Iniciando notificar_proprietario_renovacao")
-            logger.info(f"🔍 DEBUG 2: renovacao = {renovacao}")
-            logger.info(f"🔍 DEBUG 3: renovacao.id = {renovacao.id}")
             
             locacao_atual = renovacao.locacao_original
-            logger.info(f"🔍 DEBUG 4: locacao_atual OK = {locacao_atual}")
         except Exception as e:
             logger.error(f"❌ ERRO NO DEBUG: {e}")
             logger.error(f"TRACEBACK: {traceback.format_exc()}")
@@ -449,3 +445,415 @@ class EmailService:
             renovacao.registrar_comunicacao('email', 'locatario', False, str(e))
             logger.error(f"❌ Erro ao enviar email ao locatário: {e}")
             return False
+            
+            # ────────────────────────────────────────────────────────────────
+# MÉTODOS PARA RESCISÃO DE CONTRATOS
+# ────────────────────────────────────────────────────────────────
+
+    @classmethod
+    def enviar_confirmacao_rescisao(cls, rescisao):
+        """
+        Envia email com link de confirmação para inquilino.
+        Similar ao envio de renovação de contratos.
+        """
+        from django.conf import settings
+        from django.core.mail import EmailMultiAlternatives
+        from django.template.loader import render_to_string
+        import logging
+        
+        logger = logging.getLogger(__name__)
+        
+        try:
+            locatario = rescisao.locacao.locatario
+            
+            if not locatario.email:
+                logger.warning(f"Rescisão {rescisao.id}: Locatário sem email")
+                return False
+            
+            # Gerar link de confirmação
+            link_confirmacao = rescisao.token_confirmacao
+            url_confirmacao = f"{settings.SITE_URL}/rescisao/confirmar/{link_confirmacao}/"
+            
+            # Contexto para template
+            contexto = {
+                'locatario_nome': locatario.nome_razao_social,
+                'numero_contrato': rescisao.locacao.numero_contrato,
+                'imovel_endereco': f"{rescisao.locacao.imovel.endereco}, {rescisao.locacao.imovel.numero}",
+                'data_desocupacao': rescisao.data_desocupacao.strftime('%d/%m/%Y'),
+                'valor_total': f"R$ {rescisao.valor_total_devido:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.'),
+                'quantidade_parcelas': rescisao.quantidade_parcelas,
+                'valor_parcela': f"R$ {rescisao.valor_parcela:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.'),
+                'link_confirmacao': url_confirmacao,
+                'expiracao': rescisao.token_confirmacao_expira.strftime('%d/%m/%Y') if rescisao.token_confirmacao_expira else '7 dias',
+            }
+            
+            # Assunto
+            assunto = f'🏠 Confirmação de Rescisão - Contrato {rescisao.locacao.numero_contrato}'
+            
+            # Corpo do email (texto simples)
+            mensagem_texto = f"""
+Olá {contexto['locatario_nome']},
+
+Solicitamos a confirmação da rescisão do seu contrato de locação:
+
+DADOS DO CONTRATO:
+• Número: {contexto['numero_contrato']}
+• Imóvel: {contexto['imovel_endereco']}
+• Data de Desocupação: {contexto['data_desocupacao']}
+
+VALORES:
+• Total Devido: {contexto['valor_total']}
+• Parcelamento: {contexto['quantidade_parcelas']}x de {contexto['valor_parcela']}
+
+Para confirmar, acesse o link abaixo:
+{contexto['link_confirmacao']}
+
+Link válido até: {contexto['expiracao']}
+
+Em caso de dúvidas, entre em contato conosco.
+
+HABITAT PRO
+Gestão Imobiliaria Inteligente
+"""
+            
+            # Email HTML (se tiver template)
+            try:
+                mensagem_html = render_to_string('emails/confirmacao_rescisao.html', contexto)
+            except:
+                mensagem_html = mensagem_texto.replace('\n', '<br>')
+            
+            # Enviar email
+            email = EmailMultiAlternatives(
+                subject=assunto,
+                body=mensagem_texto,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                to=[locatario.email]
+            )
+            email.attach_alternative(mensagem_html, "text/html")
+            email.send()
+            
+            logger.info(f"✅ Email de confirmação enviado para {locatario.email}")
+            
+            # Registrar no log da rescisão
+            rescisao.registrar_comunicacao(
+                tipo='email',
+                destinatario=locatario.email,
+                sucesso=True,
+                detalhes=f'Email de confirmação enviado - Link: {url_confirmacao}'
+            )
+            
+            return True
+            
+        except Exception as e:
+            logger.error(f"❌ Erro ao enviar email de confirmação: {e}")
+            rescisao.registrar_comunicacao(
+                tipo='email',
+                destinatario=locatario.email if locatario else 'desconhecido',
+                sucesso=False,
+                detalhes=f'Erro: {str(e)}'
+            )
+            return False
+
+
+    @classmethod
+    def notificar_confirmacao_rescisao(cls, rescisao):
+        """
+        Notifica admin e locador quando inquilino confirma rescisão.
+        """
+        from django.conf import settings
+        from django.core.mail import send_mail
+        import logging
+        
+        logger = logging.getLogger(__name__)
+        
+        try:
+            # Email para admin
+            assunto_admin = f'✅ Rescisão Confirmada - {rescisao.locacao.numero_contrato}'
+            mensagem_admin = f"""
+Rescisão confirmada pelo inquilino:
+
+CONTRATO: {rescisao.locacao.numero_contrato}
+IMÓVEL: {rescisao.locacao.imovel.endereco}
+INQUILINO: {rescisao.locacao.locatario.nome_razao_social}
+DATA CONFIRMAÇÃO: {rescisao.data_confirmacao_inquilino.strftime('%d/%m/%Y %H:%M') if rescisao.data_confirmacao_inquilino else 'N/A'}
+CANAL: {'Link Público' if rescisao.log_confirmacao_inquilino.get('tipo') != 'confirmacao_manual' else 'Manual'}
+
+PRÓXIMOS PASSOS:
+1. Agendar vistoria
+2. Calcular valores
+3. Gerar documentos
+4. Enviar comandas de pagamento
+
+Acesse o admin para continuar o processo.
+"""
+            
+            send_mail(
+                subject=assunto_admin,
+                message=mensagem_admin,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[settings.ADMIN_EMAIL],
+            )
+            
+            logger.info(f"✅ Notificação de confirmação enviada ao admin")
+            return True
+        
+        except Exception as e:
+            logger.error(f"❌ Erro ao notificar confirmação: {e}")
+            return False
+
+
+    @classmethod
+    def enviar_comanda_rescisao(cls, comanda):
+        """
+        Envia email com comanda de pagamento de rescisão.
+        Similar ao envio de comandas de aluguel.
+        """
+        from django.conf import settings
+        from django.core.mail import EmailMultiAlternatives
+        from django.template.loader import render_to_string
+        import logging
+        
+        logger = logging.getLogger(__name__)
+        
+        try:
+            locatario = comanda.get_destinatario()
+            
+            if not locatario.email:
+                logger.warning(f"Comanda Rescisão {comanda.id}: Locatário sem email")
+                return False
+            
+            # Link público da comanda
+            link_comanda = f"{settings.SITE_URL}/comanda-rescisao/{comanda.token_publico}/"
+            
+            # Contexto
+            contexto = {
+                'locatario_nome': locatario.nome_razao_social,
+                'parcela': f"{comanda.numero_parcela}/{comanda.rescisao.quantidade_parcelas}",
+                'valor': comanda.valor_formatado,
+                'data_vencimento': comanda.data_vencimento.strftime('%d/%m/%Y'),
+                'descricao': comanda.descricao,
+                'link_comanda': link_comanda,
+                'dias_para_vencimento': comanda.dias_para_vencimento,
+            }
+            
+            # Assunto
+            assunto = f'💳 Parcela {contexto["parcela"]} - Rescisão Contrato'
+            
+            # Corpo texto
+            mensagem_texto = f"""
+Olá {contexto['locatario_nome']},
+
+Segue comanda de pagamento da rescisão:
+
+PARCELA: {contexto['parcela']}
+VALOR: {contexto['valor']}
+VENCIMENTO: {contexto['data_vencimento']}
+
+Visualizar comanda:
+{contexto['link_comanda']}
+
+HABITAT PRO
+Gestão Imobiliaria Inteligente
+"""
+            
+            # Email
+            email = EmailMultiAlternatives(
+                subject=assunto,
+                body=mensagem_texto,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                to=[locatario.email]
+            )
+            email.send()
+            
+            logger.info(f"✅ Comanda de rescisão enviada para {locatario.email}")
+            return True
+            
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            logger.error(f"❌ Erro ao enviar comanda de rescisão: {e}")
+            return False
+
+    @classmethod
+    def enviar_confirmacao_rescisao(cls, rescisao):
+        """
+        Envia email com link de confirmação para inquilino.
+        """
+        from django.conf import settings
+        from django.core.mail import EmailMultiAlternatives
+        import logging
+        
+        logger = logging.getLogger(__name__)
+        
+        try:
+            locatario = rescisao.locacao.locatario
+            
+            if not locatario.email:
+                logger.warning(f"Rescisão {rescisao.id}: Locatário sem email")
+                return False
+            
+            # Gerar link de confirmação
+            link_confirmacao = f"{settings.SITE_URL}/rescisao/confirmar/{rescisao.token_confirmacao}/"
+            
+            # Assunto
+            assunto = f'Confirmacao de Rescisao - Contrato {rescisao.locacao.numero_contrato}'
+            
+            # Corpo do email (texto simples)
+            mensagem_texto = f"""
+Ola {locatario.nome_razao_social},
+
+Solicitamos a confirmacao da rescisao do seu contrato de locacao:
+
+DADOS DO CONTRATO:
+- Numero: {rescisao.locacao.numero_contrato}
+- Imovel: {rescisao.locacao.imovel.endereco}
+- Data de Desocupacao: {rescisao.data_desocupacao.strftime('%d/%m/%Y')}
+
+VALORES:
+- Total Devido: R$ {rescisao.valor_total_devido:,.2f}
+- Parcelamento: {rescisao.quantidade_parcelas}x de R$ {rescisao.valor_parcela:,.2f}
+
+Para confirmar, acesse o link abaixo:
+{link_confirmacao}
+
+Link valido ate: {rescisao.token_confirmacao_expira.strftime('%d/%m/%Y') if rescisao.token_confirmacao_expira else '7 dias'}
+
+Em caso de duvidas, entre em contato conosco.
+
+HABITAT PRO
+Gestao Imobiliaria Inteligente
+"""
+            
+            # Enviar email
+            email = EmailMultiAlternatives(
+                subject=assunto,
+                body=mensagem_texto,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                to=[locatario.email]
+            )
+            email.send()
+            
+            logger.info(f"✅ Email de confirmacao enviado para {locatario.email}")
+            
+            # Registrar no log da rescisão
+            rescisao.registrar_comunicacao(
+                tipo='email',
+                destinatario=locatario.email,
+                sucesso=True,
+                detalhes=f'Email de confirmacao enviado - Link: {link_confirmacao}'
+            )
+            
+            return True
+            
+        except Exception as e:
+            logger.error(f"❌ Erro ao enviar email de confirmacao: {e}")
+            if 'rescisao' in locals() and 'locatario' in locals():
+                rescisao.registrar_comunicacao(
+                    tipo='email',
+                    destinatario=locatario.email if locatario else 'desconhecido',
+                    sucesso=False,
+                    detalhes=f'Erro: {str(e)}'
+                )
+            return False
+    @classmethod
+    def enviar_atraso_rescisao(cls, comanda):
+        """
+        Envia notificação de atraso de parcela de rescisão.
+        """
+        from django.conf import settings
+        from django.core.mail import EmailMultiAlternatives
+        import logging
+        
+        logger = logging.getLogger(__name__)
+        
+        try:
+            locatario = comanda.get_destinatario()
+            
+            if not locatario.email:
+                return False
+            
+            assunto = f'⚠️ PAGAMENTO EM ATRASO - Rescisão Contrato'
+            
+            mensagem_texto = f"""
+Olá {locatario.nome_razao_social},
+
+Identificamos que o pagamento da parcela {comanda.numero_parcela}/{comanda.rescisao.quantidade_parcelas} da rescisão está em atraso.
+
+VALOR: {comanda.valor_formatado}
+VENCIMENTO: {comanda.data_vencimento.strftime('%d/%m/%Y')}
+DIAS DE ATRASO: {comanda.dias_atraso}
+
+Regularize sua situação o quanto antes para evitar multa de 10% + IPCA e possível ajuizamento.
+
+Link: {settings.SITE_URL}/comanda-rescisao/{comanda.token_publico}/
+
+HABITAT PRO
+Gestão Imobiliaria Inteligente
+"""
+            
+            email = EmailMultiAlternatives(
+                subject=assunto,
+                body=mensagem_texto,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                to=[locatario.email]
+            )
+            email.send()
+            
+            logger.info(f"✅ Notificação de atraso enviada")
+            return True
+            
+        except Exception as e:
+            logger.error(f"❌ Erro ao enviar notificação de atraso: {e}")
+            return False
+
+
+    @classmethod
+    def enviar_recibo_rescisao(cls, comanda):
+        """
+        Envia recibo de pagamento de parcela de rescisão.
+        """
+        from django.conf import settings
+        from django.core.mail import EmailMultiAlternatives
+        import logging
+        
+        logger = logging.getLogger(__name__)
+        
+        try:
+            locatario = comanda.get_destinatario()
+            
+            if not locatario.email:
+                return False
+            
+            assunto = f'✅ Recibo de Pagamento - Parcela {comanda.numero_parcela}'
+            
+            mensagem_texto = f"""
+Olá {locatario.nome_razao_social},
+
+Confirmamos o recebimento do pagamento:
+
+PARCELA: {comanda.numero_parcela}/{comanda.rescisao.quantidade_parcelas}
+VALOR: {comanda.valor_formatado}
+DATA PAGAMENTO: {comanda.data_pagamento.strftime('%d/%m/%Y')}
+
+Obrigado!
+
+Atenciosamente,
+HABITAT PRO
+Gestão Imobiliaria Inteligente
+"""
+            
+            email = EmailMultiAlternatives(
+                subject=assunto,
+                body=mensagem_texto,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                to=[locatario.email]
+            )
+            email.send()
+            
+            logger.info(f"✅ Recibo enviado")
+            return True
+            
+        except Exception as e:
+            logger.error(f"❌ Erro ao enviar recibo: {e}")
+            return False    
+        

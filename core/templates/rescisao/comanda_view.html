@@ -1,0 +1,291 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comanda de Rescisão — {{ comanda.numero_parcela }}ª Parcela</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #f0f2f5;
+            color: #333;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 720px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+        }
+
+        /* HEADER */
+        .header {
+            background: linear-gradient(135deg, #c0392b, #e74c3c);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 { font-size: 22px; margin-bottom: 6px; }
+        .header p  { font-size: 14px; opacity: 0.9; }
+
+        /* STATUS BADGE */
+        .status-bar {
+            padding: 12px 30px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .status-pendente  { background: #fff3cd; color: #856404; }
+        .status-pago      { background: #d1e7dd; color: #0f5132; }
+        .status-atrasado  { background: #f8d7da; color: #721c24; }
+        .status-cancelado { background: #e2e3e5; color: #383d41; }
+
+        /* SECTIONS */
+        .section {
+            padding: 24px 30px;
+            border-bottom: 1px solid #eee;
+        }
+        .section:last-child { border-bottom: none; }
+        .section h2 {
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #e74c3c;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* GRID DE DADOS */
+        .data-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        .data-item label {
+            font-size: 11px;
+            text-transform: uppercase;
+            color: #999;
+            display: block;
+            margin-bottom: 2px;
+        }
+        .data-item span {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+        }
+        .data-item.full { grid-column: 1 / -1; }
+
+        /* VALOR DESTAQUE */
+        .valor-box {
+            background: #fff5f5;
+            border: 2px solid #e74c3c;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            margin: 16px 0;
+        }
+        .valor-box .label { font-size: 12px; color: #999; margin-bottom: 4px; }
+        .valor-box .valor { font-size: 32px; font-weight: 700; color: #c0392b; }
+        .valor-box .parcela { font-size: 13px; color: #666; margin-top: 4px; }
+
+        /* FOOTER */
+        .footer {
+            background: #f8f9fa;
+            padding: 20px 30px;
+            text-align: center;
+            font-size: 12px;
+            color: #999;
+        }
+        .footer strong { color: #666; }
+
+        /* PAGO OVERLAY */
+        .pago-stamp {
+            display: inline-block;
+            border: 3px solid #28a745;
+            color: #28a745;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-weight: 900;
+            font-size: 18px;
+            letter-spacing: 3px;
+            transform: rotate(-5deg);
+            margin: 10px auto;
+        }
+
+        @media (max-width: 480px) {
+            .data-grid { grid-template-columns: 1fr; }
+            .header { padding: 20px; }
+            .section { padding: 16px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- HEADER -->
+    <div class="header">
+        <h1>🏠 Comanda de Rescisão</h1>
+        <p>{{ locatario }} — Parcela {{ comanda.numero_parcela }}</p>
+    </div>
+
+    <!-- STATUS -->
+    <div class="status-bar status-{{ comanda.status|lower }}">
+        {% if comanda.status == 'PAGO' or comanda.status == 'pago' %}
+            ✅ PAGAMENTO CONFIRMADO
+        {% elif comanda.status == 'ATRASADO' or comanda.status == 'atrasado' %}
+            ⚠️ PAGAMENTO EM ATRASO
+        {% elif comanda.status == 'CANCELADO' or comanda.status == 'cancelado' %}
+            ❌ CANCELADO
+        {% else %}
+            ⏳ AGUARDANDO PAGAMENTO
+        {% endif %}
+    </div>
+
+    <!-- VALOR EM DESTAQUE -->
+    <div class="section">
+        <div class="valor-box">
+            <div class="label">Valor da Parcela</div>
+            <div class="valor">R$ {{ comanda.valor|floatformat:2 }}</div>
+            <div class="parcela">
+                Parcela {{ comanda.numero_parcela }}
+                {% if comanda.descricao %} — {{ comanda.descricao }}{% endif %}
+            </div>
+            {% if comanda.status == 'PAGO' or comanda.status == 'pago' %}
+                <div class="pago-stamp">PAGO</div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- DADOS DA COMANDA -->
+    <div class="section">
+        <h2>📋 Dados da Cobrança</h2>
+        <div class="data-grid">
+            <div class="data-item">
+                <label>Vencimento</label>
+                <span>{{ comanda.data_vencimento|date:"d/m/Y" }}</span>
+            </div>
+            <div class="data-item">
+                <label>Status</label>
+                <span>{{ comanda.get_status_display }}</span>
+            </div>
+            {% if comanda.data_pagamento %}
+            <div class="data-item">
+                <label>Data do Pagamento</label>
+                <span>{{ comanda.data_pagamento|date:"d/m/Y" }}</span>
+            </div>
+            {% endif %}
+            {% if comanda.descricao %}
+            <div class="data-item full">
+                <label>Descrição</label>
+                <span>{{ comanda.descricao }}</span>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- DADOS DO LOCATÁRIO -->
+    <div class="section">
+        <h2>👤 Locatário</h2>
+        <div class="data-grid">
+            <div class="data-item full">
+                <label>Nome</label>
+                <span>{{ locatario }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- DADOS DO IMÓVEL -->
+    <div class="section">
+        <h2>🏠 Imóvel</h2>
+        <div class="data-grid">
+            <div class="data-item full">
+                <label>Endereço</label>
+                <span>
+                    {{ imovel.endereco }}, {{ imovel.numero }}
+                    {% if imovel.complemento %} — {{ imovel.complemento }}{% endif %}
+                </span>
+            </div>
+            <div class="data-item">
+                <label>Bairro</label>
+                <span>{{ imovel.bairro }}</span>
+            </div>
+            <div class="data-item">
+                <label>Cidade/UF</label>
+                <span>{{ imovel.cidade }}/{{ imovel.estado }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- DADOS DA RESCISÃO -->
+    <div class="section">
+        <h2>📄 Rescisão</h2>
+        <div class="data-grid">
+            <div class="data-item">
+                <label>Contrato Nº</label>
+                <span>{{ locacao.numero_contrato }}</span>
+            </div>
+            <div class="data-item">
+                <label>Data de Saída</label>
+                <span>{{ rescisao.data_saida|date:"d/m/Y" }}</span>
+            </div>
+            <div class="data-item">
+                <label>Total da Rescisão</label>
+                <span>R$ {{ rescisao.valor_total_devido|floatformat:2 }}</span>
+            </div>
+            <div class="data-item">
+                <label>Parcelas</label>
+                <span>{{ rescisao.quantidade_parcelas }}x de R$ {{ rescisao.valor_parcela|floatformat:2 }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- DADOS DO LOCADOR -->
+    <div class="section">
+        <h2>🏢 Administradora</h2>
+        <div class="data-grid">
+            {% if locador %}
+            <div class="data-item full">
+                <label>Locador</label>
+                <span>{{ locador }}</span>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- COMPROVANTE -->
+    {% if comanda.comprovante %}
+    <div class="section">
+        <h2>📎 Comprovante</h2>
+        <p>
+            <a href="{{ comanda.comprovante.url }}" target="_blank"
+               style="color:#e74c3c; font-weight:600;">
+                📥 Baixar Comprovante
+            </a>
+        </p>
+    </div>
+    {% endif %}
+
+    <!-- FOOTER -->
+    <div class="footer">
+        <p><strong>HABITAT PRO</strong> — Sistema de Gestão Imobiliária</p>
+        <p style="margin-top:6px;">
+            Este documento é válido por {{ comanda.token_expira_em|date:"d/m/Y" }}.
+            Acesso registrado em {{ comanda.token_ultimo_acesso|date:"d/m/Y H:i" }}.
+        </p>
+        <p style="margin-top:8px; font-size:11px;">
+            Em caso de dúvidas, entre em contato com a imobiliária.
+        </p>
+    </div>
+
+</div>
+</body>
+</html>

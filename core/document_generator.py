@@ -95,6 +95,94 @@ class DocumentGenerator:
         doc.save(path)
         return os.path.basename(path)
 
+
+    def gerar_recibo_polimorfico(self, pagamento_id) -> str:
+        """
+        Gera recibo DOCX polimórfico (aluguel ou rescisão).
+        """
+        pagamento = Pagamento.objects.select_related(
+            'comanda', 'comanda__locacao', 'comanda__locacao__locatario', 'comanda__locacao__imovel'
+        ).get(pk=pagamento_id)
+
+        numero = pagamento.numero_pagamento or str(pagamento_id)
+        timestamp = timezone.now().strftime('%Y%m%d%H%M%S')
+        filename = f"recibo_{numero}_{timestamp}.docx"
+        filename = self._sanitize_filename(filename)
+        path = os.path.join(self.output_dir, filename)
+
+        doc = Document()
+        section = doc.sections[0]
+        section.page_height = Mm(297)
+        section.page_width = Mm(210)
+        section.left_margin = Mm(20)
+        section.right_margin = Mm(20)
+        section.top_margin = Mm(20)
+        section.bottom_margin = Mm(20)
+
+        p = doc.add_paragraph()
+        p.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
+        run = p.add_run("RECIBO DE PAGAMENTO\n")
+        run.bold = True
+        run.font.size = Pt(16)
+
+        doc.add_paragraph()
+
+        def add_kv(label, value):
+            p = doc.add_paragraph()
+            run = p.add_run(f"{label}: ")
+            run.bold = True
+            run.font.size = Pt(11)
+            run2 = p.add_run(str(value or "-"))
+            run2.font.size = Pt(11)
+
+        # Resolver contexto polimórfico
+        if pagamento.comanda_id:
+            # Aluguel (FK)
+            comanda = pagamento.comanda
+            locacao = comanda.locacao if comanda else None
+            locatario = locacao.locatario if locacao else None
+            imovel = locacao.imovel if locacao else None
+            ref_label = f"Comanda {comanda.numero_comanda}" if comanda else "Aluguel"
+        elif pagamento.content_type_id and pagamento.object_id:
+            # Rescisão (GenericFK)
+            comanda = None
+            _ref = pagamento.comanda_ref
+            _rs = _ref.rescisao if (_ref and hasattr(_ref, 'rescisao')) else None
+            locacao = _rs.locacao if _rs else None
+            locatario = locacao.locatario if locacao else None
+            imovel = locacao.imovel if locacao else None
+            ref_label = f"Rescisão - Parcela {_ref.numero_parcela} de {_rs.quantidade_parcelas}" if _ref and _rs else "Rescisão"
+        else:
+            locacao = locatario = imovel = None
+            ref_label = "Pagamento"
+
+        add_kv("Locatário", getattr(locatario, 'nome_razao_social', '-'))
+        add_kv("CPF/CNPJ", getattr(locatario, 'cpf_cnpj', '-'))
+        add_kv("Imóvel", f"{getattr(imovel, 'endereco', '-')}, {getattr(imovel, 'numero', '')}")
+        add_kv("Referente a", ref_label)
+        add_kv("Recibo", numero)
+        add_kv("Data do Pagamento", pagamento.data_pagamento.strftime('%d/%m/%Y') if pagamento.data_pagamento else '-')
+        add_kv("Forma", pagamento.get_forma_pagamento_display() if hasattr(pagamento, 'get_forma_pagamento_display') else pagamento.forma_pagamento)
+        doc.add_paragraph()
+
+        p = doc.add_paragraph()
+        p.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
+        valor_str = f"R$ {pagamento.valor_pago:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.')
+        run = p.add_run(f"VALOR PAGO\n{valor_str}")
+        run.bold = True
+        run.font.size = Pt(14)
+        doc.add_paragraph()
+
+        if pagamento.observacoes:
+            add_kv("Observações", pagamento.observacoes)
+
+        doc.add_paragraph()
+        doc.add_paragraph("Atenciosamente,")
+        doc.add_paragraph(getattr(settings, 'DEFAULT_FROM_EMAIL', 'HABITAT PRO'))
+
+        doc.save(path)
+        return os.path.basename(path)
+
     def gerar_recibo_pdf(self, pagamento_id) -> str:
         if not HAS_WEASY:
             raise RuntimeError("WeasyPrint não está disponível. Instale weasyprint para gerar PDF.")
