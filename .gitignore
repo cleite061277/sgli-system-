@@ -173,3 +173,9 @@ backup_*.tar.gz
 **/settings.py.bkp_*
 .env
 .env.*
+
+# Credenciais e variáveis de ambiente
+*.env
+sendgrid_backup.env
+.env.backup*
+railway_env_variables.txt
