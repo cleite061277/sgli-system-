@@ -2072,10 +2072,27 @@ def atualizar_status_comanda(sender, instance, **kwargs):
 
     # ── CASO 2: Pagamento de rescisão (GenericFK preenchida) ─────────────
     elif instance.content_type_id and instance.object_id:
+        from .models_rescisao import ComandaRescisao
+        from django.contrib.contenttypes.models import ContentType
+        
+        # ✅ VALIDAÇÃO 1: ContentType deve ser comandarescisao
+        try:
+            content_type = ContentType.objects.get_for_id(instance.content_type_id)
+            if content_type.model != 'comandarescisao':
+                return  # Não é rescisão, ignorar
+        except ContentType.DoesNotExist:
+            return
+        
+        # ✅ VALIDAÇÃO 2: Objeto deve existir
         comanda_rescisao = instance.comanda_ref
         if comanda_rescisao is None:
-            return  # Objeto pode ter sido deletado
-
+            return  # Objeto deletado
+        
+        # ✅ VALIDAÇÃO 3: isinstance() para garantia total
+        if not isinstance(comanda_rescisao, ComandaRescisao):
+            return  # Tipo incorreto, ignorar
+        
+        # ✅ SEGURO: Agora podemos acessar .valor
         # Calcular total pago
         total_pago = Pagamento.objects.filter(
             content_type_id=instance.content_type_id,
