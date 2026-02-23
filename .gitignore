@@ -179,3 +179,24 @@ backup_*.tar.gz
 sendgrid_backup.env
 .env.backup*
 railway_env_variables.txt
+
+# Backups e scripts temporários
+bkp_*/
+bkp_*.py
+backup_*.py
+correcao_*.py
+corrigir_*.py
+corrigir_*.sh
+diagnostico_*.sh
+diagnostico_*.py
+patch_*.py
+teste_*.py
+teste_*.sh
+*.sh
+solucao_*.py
+hardening_*.py
+padronizacao_*.py
+limpar_*.sh
+completar_*.sh
+aplicar_*.sh
+00_BACKUP_*.sh
