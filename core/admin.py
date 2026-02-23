@@ -745,7 +745,13 @@ class ComandaAdmin(admin.ModelAdmin):
             if hasattr(instance, "usuario_registro_id"):
                 if not getattr(instance, "usuario_registro_id", None):
                     instance.usuario_registro_id = user_pk
-             
+
+            # Limpar GenericFK se pagamento já tem comanda_id (aluguel)
+            # Evita que GenericTabularInline preencha content_type indevidamente
+            if getattr(instance, 'comanda_id', None):
+                instance.content_type = None
+                instance.object_id = None
+
             # Salvar instância
             instance.save()
                     
