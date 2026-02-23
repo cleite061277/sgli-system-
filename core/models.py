@@ -2068,7 +2068,8 @@ def atualizar_status_comanda(sender, instance, **kwargs):
             comanda.status = Comanda.StatusComanda.PENDENTE
             comanda.data_pagamento = None
 
-        comanda.save(update_fields=['status', 'data_pagamento', 'updated_at'])
+        comanda.valor_pago = total_pago
+        comanda.save(update_fields=['status', 'data_pagamento', 'valor_pago', 'updated_at'])
 
     # ── CASO 2: Pagamento de rescisão (GenericFK preenchida) ─────────────
     elif instance.content_type_id and instance.object_id:
@@ -2136,8 +2137,15 @@ def atualizar_status_comanda(sender, instance, **kwargs):
             comanda_rescisao.status = 'PENDENTE'
             comanda_rescisao.data_pagamento = None
 
+        # ✅ Atualizar valor_pago (soma de pagamentos)
+        if hasattr(comanda_rescisao, 'valor_pago'):
+            comanda_rescisao.valor_pago = total_pago
+        
         # Salvar alterações
-        comanda_rescisao.save(update_fields=['status', 'data_pagamento', 'updated_at'])
+        if hasattr(comanda_rescisao, 'valor_pago'):
+            comanda_rescisao.save(update_fields=['status', 'data_pagamento', 'valor_pago', 'updated_at'])
+        else:
+            comanda_rescisao.save(update_fields=['status', 'data_pagamento', 'updated_at'])
 
     # ── CASO 3: Sem FK nem GenericFK — ignorar ───────────────────────────
     # (não deve acontecer, mas evita crash se acontecer)

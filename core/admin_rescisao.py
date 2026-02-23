@@ -71,15 +71,15 @@ class ComandaRescisaoAdmin(admin.ModelAdmin):
 
     
     list_display = [
-        'id_display',
-        'rescisao_link',
-        'parcela_display',
-        'valor_formatado',
-        'data_vencimento',
-        'status_badge',
-        'situacao_display',
-        'comprovante_badge',
-        'acoes_rapidas'
+        'numero_comanda_link',    # ✅ Link clicável (ex: CR-01)
+        'locacao_info',           # ✅ Contrato + Locatário + Imóvel
+        'parcela_display',        # ✅ Parcela X/Y (mantido)
+        'vencimento_colorido',    # ✅ Data com cores (novo)
+        'valor_total_display',    # ✅ Valor formatado (novo)
+        'saldo_display',          # ✅ Saldo colorido (novo)
+        'acoes_envio',            # ✅ Botões ação (novo)
+        'status_badge',           # ✅ Badge status (mantido)
+        'dias_vencimento',        # ✅ Alerta dias (novo)
     ]
     
     list_filter = [
@@ -239,6 +239,174 @@ class ComandaRescisaoAdmin(admin.ModelAdmin):
             )
         return format_html('<span style="color:#999;">—</span>')
     comprovante_badge.short_description = 'Comprovante'
+    
+    # ========================================
+    # NOVOS MÉTODOS DISPLAY (Padrão Aluguel)
+    # ========================================
+    
+    def numero_comanda_link(self, obj):
+        """Número da comanda como link clicável."""
+        from django.urls import reverse
+        from django.utils.html import format_html
+        url = reverse('admin:core_comandarescisao_change', args=[obj.id])
+        return format_html(
+            '<a href="{}" style="font-weight:600; color:#2563eb;">{}</a>',
+            url,
+            f'CR-{obj.numero_parcela:02d}'
+        )
+    numero_comanda_link.short_description = 'Nº Comanda'
+    numero_comanda_link.admin_order_field = 'numero_parcela'
+    
+    def locacao_info(self, obj):
+        """Informações da locação (contrato + locatário + imóvel)."""
+        from django.urls import reverse
+        from django.utils.html import format_html
+        
+        if not obj.locacao:
+            return format_html('<span style="color:#6c757d;">N/A</span>')
+        
+        url = reverse('admin:core_locacao_change', args=[obj.locacao.id])
+        return format_html(
+            '<a href="{}" style="font-weight:500;">{}</a><br>'
+            '<small style="color:#6b7280;">👤 {}</small><br>'
+            '<small style="color:#6b7280;">🏠 {}</small>',
+            url,
+            obj.numero_contrato,
+            obj.locatario_nome[:30],
+            obj.imovel_endereco[:40]
+        )
+    locacao_info.short_description = '📋 Contrato'
+    
+    def vencimento_colorido(self, obj):
+        """Data de vencimento com cor baseada em dias."""
+        from django.utils.html import format_html
+        from datetime import date
+        
+        hoje = date.today()
+        dias = (obj.data_vencimento - hoje).days
+        
+        # Definir cor
+        if obj.status == 'PAGO':
+            cor = '#28a745'  # Verde
+            icone = '✅'
+        elif dias < 0:
+            cor = '#dc3545'  # Vermelho
+            icone = '⚠️'
+        elif dias == 0:
+            cor = '#ffc107'  # Amarelo
+            icone = '⏰'
+        elif dias <= 3:
+            cor = '#fd7e14'  # Laranja
+            icone = '🔔'
+        else:
+            cor = '#6c757d'  # Cinza
+            icone = '📅'
+        
+        data_br = obj.data_vencimento.strftime('%d/%m/%Y')
+        return format_html(
+            '<span style="color:{}; font-weight:500;">{} {}</span>',
+            cor, icone, data_br
+        )
+    vencimento_colorido.short_description = '📅 Vencimento'
+    vencimento_colorido.admin_order_field = 'data_vencimento'
+    
+    def valor_total_display(self, obj):
+        """Valor da parcela formatado (BR)."""
+        from django.utils.html import format_html
+        valor_br = f"R$ {obj.valor:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.')
+        return format_html(
+            '<span style="font-weight:600; color:#1e40af;">{}</span>',
+            valor_br
+        )
+    valor_total_display.short_description = '💰 Valor Total'
+    valor_total_display.admin_order_field = 'valor'
+    
+    def saldo_display(self, obj):
+        """Saldo com cor (verde=pago, vermelho=deve)."""
+        from django.utils.html import format_html
+        from decimal import Decimal
+        
+        # Verificar se tem campo valor_pago
+        if not hasattr(obj, 'valor_pago'):
+            return format_html('<span style="color:#6c757d;">N/A</span>')
+        
+        saldo = obj.valor_pago - obj.valor
+        
+        if saldo >= 0:
+            # Pago ou crédito
+            cor = '#28a745'
+            icone = '✅'
+            prefixo = '+' if saldo > 0 else ''
+        else:
+            # Deve
+            cor = '#dc3545'
+            icone = '▼'
+            prefixo = ''
+        
+        valor_br = f"{prefixo}R$ {abs(saldo):,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.')
+        return format_html(
+            '<span style="color:{}; font-weight:600;">{} {}</span>',
+            cor, icone, valor_br
+        )
+    saldo_display.short_description = '⚖️ Saldo'
+    
+    def acoes_envio(self, obj):
+        """Botões de ação (WhatsApp, Email, Ver) - igual aluguel."""
+        from django.utils.html import format_html
+        from django.urls import reverse
+        
+        # Link público
+        if obj.token_publico:
+            link_publico = f"/comanda-rescisao/{obj.token_publico}/"
+        else:
+            link_publico = "#"
+        
+        # Link WhatsApp
+        if obj.locatario and hasattr(obj.locatario, 'telefone'):
+            telefone = obj.locatario.telefone.replace('(', '').replace(')', '').replace('-', '').replace(' ', '')
+            msg = f"Olá! Segue o link da comanda de rescisão: {link_publico}"
+            link_whats = f"https://wa.me/55{telefone}?text={msg}"
+        else:
+            link_whats = "#"
+        
+        return format_html(
+            '<div style="display:flex; gap:4px;">'
+            '<a href="{}" target="_blank" style="background:#25D366; color:white; '
+            'padding:4px 8px; border-radius:4px; text-decoration:none; font-size:11px;">📱 WhatsApp</a>'
+            '<a href="#" style="background:#0284c7; color:white; '
+            'padding:4px 8px; border-radius:4px; text-decoration:none; font-size:11px;">✉️ Email</a>'
+            '<a href="{}" target="_blank" style="background:#6b7280; color:white; '
+            'padding:4px 8px; border-radius:4px; text-decoration:none; font-size:11px;">👁️ Ver</a>'
+            '</div>',
+            link_whats, link_publico
+        )
+    acoes_envio.short_description = '🎬 Ações'
+    
+    def dias_vencimento(self, obj):
+        """Dias para/após vencimento com alerta visual."""
+        from django.utils.html import format_html
+        from datetime import date
+        
+        if obj.status == 'PAGO':
+            return format_html('<span style="color:#28a745;">✅ Pago</span>')
+        
+        dias = obj.dias_para_vencimento
+        
+        if dias < 0:
+            return format_html(
+                '<span style="background:#dc3545; color:white; padding:2px 6px; '
+                'border-radius:3px; font-weight:bold; font-size:10px;">{} dia(s)</span>',
+                abs(dias)
+            )
+        elif dias == 0:
+            return format_html('<span style="color:#ffc107; font-weight:bold;">⏰ Hoje</span>')
+        elif dias <= 3:
+            return format_html('<span style="color:#fd7e14;">🔔 {} dias</span>', dias)
+        else:
+            return format_html('<span style="color:#6c757d;">{} dias</span>', dias)
+    dias_vencimento.short_description = '⏱️ Dias'
+    dias_vencimento.admin_order_field = 'data_vencimento'
+    
     
     def acoes_rapidas(self, obj):
         if obj.status in ['PENDENTE', 'ATRASADO']:
@@ -601,6 +769,174 @@ class RescisaoContratoAdmin(admin.ModelAdmin):
         else:
             return format_html('<span style="color:red;">❌ Token expirado</span>')
     confirmado_badge.short_description = 'Confirmação'
+    
+    # ========================================
+    # NOVOS MÉTODOS DISPLAY (Padrão Aluguel)
+    # ========================================
+    
+    def numero_comanda_link(self, obj):
+        """Número da comanda como link clicável."""
+        from django.urls import reverse
+        from django.utils.html import format_html
+        url = reverse('admin:core_comandarescisao_change', args=[obj.id])
+        return format_html(
+            '<a href="{}" style="font-weight:600; color:#2563eb;">{}</a>',
+            url,
+            f'CR-{obj.numero_parcela:02d}'
+        )
+    numero_comanda_link.short_description = 'Nº Comanda'
+    numero_comanda_link.admin_order_field = 'numero_parcela'
+    
+    def locacao_info(self, obj):
+        """Informações da locação (contrato + locatário + imóvel)."""
+        from django.urls import reverse
+        from django.utils.html import format_html
+        
+        if not obj.locacao:
+            return format_html('<span style="color:#6c757d;">N/A</span>')
+        
+        url = reverse('admin:core_locacao_change', args=[obj.locacao.id])
+        return format_html(
+            '<a href="{}" style="font-weight:500;">{}</a><br>'
+            '<small style="color:#6b7280;">👤 {}</small><br>'
+            '<small style="color:#6b7280;">🏠 {}</small>',
+            url,
+            obj.numero_contrato,
+            obj.locatario_nome[:30],
+            obj.imovel_endereco[:40]
+        )
+    locacao_info.short_description = '📋 Contrato'
+    
+    def vencimento_colorido(self, obj):
+        """Data de vencimento com cor baseada em dias."""
+        from django.utils.html import format_html
+        from datetime import date
+        
+        hoje = date.today()
+        dias = (obj.data_vencimento - hoje).days
+        
+        # Definir cor
+        if obj.status == 'PAGO':
+            cor = '#28a745'  # Verde
+            icone = '✅'
+        elif dias < 0:
+            cor = '#dc3545'  # Vermelho
+            icone = '⚠️'
+        elif dias == 0:
+            cor = '#ffc107'  # Amarelo
+            icone = '⏰'
+        elif dias <= 3:
+            cor = '#fd7e14'  # Laranja
+            icone = '🔔'
+        else:
+            cor = '#6c757d'  # Cinza
+            icone = '📅'
+        
+        data_br = obj.data_vencimento.strftime('%d/%m/%Y')
+        return format_html(
+            '<span style="color:{}; font-weight:500;">{} {}</span>',
+            cor, icone, data_br
+        )
+    vencimento_colorido.short_description = '📅 Vencimento'
+    vencimento_colorido.admin_order_field = 'data_vencimento'
+    
+    def valor_total_display(self, obj):
+        """Valor da parcela formatado (BR)."""
+        from django.utils.html import format_html
+        valor_br = f"R$ {obj.valor:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.')
+        return format_html(
+            '<span style="font-weight:600; color:#1e40af;">{}</span>',
+            valor_br
+        )
+    valor_total_display.short_description = '💰 Valor Total'
+    valor_total_display.admin_order_field = 'valor'
+    
+    def saldo_display(self, obj):
+        """Saldo com cor (verde=pago, vermelho=deve)."""
+        from django.utils.html import format_html
+        from decimal import Decimal
+        
+        # Verificar se tem campo valor_pago
+        if not hasattr(obj, 'valor_pago'):
+            return format_html('<span style="color:#6c757d;">N/A</span>')
+        
+        saldo = obj.valor_pago - obj.valor
+        
+        if saldo >= 0:
+            # Pago ou crédito
+            cor = '#28a745'
+            icone = '✅'
+            prefixo = '+' if saldo > 0 else ''
+        else:
+            # Deve
+            cor = '#dc3545'
+            icone = '▼'
+            prefixo = ''
+        
+        valor_br = f"{prefixo}R$ {abs(saldo):,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.')
+        return format_html(
+            '<span style="color:{}; font-weight:600;">{} {}</span>',
+            cor, icone, valor_br
+        )
+    saldo_display.short_description = '⚖️ Saldo'
+    
+    def acoes_envio(self, obj):
+        """Botões de ação (WhatsApp, Email, Ver) - igual aluguel."""
+        from django.utils.html import format_html
+        from django.urls import reverse
+        
+        # Link público
+        if obj.token_publico:
+            link_publico = f"/comanda-rescisao/{obj.token_publico}/"
+        else:
+            link_publico = "#"
+        
+        # Link WhatsApp
+        if obj.locatario and hasattr(obj.locatario, 'telefone'):
+            telefone = obj.locatario.telefone.replace('(', '').replace(')', '').replace('-', '').replace(' ', '')
+            msg = f"Olá! Segue o link da comanda de rescisão: {link_publico}"
+            link_whats = f"https://wa.me/55{telefone}?text={msg}"
+        else:
+            link_whats = "#"
+        
+        return format_html(
+            '<div style="display:flex; gap:4px;">'
+            '<a href="{}" target="_blank" style="background:#25D366; color:white; '
+            'padding:4px 8px; border-radius:4px; text-decoration:none; font-size:11px;">📱 WhatsApp</a>'
+            '<a href="#" style="background:#0284c7; color:white; '
+            'padding:4px 8px; border-radius:4px; text-decoration:none; font-size:11px;">✉️ Email</a>'
+            '<a href="{}" target="_blank" style="background:#6b7280; color:white; '
+            'padding:4px 8px; border-radius:4px; text-decoration:none; font-size:11px;">👁️ Ver</a>'
+            '</div>',
+            link_whats, link_publico
+        )
+    acoes_envio.short_description = '🎬 Ações'
+    
+    def dias_vencimento(self, obj):
+        """Dias para/após vencimento com alerta visual."""
+        from django.utils.html import format_html
+        from datetime import date
+        
+        if obj.status == 'PAGO':
+            return format_html('<span style="color:#28a745;">✅ Pago</span>')
+        
+        dias = obj.dias_para_vencimento
+        
+        if dias < 0:
+            return format_html(
+                '<span style="background:#dc3545; color:white; padding:2px 6px; '
+                'border-radius:3px; font-weight:bold; font-size:10px;">{} dia(s)</span>',
+                abs(dias)
+            )
+        elif dias == 0:
+            return format_html('<span style="color:#ffc107; font-weight:bold;">⏰ Hoje</span>')
+        elif dias <= 3:
+            return format_html('<span style="color:#fd7e14;">🔔 {} dias</span>', dias)
+        else:
+            return format_html('<span style="color:#6c757d;">{} dias</span>', dias)
+    dias_vencimento.short_description = '⏱️ Dias'
+    dias_vencimento.admin_order_field = 'data_vencimento'
+    
     
     def acoes_rapidas(self, obj):
         botoes = []

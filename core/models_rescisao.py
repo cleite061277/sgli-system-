@@ -645,6 +645,44 @@ class RescisaoContrato(BaseModel):
             models.Index(fields=['token_confirmacao']),
         ]
     
+
+    
+    # ========================================
+    # PROPERTIES
+    # ========================================
+
+    @property
+    def saldo_devedor(self):
+        """Saldo devedor da rescisão (total_devido - total_pago)."""
+        return self.valor_total_devido - self.valor_total_pago
+
+    @property
+    def locatario(self):
+        """Atalho para acessar o locatário via FK locacao."""
+        return self.locacao.locatario if self.locacao_id else None
+
+    @property
+    def imovel(self):
+        """Atalho para acessar o imóvel via FK locacao."""
+        return self.locacao.imovel if self.locacao_id else None
+
+    @property
+    def numero_contrato(self):
+        """Número do contrato de locação."""
+        return self.locacao.numero_contrato if self.locacao_id else 'N/A'
+
+    @property
+    def locatario_nome(self):
+        """Nome do locatário (para exibição rápida)."""
+        return self.locacao.locatario.nome_razao_social if self.locacao_id else 'N/A'
+
+    @property
+    def imovel_endereco(self):
+        """Endereço do imóvel (para exibição rápida)."""
+        if self.locacao_id and self.locacao.imovel:
+            return self.imovel.endereco
+        return 'N/A'
+
     def __str__(self):
         return f"Rescisão #{str(self.id)[:8]} - {self.locacao.numero_contrato} - {self.get_status_display()}"
     
@@ -996,7 +1034,15 @@ class ComandaRescisao(ComandaBase):
         verbose_name=_('Rescisão'),
         help_text=_('Rescisão de contrato associada')
     )
-    
+
+    valor_pago = models.DecimalField(
+        _('Valor Pago'),
+        max_digits=10,
+        decimal_places=2,
+        default=0,
+        help_text=_('Soma de todos os pagamentos confirmados desta comanda')
+    )
+
     class Meta:
         db_table = 'core_comanda_rescisao'
         verbose_name = 'Comanda de Rescisão'
@@ -1008,6 +1054,62 @@ class ComandaRescisao(ComandaBase):
             models.Index(fields=['token_publico']),
         ]
     
+
+    
+    @property
+    def saldo(self):
+        """Saldo: valor_pago - valor (negativo = deve, positivo = crédito)."""
+        from decimal import Decimal
+        if not hasattr(self, 'valor_pago'):
+            return Decimal('0.00')
+        return self.valor_pago - self.valor
+
+
+    
+    # ========================================
+    # PROPERTIES DE NAVEGAÇÃO (Atalhos FK)
+    # ========================================
+    
+    @property
+    def locacao(self):
+        """Atalho para acessar a locação (contrato original)."""
+        return self.rescisao.locacao if self.rescisao else None
+    
+    @property
+    def locatario(self):
+        """Atalho para acessar o locatário."""
+        if self.rescisao and self.rescisao.locacao:
+            return self.rescisao.locacao.locatario
+        return None
+    
+    @property
+    def imovel(self):
+        """Atalho para acessar o imóvel."""
+        if self.rescisao and self.rescisao.locacao:
+            return self.rescisao.locacao.imovel
+        return None
+    
+    @property
+    def numero_contrato(self):
+        """Número do contrato de locação."""
+        if self.rescisao and self.rescisao.locacao:
+            return self.rescisao.locacao.numero_contrato
+        return 'N/A'
+    
+    @property
+    def locatario_nome(self):
+        """Nome do locatário (para exibição rápida)."""
+        if self.locatario:
+            return self.locatario.nome_razao_social
+        return 'N/A'
+    
+    @property
+    def imovel_endereco(self):
+        """Endereço do imóvel (para exibição rápida)."""
+        if self.imovel:
+            return self.imovel.endereco
+        return 'N/A'
+
     def __str__(self):
         return f"Rescisão {str(self.rescisao.id)[:8]} - Parcela {self.numero_parcela}/{self.rescisao.quantidade_parcelas}"
     

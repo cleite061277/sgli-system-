@@ -99,6 +99,7 @@ REST_FRAMEWORK = {
 LANGUAGE_CODE = 'pt-br'
 TIME_ZONE = 'America/Sao_Paulo'
 USE_I18N = True
+USE_L10N = False  # Evita conversão de ponto para vírgula em números/URLs
 USE_TZ = True
 
 STATIC_URL = '/static/'
