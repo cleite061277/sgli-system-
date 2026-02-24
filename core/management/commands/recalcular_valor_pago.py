@@ -89,4 +89,20 @@ class Command(BaseCommand):
                 self.stdout.write(f'  {str(cr.id)[:8]}: status={novo_status}')
         self.stdout.write(f'Fase 4: {atualizadas} status atualizado(s)')
 
+        # ══════════════════════════════════════════════════════
+        # FASE 5: Gerar tokens para pagamentos históricos sem token
+        # ══════════════════════════════════════════════════════
+        self.stdout.write('=== FASE 5: Tokens históricos ===')
+        from core.utils.token_publico import gerar_dados_token
+        sem_token = Pagamento.objects.filter(token__isnull=True)
+        count = 0
+        for pag in sem_token:
+            dados = gerar_dados_token()
+            pag.token = dados['token']
+            pag.token_gerado_em = dados['token_gerado_em']
+            pag.token_expira_em = dados['token_expira_em']
+            pag.save(update_fields=['token', 'token_gerado_em', 'token_expira_em'])
+            count += 1
+        self.stdout.write(f'Fase 5: {count} token(s) gerado(s)')
+
         self.stdout.write('✅ RECALCULO CONCLUÍDO')

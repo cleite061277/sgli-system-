@@ -1704,7 +1704,7 @@ class Pagamento(BaseModel):
     
 
     def save(self, *args, **kwargs):
-        """Gera numero_pagamento sequencial único"""
+        """Gera numero_pagamento sequencial único + token público"""
         if not self.numero_pagamento:
             from django.utils import timezone
             hoje = timezone.now()
@@ -1713,7 +1713,15 @@ class Pagamento(BaseModel):
             # Usar SequenceCounter para garantir unicidade
             seq = SequenceCounter.get_next(prefix)
             self.numero_pagamento = f"{prefix}-{seq:04d}"
-        
+
+        # Gerar token público se não existir
+        if not self.token:
+            from core.utils.token_publico import gerar_dados_token
+            dados = gerar_dados_token()
+            self.token = dados['token']
+            self.token_gerado_em = dados['token_gerado_em']
+            self.token_expira_em = dados['token_expira_em']
+
         super().save(*args, **kwargs)
 
     class Meta:

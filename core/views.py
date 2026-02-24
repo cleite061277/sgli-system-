@@ -641,8 +641,13 @@ def recibo_publico(request, token):
             logger.warning(f'Token inválido (não UUID): {token}')
             raise Http404("Link inválido")
         
-        # Buscar pagamento
-        pagamento = get_object_or_404(Pagamento, token=token)
+        # Buscar pagamento — token pode não existir (pagamento sem token gerado)
+        try:
+            pagamento = Pagamento.objects.get(token=token)
+        except Pagamento.DoesNotExist:
+            return render(request, 'recibo_expirado.html', {
+                'numero_pagamento': 'desconhecido',
+            })
         
         # Verificar expiração
         if not pagamento.token_expira_em or pagamento.token_expira_em < timezone.now():
