@@ -30,9 +30,13 @@ class DocumentGenerator:
         return "".join(c for c in name if c.isalnum() or c in (' ', '-', '_', '.')).rstrip()
 
     def gerar_recibo_pagamento(self, pagamento_id) -> str:
-        pagamento = Pagamento.objects.select_related(
-            'comanda', 'comanda__locacao', 'comanda__locacao__locatario', 'comanda__locacao__imovel'
-        ).get(pk=pagamento_id)
+        # Aceita objeto Pagamento ou UUID
+        if isinstance(pagamento_id, Pagamento):
+            pagamento = pagamento_id
+        else:
+            pagamento = Pagamento.objects.select_related(
+                'comanda', 'comanda__locacao', 'comanda__locacao__locatario', 'comanda__locacao__imovel'
+            ).get(pk=pagamento_id)
 
         numero = pagamento.numero_pagamento or str(pagamento_id)
         timestamp = timezone.now().strftime('%Y%m%d%H%M%S')
@@ -100,9 +104,13 @@ class DocumentGenerator:
         """
         Gera recibo DOCX polimórfico (aluguel ou rescisão).
         """
-        pagamento = Pagamento.objects.select_related(
-            'comanda', 'comanda__locacao', 'comanda__locacao__locatario', 'comanda__locacao__imovel'
-        ).get(pk=pagamento_id)
+        # Aceita objeto Pagamento ou UUID
+        if isinstance(pagamento_id, Pagamento):
+            pagamento = pagamento_id
+        else:
+            pagamento = Pagamento.objects.select_related(
+                'comanda', 'comanda__locacao', 'comanda__locacao__locatario', 'comanda__locacao__imovel'
+            ).get(pk=pagamento_id)
 
         numero = pagamento.numero_pagamento or str(pagamento_id)
         timestamp = timezone.now().strftime('%Y%m%d%H%M%S')
@@ -187,9 +195,13 @@ class DocumentGenerator:
         if not HAS_WEASY:
             raise RuntimeError("WeasyPrint não está disponível. Instale weasyprint para gerar PDF.")
 
-        pagamento = Pagamento.objects.select_related(
-            'comanda', 'comanda__locacao', 'comanda__locacao__locatario', 'comanda__locacao__imovel'
-        ).get(pk=pagamento_id)
+        # Aceita objeto Pagamento ou UUID
+        if isinstance(pagamento_id, Pagamento):
+            pagamento = pagamento_id
+        else:
+            pagamento = Pagamento.objects.select_related(
+                'comanda', 'comanda__locacao', 'comanda__locacao__locatario', 'comanda__locacao__imovel'
+            ).get(pk=pagamento_id)
         context = {
             'pagamento': pagamento,
             'comanda': pagamento.comanda,
