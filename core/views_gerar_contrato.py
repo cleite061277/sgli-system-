@@ -249,8 +249,16 @@ def gerar_docx_contrato(locacao):
     # Preparar contexto
     contexto = preparar_contexto_contrato(locacao)
     
-    # Carregar template
-    doc_template = DocxTemplate(template_obj.arquivo_template.path)
+    # Carregar template — suporta storage local e remoto (R2/S3)
+    import io as _io
+    try:
+        # Storage local: usa .path()
+        doc_template = DocxTemplate(template_obj.arquivo_template.path)
+    except NotImplementedError:
+        # Storage remoto (R2/S3): baixa arquivo via .open()
+        with template_obj.arquivo_template.open('rb') as _f:
+            _template_bytes = _io.BytesIO(_f.read())
+        doc_template = DocxTemplate(_template_bytes)
     
     # Preencher template
     doc_template.render(contexto)
@@ -415,8 +423,16 @@ def gerar_docx_contrato_renovacao(renovacao):
     # Preparar contexto COM VARIÁVEIS DE RENOVAÇÃO
     contexto = preparar_contexto_renovacao(renovacao)
     
-    # Carregar template
-    doc_template = DocxTemplate(template_obj.arquivo_template.path)
+    # Carregar template — suporta storage local e remoto (R2/S3)
+    import io as _io
+    try:
+        # Storage local: usa .path()
+        doc_template = DocxTemplate(template_obj.arquivo_template.path)
+    except NotImplementedError:
+        # Storage remoto (R2/S3): baixa arquivo via .open()
+        with template_obj.arquivo_template.open('rb') as _f:
+            _template_bytes = _io.BytesIO(_f.read())
+        doc_template = DocxTemplate(_template_bytes)
     
     # Preencher template
     doc_template.render(contexto)
