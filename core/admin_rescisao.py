@@ -57,13 +57,13 @@ class ComandaRescisaoAdmin(admin.ModelAdmin):
                 if not getattr(instance, 'usuario_registro_id', None):
                     instance.usuario_registro_id = user_pk
 
-            # Preencher GenericFK: content_type + object_id
-            if hasattr(instance, 'content_type_id'):
-                if not getattr(instance, 'content_type_id', None):
-                    from django.contrib.contenttypes.models import ContentType
-                    from .models_rescisao import ComandaRescisao
-                    instance.content_type = ContentType.objects.get_for_model(ComandaRescisao)
-                    instance.object_id = form.instance.pk
+            # Vincular pagamento à ComandaRescisao (GenericFK) — sempre garante vínculo
+            from django.contrib.contenttypes.models import ContentType
+            from .models_rescisao import ComandaRescisao
+            instance.content_type = ContentType.objects.get_for_model(ComandaRescisao)
+            instance.object_id = form.instance.pk
+            # Garantir que FK de aluguel está nula
+            instance.comanda = None
 
             instance.save()
 
