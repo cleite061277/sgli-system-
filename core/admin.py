@@ -2446,7 +2446,7 @@ Dados da Renovação:
 - Valor Novo: R$ {renovacao.novo_valor_aluguel:,.2f}
 - Reajuste: {renovacao.aumento_percentual:.1f}%
 
-Por favor, imprimam, assinem e devolvam 2 vias.
+Por favor, assinem eletronicamente via GOV e retornem 1 via.
 
 Atenciosamente,
 HABITAT PRO - A&C Imóveis e Sistemas Imobiliários
@@ -2533,7 +2533,7 @@ Seu contrato de renovação foi aprovado! ✅
 
 ⏰ Link válido por 7 dias
 
-Por favor, imprima, assine e devolva 2 vias.
+Por favor, assine eletronicamente via GOV e retorne 1 via.
 
 *HABITAT PRO - A&C Imóveis e Sistemas Imobiliários*"""
         
