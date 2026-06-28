@@ -977,9 +977,9 @@ class Locacao(BaseModel):
         if self.tipo_garantia == 'fiador' and self.fiador_garantia:
             fiador = self.fiador_garantia
             garantia_vars.update({
-                'fiador_nome': fiador.nome,
-                'fiador_cpf': fiador.cpf_cnpj,
-                'fiador_endereco': fiador.endereco,
+                'fiador_nome': fiador.nome_completo,
+                'fiador_cpf': fiador.cpf,
+                'fiador_endereco': fiador.endereco_completo,
                 'fiador_telefone': fiador.telefone,
                 'fiador_email': fiador.email,
                 'fiador_profissao': getattr(fiador, 'profissao', 'NÃO INFORMADO'),
