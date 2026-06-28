@@ -35,7 +35,7 @@ class ComandaSerializer(serializers.ModelSerializer):
 
 class PagamentoSerializer(serializers.ModelSerializer):
     comanda_numero = serializers.CharField(source='comanda.numero_comanda', read_only=True)
-    usuario_nome = serializers.CharField(source='usuario_registro.get_full_name', read_only=True)
+    usuario_nome = serializers.CharField(source='usuario_registro.get_full_name()', read_only=True)
     valor_formatado = serializers.SerializerMethodField()
     
     class Meta:
