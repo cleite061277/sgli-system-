@@ -12,7 +12,6 @@ from .views import (
     download_recibo_pagamento,
     recibo_publico,
     recibo_publico_pdf,
-    comanda_web_view_OLD_DEPRECATED,
 )
 
 # Views de rescisão (core/views_rescisao.py)
