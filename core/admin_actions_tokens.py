@@ -194,8 +194,10 @@ def action_renovar_token_renovacao(modeladmin, request, queryset):
     Renova AMBOS: token_proprietario E token_locatario
     """
     from django.contrib import messages
+    from django.utils import timezone
+    from datetime import timedelta
     from core.utils.token_publico import renovar_token
-    
+
     renovados = 0
     
     for renovacao in queryset:
