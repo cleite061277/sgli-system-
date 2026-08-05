@@ -15,13 +15,12 @@ class WhatsAppService:
     def gerar_mensagem_renovacao_proprietario(renovacao: RenovacaoContrato) -> str:
         """
         Gera mensagem formatada para WhatsApp do proprietário.
-        Retorna texto já codificado para URL (wa.me).
-        
+
         Args:
             renovacao: Objeto RenovacaoContrato
-            
+
         Returns:
-            str: Mensagem codificada para URL
+            str: Mensagem em texto plano (não codificada)
         """
         locacao_atual = renovacao.locacao_original
         proprietario = locacao_atual.imovel.locador
@@ -62,20 +61,19 @@ O contrato do imóvel *{locacao_atual.imovel.endereco_completo}* vence em {dias_
 
 Dúvidas? Entre em contato através do sistema.Atenciosamente,
 *HABITAT PRO - A&C Imóveis e Sistemas Imobiliários*"""
-        
-        # Codificar para URL (wa.me exige)
-        return quote(mensagem)
-    
+
+        return mensagem
+
     @staticmethod
     def gerar_mensagem_renovacao_locatario(renovacao: RenovacaoContrato) -> str:
         """
         Gera mensagem formatada para WhatsApp do locatário.
-        
+
         Args:
             renovacao: Objeto RenovacaoContrato
-            
+
         Returns:
-            str: Mensagem codificada para URL
+            str: Mensagem em texto plano (não codificada)
         """
         locacao_atual = renovacao.locacao_original
         locatario = locacao_atual.locatario
@@ -122,27 +120,27 @@ Seu contrato do imóvel *{locacao_atual.imovel.endereco_completo}* foi aprovado 
 
 Dúvidas? Entre em contato através do sistema.Atenciosamente,
 *HABITAT PRO - A&C Imóveis e Sistemas Imobiliários*"""
-        
-        return quote(mensagem)
-    
+
+        return mensagem
+
     @staticmethod
     def gerar_link_whatsapp(telefone: str, mensagem: str) -> str:
         """
         Gera link completo wa.me com telefone e mensagem.
-        
+
         Args:
             telefone: Telefone com DDD (ex: 41999999999)
-            mensagem: Mensagem já codificada (usar quote())
-            
+            mensagem: Mensagem em texto plano (será codificada aqui)
+
         Returns:
             str: URL completa para wa.me
         """
         # Limpar telefone (remover caracteres não numéricos)
         telefone_limpo = ''.join(filter(str.isdigit, telefone))
-        
+
         # Adicionar código do Brasil se não tiver
         if not telefone_limpo.startswith('55'):
             telefone_limpo = f'55{telefone_limpo}'
-        
-        # Gerar link wa.me
-        return f"https://wa.me/{telefone_limpo}?text={mensagem}"
+
+        # Gerar link wa.me (mensagem codificada apenas aqui, no destino final)
+        return f"https://wa.me/{telefone_limpo}?text={quote(mensagem)}"

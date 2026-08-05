@@ -2001,6 +2001,9 @@ class RenovacaoContratoAdmin(admin.ModelAdmin):
         Exibe ferramentas de comunicação: Email, WhatsApp e Links públicos.
         Esta é a funcionalidade PRINCIPAL dos 3 canais de comunicação.
         """
+        import json
+        from django.utils.html import escape
+
         locacao_atual = obj.locacao_original
         proprietario = locacao_atual.imovel.locador
         locatario = locacao_atual.locatario
@@ -2016,14 +2019,18 @@ class RenovacaoContratoAdmin(admin.ModelAdmin):
             tel_proprietario = proprietario.telefone
             link_whatsapp_prop = WhatsAppService.gerar_link_whatsapp(tel_proprietario, msg_proprietario)
         except:
+            msg_proprietario = ""
             link_whatsapp_prop = "#"
-        
+        msg_proprietario_js = escape(json.dumps(msg_proprietario))
+
         try:
             msg_locatario = WhatsAppService.gerar_mensagem_renovacao_locatario(obj)
             tel_locatario = locatario.telefone
             link_whatsapp_loc = WhatsAppService.gerar_link_whatsapp(tel_locatario, msg_locatario)
         except:
+            msg_locatario = ""
             link_whatsapp_loc = "#"
+        msg_locatario_js = escape(json.dumps(msg_locatario))
         
         html = f"""
         <div style="background: #f8f9fa; padding: 20px; border-radius: 8px;">
@@ -2057,7 +2064,7 @@ class RenovacaoContratoAdmin(admin.ModelAdmin):
                               margin-right: 10px;">
                         💬 Abrir WhatsApp Web
                     </a>
-                    <button onclick="navigator.clipboard.writeText('{msg_proprietario}'.replace(/%20/g, ' ').replace(/%0A/g, String.fromCharCode(10))); alert('Mensagem copiada!');" 
+                    <button onclick="navigator.clipboard.writeText({msg_proprietario_js}); alert('Mensagem copiada!');"
                             style="background: #28a745; color: white; border: none; padding: 10px 20px; 
                                    border-radius: 4px; cursor: pointer;">
                         📋 Copiar Mensagem
@@ -2114,7 +2121,7 @@ class RenovacaoContratoAdmin(admin.ModelAdmin):
                               margin-right: 10px;">
                         💬 Abrir WhatsApp Web
                     </a>
-                    <button onclick="navigator.clipboard.writeText('{msg_locatario}'.replace(/%20/g, ' ').replace(/%0A/g, String.fromCharCode(10))); alert('Mensagem copiada!');" 
+                    <button onclick="navigator.clipboard.writeText({msg_locatario_js}); alert('Mensagem copiada!');"
                             style="background: #28a745; color: white; border: none; padding: 10px 20px; 
                                    border-radius: 4px; cursor: pointer;">
                         📋 Copiar Mensagem
